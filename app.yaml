@@ -1,0 +1,24 @@
+application: oval-replica-393
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+builtins:
+- deferred: on
+- appstats: on
+
+handlers:
+- url: /.*
+  script: schedup.main.app
+
+libraries:
+- name: webob
+  version: latest
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+- name: endpoints
+  version: latest
+
