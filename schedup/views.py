@@ -1,10 +1,21 @@
-from schedup.base import app
-import webapp2
+from schedup.base import BaseHandler
 
 
-@app.route("/")
-class MainPage(webapp2.RequestHandler):
+class MainPage(BaseHandler):
+    URL = "/"
+    
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World!')
+        self.render_response('index.html', 
+            title = "SchedUp", 
+            subtitle = "The way to schedule up", 
+            content = "hello moishe")
+
+class FooPage(BaseHandler):
+    URL = "/foo"
+    
+    def get(self):
+        self.render_response('index.html', 
+            title = "SchedUp", 
+            subtitle = "The way to schedule up", 
+            content = "hello baruch")
 
