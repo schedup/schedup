@@ -129,6 +129,9 @@
               <li class="active"><i class="icon-file-alt"></i> Blank Page</li>
             </ol>
             <p>
+            {% for i in foo %}
+            {{i}}, 
+            {% endfor %}
             {{content}}
             </p>
           </div>
