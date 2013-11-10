@@ -53,5 +53,3 @@ class BaseHandler(webapp2.RequestHandler):
         return self.session_store.get_session()
 
 
-
-
