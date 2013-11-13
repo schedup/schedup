@@ -1,5 +1,4 @@
-from schedup.base import BaseHandler
-from schedup.models import EventInfo
+from schedup.base import BaseHandler, oauth
 
 
 class MainPage(BaseHandler):
@@ -11,13 +10,19 @@ class MainPage(BaseHandler):
             subtitle = "The way to schedule up", 
             content = "hello moishe")
 
+
 # Tomer + send emails
 class LoginPage(BaseHandler):
     URL = "/login"
     
+    @oauth.oauth_required
     def get(self):
-        self.render_response('index.html')
+        from apiclient import discovery
+        calendar_service = discovery.build('calendar', 'v3')
+        result = calendar_service.calendarList().list().execute(http=oauth.http())
+        self.render_response('index.html', content = repr(result))
 
+'''
 # Shir
 class MyEventsPage(BaseHandler):
     URL = "/myevents"
@@ -55,7 +60,7 @@ class GuestPage(BaseHandler):
         evt = EventInfo.query(token == token).get()
         if self.request["answer"]:
             evt.confirmed.append(token)
-
+'''
 
 
 '''
@@ -73,6 +78,6 @@ Moshe invited you to a meeting.
 <Click here http://schedup.appspot.com/guest/983329847376783745>
     
 '''
-        
+
       
       
