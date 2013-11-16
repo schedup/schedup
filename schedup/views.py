@@ -1,4 +1,6 @@
+import json
 from schedup.base import BaseHandler, oauth
+from datetime import datetime, timedelta
 
 
 class MainPage(BaseHandler):
@@ -17,9 +19,11 @@ class CalPage(BaseHandler):
     @oauth.oauth_required
     def get(self):
         from apiclient import discovery
-        calendar_service = discovery.build('calendar', 'v3')
-        result = calendar_service.calendarList().list().execute(http=oauth.http())
-        self.render_response('index.html', content = repr(result))
+        service = discovery.build('calendar', 'v3')
+        #result = calendar_service.calendarList().list().execute(http=oauth.http())
+        today = datetime.now()
+        events = service.events().list(calendarId='primary', timeMin = today, timeMax = today + timedelta(days = 7)).execute(http=oauth.http())
+        self.render_response('index.html', content = repr(events))
 
 class ContactPage(BaseHandler):
     URL = "/contact"
@@ -27,10 +31,22 @@ class ContactPage(BaseHandler):
     @oauth.oauth_required
     def get(self):
         from gdata.contacts.client import ContactsClient, ContactsQuery
-        client = ContactsClient(source = "SchedUp", auth_token = oauth.credentials.access_token)
+        from gdata.gauth import ClientLoginToken
+        
+        client = ContactsClient(source = "SchedUp", auth_token = ClientLoginToken(oauth.credentials.access_token))
         query = ContactsQuery(max_results = 10)
         result = client.GetContacts(q=query)
         self.render_response('index.html', content = repr(result))
+
+class ProfilePage(BaseHandler):
+    URL = "/profile"
+    
+    @oauth.oauth_required
+    def get(self):
+        headers, body = oauth.http().request("https://www.googleapis.com/oauth2/v2/userinfo?alt=json")
+        result = json.loads(body)
+        self.render_response('index.html', content = repr(body))
+
 
 
 '''

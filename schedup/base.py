@@ -8,7 +8,7 @@ from schedup.settings import SESSION_SECRET
 
 
 app = webapp2.WSGIApplication([], 
-    debug = os.environ['SERVER_SOFTWARE'].startswith('Dev'),
+    debug = True, #os.environ['SERVER_SOFTWARE'].startswith('Dev'),
     config = {
         'webapp2_extras.sessions' : {
             'secret_key': SESSION_SECRET,
