@@ -3,6 +3,13 @@ from datetime import datetime, timedelta
 from schedup.connector import GoogleConnector
 from schedup.models import UserProfile, EventInfo
 
+#Dummy events i've created to test events list pages (Shir)
+u1 = UserProfile(email="email")
+e1 = EventInfo(title="Shir's Birthday", start_time=datetime.strptime("3/4/13 21:00", "%d/%m/%y %H:%M"))
+e2 = EventInfo(title="Business Meeting", start_time=datetime.strptime("21/11/13 13:30", "%d/%m/%y %H:%M"))
+e3 = EventInfo(title="Night Out!", start_time=datetime.strptime("15/11/13 22:00", "%d/%m/%y %H:%M"))
+my_events = [e1, e2, e3]
+
 
 class MainPage(BaseHandler):
     URL = "/"
@@ -48,23 +55,21 @@ class ProfilePage(BaseHandler):
 
 
 
-'''
 # Shir
 class MyEventsPage(BaseHandler):
     URL = "/myevents"
     
     def get(self):
-        EventInfo.get_owner_events()
-        self.render_response('index.html')
-
+        self.render_response('myevents.html',title= "My Events", events = my_events)
+        
 # Shir
 class InvitedToPage(BaseHandler):
     URL = "/invited"
     
     def get(self):
-        EventInfo.get_participating_events()
-        self.render_response('index.html')
+        self.render_response('invitedto.html',title= "Events I'm Invited To", events = my_events)
 
+'''
 # Ofir
 class NewEventPage(BaseHandler):
     URL = "/new"
