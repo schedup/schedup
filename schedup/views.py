@@ -11,9 +11,8 @@ class MainPage(BaseHandler):
             content = "hello moishe")
 
 
-# Tomer + send emails
-class LoginPage(BaseHandler):
-    URL = "/login"
+class CalPage(BaseHandler):
+    URL = "/calendar"
     
     @oauth.oauth_required
     def get(self):
@@ -21,6 +20,18 @@ class LoginPage(BaseHandler):
         calendar_service = discovery.build('calendar', 'v3')
         result = calendar_service.calendarList().list().execute(http=oauth.http())
         self.render_response('index.html', content = repr(result))
+
+class ContactPage(BaseHandler):
+    URL = "/contact"
+    
+    @oauth.oauth_required
+    def get(self):
+        from gdata.contacts.client import ContactsClient, ContactsQuery
+        client = ContactsClient(source = "SchedUp", auth_token = oauth.credentials.access_token)
+        query = ContactsQuery(max_results = 10)
+        result = client.GetContacts(q=query)
+        self.render_response('index.html', content = repr(result))
+
 
 '''
 # Shir
