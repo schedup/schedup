@@ -12,6 +12,8 @@ class MainPage(BaseHandler):
             subtitle = "The way to schedule up", 
             content = "hello moishe")
 
+#def isotime(dt):
+#    return dt.strftime("%Y-%m-%dT%H:%M:%S")
 
 class CalPage(BaseHandler):
     URL = "/calendar"
@@ -20,9 +22,9 @@ class CalPage(BaseHandler):
     def get(self):
         from apiclient import discovery
         service = discovery.build('calendar', 'v3')
-        #result = calendar_service.calendarList().list().execute(http=oauth.http())
         today = datetime.now()
-        events = service.events().list(calendarId='primary', timeMin = today, timeMax = today + timedelta(days = 7)).execute(http=oauth.http())
+        events = service.events().list(calendarId='primary', timeMin = isotime(today), 
+            timeMax = isotime(today + timedelta(days = 7))).execute(http=oauth.http())
         self.render_response('index.html', content = repr(events))
 
 class ContactPage(BaseHandler):
