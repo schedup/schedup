@@ -19,10 +19,14 @@ class EventInfo(ndb.Model):
     recepients = ndb.KeyProperty(UserProfile, repeated = True)
     confirmed = ndb.KeyProperty(UserProfile, repeated = True)
     tokens = ndb.StringProperty(repeated = True)
-
-    title = ndb.StringProperty()    
-    start_time = ndb.DateTimeProperty(required = True)
-    duration_minutes = ndb.IntegerProperty(required = True)
+    daytime = ndb.StringProperty(repeated = True)
+    type = ndb.StringProperty()
+    title = ndb.StringProperty(required = True)    
+    description = ndb.StringProperty()
+    start_window = ndb.DateProperty(required = True)
+    end_window = ndb.DateProperty(required = True)
+    start_time = ndb.DateTimeProperty()
+    end_time = ndb.DateTimeProperty()
 
     @property
     def end_time(self):

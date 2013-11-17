@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+        <div class="row">
+          <div class="col-lg-12">
+            <h1>Sched'up <small>Create New Event</small></h1>
+          </div>
+        </div><!-- /.row -->
+
+        <div class="row">
+          <div class="col-lg-6">
+
+            <form role="form" action="/new" method="post">
+
+              <div class="form-group">
+                <label>Title</label>
+                <input class="form-control" name="title">
+              </div>
+
+              <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" rows="3" placeholder="Enter text" name="description"></textarea>
+              </div>
+			  
+			  <p>Start Window: <input type="text" id="someDateField" name="start"/></p>
+			  <p>End Window: <input type="text" id="someDateField1" name="end"/></p>
+
+              <div class="form-group">
+                <label>Time during the day</label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" name="morning"> Morning
+                </label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" name="afternoon"> Afternoon
+                </label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" name="evening"> Evening
+                </label>
+				<label class="checkbox-inline">
+                  <input type="checkbox" name="night"> Night
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label>Event Type</label>
+                <label class="radio-inline">
+                  <input type="radio" name="business" id="optionsRadiosInline1" value="option1" checked> Business
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="friends" id="optionsRadiosInline2" value="option2"> Friends
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="family" id="optionsRadiosInline3" value="option3"> Family
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-default">Submit Button</button>
+              <button type="reset" class="btn btn-default">Reset Button</button>  
+
+            </form>
+
+          </div>
+
+		  </div><!-- /.row -->
+
+	<script>
+		jQuery(function() {
+			$( "#someDateField" ).datepicker();
+        	$( "#someDateField1" ).datepicker();
+        });
+    </script>
+
+{% endblock main %}
+
