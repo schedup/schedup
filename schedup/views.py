@@ -75,24 +75,29 @@ class NewEventPage(BaseHandler):
         evt.save()
 '''
 
+class FooPage(BaseHandler):
+    URL = "/foo"
+    
+    def get(self):
+        user1 = UserProfile(email = "yanooosh@gmail.com")
+        user1.put()
+
+        evt = EventInfo(owner = user1.key, title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
+        evt.tokens = ["babayaga"]
+        evt.put()
+
+
 # Yana
 class GuestPage(BaseHandler):
     URL = "/guest/(.*)"
     
     def get(self, token):
-        #evt = EventInfo.query(token == token).get()
-        #self.render_response('index.html')
-        
-        user1 = UserProfile(email = "yanooosh@gmail.com")
-        user1.put()
-
-        evt = EventInfo(owner = user1.key, title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
-#         evt = EventInfo()
-#         evt.owner = "Yana"
-#         evt.title  = "partyyyyyyyy"
-#         evt.start_time = datetime(2013, 11, 18, 18, 00)
-#         evt.duration_minutes = 800
-        self.render_response("guest.html", event = evt)
+        evt = EventInfo.query(EventInfo.tokens == token).get()
+        if not evt:
+            # show some error page to the user
+            self.render_response("index.html", content="error")
+        else:
+            self.render_response("guest.html", event = evt)
     
     def post(self, token):
         evt = EventInfo.query(token == token).get()
