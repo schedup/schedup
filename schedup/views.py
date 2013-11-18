@@ -109,6 +109,20 @@ class GuestPage(BaseHandler):
         if self.request["answer"]:
             evt.confirmed.append(token)
 
+# Shir
+class MyEventsPage(BaseHandler):
+    URL = "/myevents"
+    
+    def get(self):
+        self.render_response('myevents.html',events = my_events)
+        
+# Shir
+class InvitedToPage(BaseHandler):
+    URL = "/invited"
+    
+    def get(self):
+        self.render_response('invitedto.html',events = my_events)
+
 '''
 
 MVC - model view container
@@ -125,5 +139,4 @@ Moshe invited you to a meeting.
     
 '''
 
-      
       
