@@ -83,9 +83,16 @@ class GuestPage(BaseHandler):
         #evt = EventInfo.query(token == token).get()
         #self.render_response('index.html')
         
+        user1 = UserProfile(email = "yanooosh@gmail.com")
+        user1.put()
 
-        evt = EventInfo(owner = "Yana", title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
-        self.render_response("guest.html", content = token, event = evt)
+        evt = EventInfo(owner = user1.key, title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
+#         evt = EventInfo()
+#         evt.owner = "Yana"
+#         evt.title  = "partyyyyyyyy"
+#         evt.start_time = datetime(2013, 11, 18, 18, 00)
+#         evt.duration_minutes = 800
+        self.render_response("guest.html", event = evt)
     
     def post(self, token):
         evt = EventInfo.query(token == token).get()
