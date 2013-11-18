@@ -54,20 +54,20 @@ class ProfilePage(BaseHandler):
         self.render_response('index.html', content = repr(self.user.email))
 
 
-
 # Shir
 class MyEventsPage(BaseHandler):
     URL = "/myevents"
     
     def get(self):
-        self.render_response('myevents.html',title= "My Events", events = my_events)
-        
+        self.render_response('myevents.html',events = my_events,active="events")
+
 # Shir
 class InvitedToPage(BaseHandler):
     URL = "/invited"
     
     def get(self):
-        self.render_response('invitedto.html',title= "Events I'm Invited To", events = my_events)
+        self.render_response('invitedto.html',events = my_events, active="events")
+
 
 '''
 # Ofir
@@ -109,19 +109,6 @@ class GuestPage(BaseHandler):
         if self.request["answer"]:
             evt.confirmed.append(token)
 
-# Shir
-class MyEventsPage(BaseHandler):
-    URL = "/myevents"
-    
-    def get(self):
-        self.render_response('myevents.html',events = my_events)
-        
-# Shir
-class InvitedToPage(BaseHandler):
-    URL = "/invited"
-    
-    def get(self):
-        self.render_response('invitedto.html',events = my_events)
 
 '''
 
@@ -139,4 +126,3 @@ Moshe invited you to a meeting.
     
 '''
 
-      
