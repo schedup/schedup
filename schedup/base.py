@@ -5,6 +5,7 @@ from webapp2_extras import sessions
 from oauth2client.appengine import OAuth2Decorator
 from schedup import settings
 from schedup.settings import SESSION_SECRET
+import functools
 
 
 app = webapp2.WSGIApplication([], 
@@ -55,5 +56,21 @@ class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def session(self):
         return self.session_store.get_session()
+
+
+def logged_in(method):
+    @oauth.oauth_required
+    @functools.wraps(method)
+    def method2(self, *args):
+        from schedup.connector import GoogleConnector
+        from schedup.models import UserProfile
+        self.gconn = GoogleConnector(oauth)
+        self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
+        if not self.user:
+            prof = self.gconn.get_profile()
+            self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
+            self.user.put()
+        return method(self, *args)
+    return method2
 
 

@@ -4,6 +4,7 @@ from datetime import timedelta
 
 class UserProfile(ndb.Model):
     email = ndb.StringProperty(required=True)
+    fullname = ndb.StringProperty()
     google_id = ndb.StringProperty()
     facebook_id = ndb.StringProperty()
 
