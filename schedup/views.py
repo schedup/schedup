@@ -1,7 +1,7 @@
 from schedup.base import BaseHandler, oauth, logged_in
 from datetime import datetime, timedelta
 from schedup.connector import GoogleConnector
-from schedup.models import UserProfile
+from schedup.models import UserProfile, EventInfo
 
 
 class MainPage(BaseHandler):
@@ -73,21 +73,24 @@ class NewEventPage(BaseHandler):
         evt = EventInfo(title = self.request["title"], start_date = self.request["start_date"])
         evt.token = "random token"
         evt.save()
+'''
 
 # Yana
 class GuestPage(BaseHandler):
     URL = "/guest/(.*)"
     
     def get(self, token):
-        evt = EventInfo.query(token == token).get()
-        self.render_response('index.html')
+        #evt = EventInfo.query(token == token).get()
+        #self.render_response('index.html')
+        
+
+        evt = EventInfo(owner = "Yana", title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
+        self.render_response("guest.html", content = token, event = evt)
     
     def post(self, token):
         evt = EventInfo.query(token == token).get()
         if self.request["answer"]:
             evt.confirmed.append(token)
-'''
-
 
 '''
 
