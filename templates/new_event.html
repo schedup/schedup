@@ -5,18 +5,19 @@ New Event
 {% endblock %}
 
 {% block content %}
-<form action="{{post_url}}" method="post">
+<form action="{{post_url}}" method="post" class="validate" id="newevtform">
     <div data-role="fieldcontain">
         <label for="textinput1">
             Title
         </label>
-        <input name="title" id="textinput1" data-mini="true" placeholder="event title" value="" type="text" autocomplete="off">
+        <input name="title" id="textinput1" data-mini="true" placeholder="event title" value="" 
+            type="text" autocomplete="off" >
     </div>
     <div data-role="fieldcontain">
         <label for="guestinput">
             Guests
         </label>
-        <input name="guests" id="guestinput" data-mini="true" placeholder="emails" value="" type="text">
+        <input name="guests" id="guestinput" data-mini="true" placeholder="emails" value="" type="text" >
     </div>
     <div id="checkboxes1" data-role="fieldcontain">
         <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
@@ -61,17 +62,17 @@ New Event
             From
         </label>
     	<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="First applicable date"
-    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d"}'>
+            data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
     </div>
     <div data-role="fieldcontain">
         <label for="todate">
             To
         </label>
     	<input name="todate" data-mini="true" id="todate" type="date" placeholder="Last applicable date"
-    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d"}'>
+    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
     </div>
     
-    <input type="submit" value="Next" data-theme="b">   
+    <input type="submit" value="Next" data-theme="b" >
 </form>
 
 <script type="text/javascript">
@@ -83,6 +84,24 @@ New Event
 		    tokenDelimiter : ";",
 		    preventDuplicates : true,
 		});
+		
+		$("#newevtform").validate({
+            rules: {
+                title: {
+                    required: true
+                },
+                guests: {
+                    required: true
+                },
+                fromdate: {
+                    required: true
+                },
+                todate: {
+                    required: true
+                },
+            }
+		});
+		
 	});
 </script>
 
