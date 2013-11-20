@@ -59,6 +59,9 @@ class MyEventsPage(BaseHandler):
     URL = "/myevents"
     
     def get(self):
+#        own = UserProfile.query(UserProfile.email == "lshirlev@gmail.com")
+#        ev = EventInfo.query(EventInfo.owner == own)
+#        ev.fetch(limit=30).order('-date')
         self.render_response('myevents.html',events = my_events,active="events")
 
 # Shir
@@ -66,6 +69,8 @@ class InvitedToPage(BaseHandler):
     URL = "/invited"
     
     def get(self):
+#        q = UserProfile.get_participating_events(self)
+#        ev= q.fetch(limit=30).order('-date')
         self.render_response('invitedto.html',events = my_events, active="events")
 
 
@@ -84,11 +89,11 @@ class FooPage(BaseHandler):
     URL = "/foo"
     
     def get(self):
-        user1 = UserProfile(email = "yanooosh@gmail.com")
+        user1 = UserProfile(email = "lshirlev@gmail.com")
         user1.put()
 
-        evt = EventInfo(owner = user1.key, title = "partyyyyyyyy", start_time = datetime(2013, 11, 18, 18, 00), duration_minutes = 800)
-        evt.tokens = ["babayaga"]
+        evt = EventInfo(owner = user1.key, title = "b", start_time = datetime(2013, 11, 29, 10, 30), duration_minutes = 120)
+        evt.tokens = ["shishir"]
         evt.put()
 
 
