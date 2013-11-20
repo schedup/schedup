@@ -1,11 +1,15 @@
 import os
 import webapp2
 import jinja2
+import functools
+import json
+import sys
+import traceback
 from webapp2_extras import sessions
 from oauth2client.appengine import OAuth2Decorator
 from schedup import settings
 from schedup.settings import SESSION_SECRET
-import functools
+import inspect
 
 
 app = webapp2.WSGIApplication([], 
@@ -17,11 +21,13 @@ app = webapp2.WSGIApplication([],
     }
 )
 
-oauth = OAuth2Decorator(client_id=settings.CLIENT_ID, client_secret=settings.CLIENT_SECRET,
-    scope=settings.SCOPE)
+oauth = OAuth2Decorator(
+    client_id = settings.CLIENT_ID, 
+    client_secret = settings.CLIENT_SECRET,
+    scope = settings.OAUTH_SCOPES)
 app.router.add((oauth.callback_path, oauth.callback_handler()))
 
-_configured_urls = set()
+_configured_urls = {}
 
 class BaseHandler(webapp2.RequestHandler):
     JINJA = jinja2.Environment(
@@ -36,12 +42,21 @@ class BaseHandler(webapp2.RequestHandler):
             if namespace.get("URL"):
                 url = namespace["URL"]
                 if url in _configured_urls:
-                    raise ValueError("URL %r already appears in routes" % (url,))
+                    raise ValueError("URL %r already appears in routes: %r conflicts with %r" % 
+                        (url, _configured_urls[url], cls2))
                 app.router.add((url, cls2))
-                _configured_urls.add(url)
+                _configured_urls[url] = cls2
             return cls2
     
+    def redirect_with_flashmsg(self, url, msg):
+        self.session["flashmsg"] = msg
+        self.redirect(url)
+    
     def render_response(self, _template, **params):
+        if "flashmsg" not in params:
+            params["flashmsg"] = self.session.pop("flashmsg", None)
+        if "user" not in params:
+            params["user"] = getattr(self, "user", None)
         temp = self.JINJA.get_template(_template)
         output = temp.render(params)
         self.response.write(output)
@@ -72,5 +87,65 @@ def logged_in(method):
             self.user.put()
         return method(self, *args)
     return method2
+
+def maybe_logged_in(method):
+    @oauth.oauth_aware
+    @functools.wraps(method)
+    def method2(self, *args):
+        from schedup.connector import GoogleConnector
+        from schedup.models import UserProfile
+        if oauth.has_credentials():
+            self.gconn = GoogleConnector(oauth)
+            self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
+            if not self.user:
+                prof = self.gconn.get_profile()
+                self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
+                self.user.put()
+        else:
+            self.gconn = None
+            self.user = None
+        return method(self, *args)
+    return method2
+
+
+def api_call(**signature):
+    def deco(method):
+        argnames, _, _, defaults = inspect.getargspec(method)
+        optional_argsnames = frozenset(argnames[-len(defaults):] if defaults else ())
+        
+        @functools.wraps(method)
+        def method2(self):
+            try:
+                kwargs = {}
+                for name, tp in signature.items():
+                    if name not in self.request.params:
+                        if name not in optional_argsnames:
+                            raise KeyError("Missing parameter: %s" % (name,))
+                    else:
+                        kwargs[name] = tp(self.request.params[name])
+                
+                res = method(self, **kwargs)
+            except Exception as ex:
+                result = {"status" : "error", "exception" : repr(ex)}
+                if app.debug:
+                    result["traceback"] = "".join(traceback.format_exception(*sys.exc_info())).splitlines()
+                self.response.status = 500
+            else:
+                result = {"status" : "ok", "value" : res}
+                self.response.status = 200
+            
+            json_data = json.dumps(result)
+            self.response.content_type = 'application/json'
+            self.response.write(json_data)
+        return method2
+    return deco
+
+
+
+
+
+
+
+
 
 

@@ -1,0 +1,17 @@
+@media screen and (min-width: 900px) {
+	.content-width-limit {
+		max-width: 800px;
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	.content-width-limit {
+		max-width: 1200px;
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
+

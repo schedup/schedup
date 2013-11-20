@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block header %}
+New Event
+{% endblock %}
+
+{% block content %}
+<form action="{{post_url}}" method="post">
+    <div data-role="fieldcontain">
+        <label for="textinput1">
+            Title
+        </label>
+        <input name="title" id="textinput1" data-mini="true" placeholder="event title" value="" type="text" autocomplete="off">
+    </div>
+    <div data-role="fieldcontain">
+        <label for="guestinput">
+            Guests
+        </label>
+        <input name="guests" id="guestinput" data-mini="true" placeholder="emails" value="" type="text">
+    </div>
+    <div id="checkboxes1" data-role="fieldcontain">
+        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+            <legend>
+                When:
+            </legend>
+            <input id="checkbox1" name="morning" type="checkbox">
+            <label for="checkbox1">
+                Morning
+            </label>
+            <input id="checkbox2" name="noon" type="checkbox">
+            <label for="checkbox2">
+                Noon
+            </label>
+            <input id="checkbox6" name="evening" type="checkbox">
+            <label for="checkbox6">
+                Evening
+            </label>
+        </fieldset>
+    </div>
+    <div data-role="fieldcontain">
+        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+            <legend>
+                Type
+            </legend>
+            <input id="radio1" name="type" value="business" type="radio">
+            <label for="radio1">
+                Business
+            </label>
+            <input id="radio2" name="type" value="friends" type="radio">
+            <label for="radio2">
+                Friends
+            </label>
+            <input id="radio3" name="type" value="family" type="radio">
+            <label for="radio3">
+                Family
+            </label>
+        </fieldset>
+    </div>
+    <div data-role="fieldcontain">
+        <label for="fromdate">
+            From
+        </label>
+    	<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="First applicable date"
+    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d"}'>
+    </div>
+    <div data-role="fieldcontain">
+        <label for="todate">
+            To
+        </label>
+    	<input name="todate" data-mini="true" id="todate" type="date" placeholder="Last applicable date"
+    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d"}'>
+    </div>
+    
+    <input type="submit" value="Next" data-theme="b">   
+</form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#guestinput").tokenInput("/api/autocomplete-contacts", {
+		    minChars : 3, 
+		    theme : "facebook",
+		    hintText : "Email address or contact name",
+		    tokenDelimiter : ";",
+		    preventDuplicates : true,
+		});
+	});
+</script>
+
+{% endblock %}
+

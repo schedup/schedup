@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block header %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+
+<table data-role="table" id="movie-table" data-mode="reflow" class="ui-responsive table-stroke">
+  <thead>
+    <tr>
+      <th data-priority="1">Event</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+	{% for evt in events %}
+    <tr>
+    	<td>{{ evt.title }}</td>
+    	<td>
+    		{% if owner %}
+    			<a href="/edit/{{evt.owner_token}}" data-role="button" data-icon="edit" data-iconpos="notext" data-theme="b"></a>
+    		{% else %}
+    			
+    			<a href="/guest/{{evt.get_token_for(user)}}" data-role="button" data-icon="info" data-iconpos="notext" data-theme="b"></a>
+    		{% endif %}
+    	</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</ul>
+
+{% endblock %}
+
