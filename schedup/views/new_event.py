@@ -3,7 +3,7 @@ Create new event flow
 """
 import string
 import random
-from datetime import datetime
+from dateutil.parser import parse as parse_datetime
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 
@@ -44,8 +44,8 @@ class NewEventPage(BaseHandler):
             title = self.request.params["title"],
             daytime = daytime,
             type = self.request.params.get("type"),
-            start_window = datetime.strptime(self.request.params["fromdate"], "%Y-%m-%d"),
-            end_window = datetime.strptime(self.request.params["todate"], "%Y-%m-%d"),
+            start_window = parse_datetime(self.request.params["fromdate"]),
+            end_window = parse_datetime(self.request.params["todate"]),
         )
         evt.put()
         
