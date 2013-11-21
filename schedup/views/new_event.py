@@ -49,8 +49,9 @@ class NewEventPage(BaseHandler):
         )
         evt.put()
         
-        return self.render_response("calendar.html", title = "Choose Time Slots", 
-            post_url = "/choose/%s" % (owner_token,))
+        self.redirect_with_flashmsg("/my", "Event created successfully")
+        #return self.render_response("calendar.html", title = "Choose Time Slots", 
+        #    post_url = "/choose/%s" % (owner_token,))
 
 
 class ChooseTimeslotsPage(BaseHandler):
@@ -59,8 +60,7 @@ class ChooseTimeslotsPage(BaseHandler):
     @logged_in
     def post(self, owner_token):
         evt = EventInfo.query(EventInfo.owner_token == owner_token).get() 
-        self.session["flash"] = "Event Created"
-        self.redirect("/my")
+        self.redirect_with_flashmsg("/my", "Event created successfully")
 
 
 

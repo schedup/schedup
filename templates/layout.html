@@ -26,15 +26,18 @@
 </head>
 <body>
 <!-- Home -->
-<div data-role="page" id="page1">
+<div data-role="page" id="page{{pageid}}">
 
 	{% if not hide_header %}
 	<div data-role="panel" id="sidepanel" data-position="left" data-theme="b" data-display="overlay">
 	    <ul data-role="listview">
-		    <li data-icon="plus"><a href="/new" >New Event</a></li>
+		    <li data-role="list-divider">Me</li>
+		    <li data-icon="plus"><a href="/new">New Event</a></li>
 		    <li data-icon="edit"><a href="/my">My Events</a></li>
-		    <li><a href="/invited">Invited To <span class="ui-li-count">0</span></a></li>
+		    <li><a href="/invited">Invited To <span class="ui-li-count">{{invited_to_count or 0}}</span></a></li>
 		    <li data-icon="gear"><a href="/profile">Profile</a></li>
+		    <li data-role="list-divider">SchedUp</li>
+		    <li data-icon="info"><a href="/about">About</a></li>
 		</ul>
 	</div>
 	{% endif %}

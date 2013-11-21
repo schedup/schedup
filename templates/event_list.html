@@ -6,24 +6,33 @@
 
 {% block content %}
 
-<table data-role="table" id="movie-table" data-mode="reflow" class="ui-responsive table-stroke">
-  <thead>
-    <tr>
-      <th data-priority="1">Event</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
+<ul data-role="listview" data-inset="true">
 	{% for evt in events %}
+    <!-- li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li-->
+    	<li>
+	    {% if owner %}
+	    <a href="/edit/{{evt.owner_token}}">
+	        <h2>{{ evt.title }}</h2>
+	        <p></p>
+	        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
+	    </a>
+	    {% else %}
+	    <a href="/guest/{{evt.get_token_for(user)}}">
+	        <h2>{{ evt.title }}</h2>
+	        <p>{{evt.type}}</p>
+	        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
+	    </a>
+		{% endif %}
+    	</li>
+    {% endfor %}
+</ul>
+
     <tr>
-    	<td>{{ evt.title }}</td>
+    	<td></td>
     	<td>
-    		{% if owner %}
     			<a href="/edit/{{evt.owner_token}}" data-role="button" data-icon="edit" data-iconpos="notext" data-theme="b"></a>
-    		{% else %}
     			
-    			<a href="/guest/{{evt.get_token_for(user)}}" data-role="button" data-icon="info" data-iconpos="notext" data-theme="b"></a>
-    		{% endif %}
+    			<a href data-role="button" data-icon="info" data-iconpos="notext" data-theme="b"></a>
     	</td>
     </tr>
     {% endfor %}
