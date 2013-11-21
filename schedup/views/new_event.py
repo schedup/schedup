@@ -33,7 +33,7 @@ class NewEventPage(BaseHandler):
         for email in self.request.params["guests"].split(";"):
             user = UserProfile.query(UserProfile.email == email).get()
             if user:
-                gst = EventGuest(user = user, token = self.generate_token())
+                gst = EventGuest(user = user.key, token = self.generate_token())
             else:
                 gst = EventGuest(email = email, token = self.generate_token())
             guests.append(gst)
