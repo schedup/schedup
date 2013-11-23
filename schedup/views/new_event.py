@@ -34,7 +34,7 @@ class NewEventPage(BaseHandler):
         for email in self.request.params["guests"].split(";"):
             user = UserProfile.query(UserProfile.email == email).get()
             if user:
-                gst = EventGuest(user = user.key, token = self.generate_token())
+                gst = EventGuest(user = user.key, email = email, token = self.generate_token())
             else:
                 gst = EventGuest(email = email, token = self.generate_token())
             guests.append(gst)
@@ -54,7 +54,7 @@ class NewEventPage(BaseHandler):
         
         for guest in guests:
             send_email("%s invited you to %s" % (self.user.fullname, title),
-                recipient = guest.user.email if guest.user else guest.email,
+                recipient = guest.email,
                 html_body = self.render_template("emails/guest.html", 
                         fullname = self.user.fullname, title = title, token = guest.token),
             )

@@ -1,0 +1,6 @@
+indexes:
+- kind: EventInfo
+  properties:
+  - name: owner
+  - name: start_window
+
