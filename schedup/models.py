@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from google.appengine._internal.django.template.defaultfilters import date
 
 
 class UserProfile(ndb.Model):
@@ -8,7 +9,7 @@ class UserProfile(ndb.Model):
     facebook_id = ndb.StringProperty()
 
     def get_owner_events(self):
-        return EventInfo.query(EventInfo.owner == self.key)
+        return EventInfo.query(EventInfo.owner == self.key).order(+EventInfo.start_window)
     
     def get_participating_events(self):
         return EventInfo.query(EventInfo.guests.user == self.key)
