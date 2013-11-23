@@ -32,21 +32,21 @@
 	<div data-role="panel" id="sidepanel" data-position="left" data-theme="b" data-display="overlay">
 	    <ul data-role="listview">
 		    <li data-role="list-divider">Me</li>
-		    <li data-icon="plus"><a href="/new">New Event</a></li>
-		    <li data-icon="edit"><a href="/my">My Events</a></li>
-		    <li><a href="/invited">Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
-		    <li data-icon="gear"><a href="/profile">Profile</a></li>
+		    <li data-icon="plus"><a href="/new" data-ajax=false>New Event</a></li>
+		    <li data-icon="edit"><a href="/my" data-ajax=false>My Events</a></li>
+		    <li><a href="/invited" data-ajax=false>Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
+		    <li data-icon="gear"><a href="/profile" data-ajax=false>Profile</a></li>
 		    <li data-role="list-divider">SchedUp</li>
-		    <li data-icon="info"><a href="/about">About</a></li>
+		    <li data-icon="info"><a href="/about" data-ajax=false>About</a></li>
 		</ul>
 	</div>
 	{% endif %}
 	
 	{% if not hide_header %}
     <div data-theme="b" data-role="header" >
-    	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false"></a>
+    	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false></a>
         <h3>{% block header %}SchedUp{% endblock %}</h3>
-    	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false"></a>
+    	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false></a>
     </div>
 	{% endif %}
 

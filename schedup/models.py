@@ -68,6 +68,10 @@ class EventInfo(ndb.Model):
         return [gst for gst in self.guests if gst.status == status]
 
 
+    def has_responded(self,user):
+        for guest in self.guests:
+            if guest.user==user.key:
+                return guest.status!="pending"
 
 
 
