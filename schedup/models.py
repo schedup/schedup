@@ -27,6 +27,7 @@ class EventInfo(ndb.Model):
     owner = ndb.KeyProperty(UserProfile, required = True)
     owner_token = ndb.StringProperty(required = True)
     guests = ndb.StructuredProperty(EventGuest, repeated = True)
+    created_at = ndb.DateTimeProperty(auto_now_add = True)
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()
@@ -52,6 +53,9 @@ class EventInfo(ndb.Model):
             if guest.user == user.key:
                 return guest.token
         return None
+    
+    def get_guests_by_status(self, status):
+        return [gst for gst in self.guests if gst.status == status]
 
 
 

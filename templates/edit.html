@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
 {% block header %}
-New Invitation
+Edit Your'e Event
 {% endblock %}
 
 {% block content %}
 
-<h1>You Have Been Invited To: {{event.title}}</h1>
+<h1>{{event.title}}</h1>
 <br>
 <h4 id="startTime">Start Time: {{event.start_time}}</h4>
 <br>
@@ -54,22 +54,5 @@ New Invitation
 <p>Event Description:...</p>
 <br>
 
-<form action="{{post_url}}" method="post" class="validate" id="newevtform">
-	<div data-role="fieldcontain">
-        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-            <input id="radio1" name="status" value="accept" type="radio" data-icon="check">
-            <label for="radio1">
-                ACCEPT
-            </label>
-            <input id="radio2" name="status" value="decline" type="radio" data-icon="delete">
-            <label for="radio2">
-                DECLINE
-            </label>
-        </fieldset>
-    </div>
-    
-    <input type="submit" value="Next" data-theme="b" >
-    
-</form>
 
 {% endblock %}

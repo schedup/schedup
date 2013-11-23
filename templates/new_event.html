@@ -17,13 +17,12 @@
 		<fieldset data-role="controlgroup" data-type="horizontal"
 			data-mini="true">
 			<legend> When </legend>
-			<input id="checkbox1" class='{roles: true}' name="roles"
-				type="checkbox" value='1'> <label for="checkbox1">
-				Morning </label> <input id="checkbox2" class='{roles: true}' name="roles"
-				type="checkbox" value='2'> <label for="checkbox2">
-				Noon </label> <input id="checkbox6" class='{roles: true}' name="roles"
-				type="checkbox" value='3'> <label for="checkbox6">
-				Evening </label>
+			<input id="checkbox1" name="when" type="checkbox" value="morning" > 
+			<label for="checkbox1">	Morning </label> 
+			<input id="checkbox2" name="when"	type="checkbox" value="noon"> 
+			<label for="checkbox2">	Noon </label> 
+			<input id="checkbox6" name="when" type="checkbox" value="evening"> 
+			<label for="checkbox6">	Evening </label>
 		</fieldset>
 	</div>
 	<div data-role="fieldcontain">
@@ -90,13 +89,13 @@
 				todate : {
 					required : true
 				},
-				"roles" : {
+				when : {
 					required : true,
 					minlength : 1
 				}
 			},
 			messages : {
-				"roles" : " Please select at least one checkbox"
+				when : " Please select at least one checkbox"
 			}
 		});
 	});

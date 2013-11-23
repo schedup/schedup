@@ -51,7 +51,10 @@ class BaseHandler(webapp2.RequestHandler):
     
     def redirect_with_flashmsg(self, url, msg):
         self.session["flashmsg"] = msg
-        logging.info("setting flashmsg to %r, redirect to %r", msg, url)
+        return self.redirect(url)
+    
+    def redirect_with_context(self, url, **params):
+        self.session.update(params)
         return self.redirect(url)
     
     def render_response(self, _template, **params):
@@ -61,11 +64,17 @@ class BaseHandler(webapp2.RequestHandler):
             logging.info("rendering flashmsg=%r", msg)
         if "user" not in params:
             params["user"] = getattr(self, "user", None)
+        if "pageid" not in params:
+            params["pageid"] = self.__class__.__name__
         params["logging"] = logging
         temp = self.JINJA.get_template(_template)
         output = temp.render(params)
         self.response.write(output)
-
+    
+    def render_template(self, _template, **params):
+        temp = self.JINJA.get_template(_template)
+        return temp.render(params)
+        
     def dispatch(self):
         self.session_store = sessions.get_store(request=self.request)
         try:

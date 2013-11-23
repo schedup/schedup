@@ -42,13 +42,6 @@
 	</div>
 	{% endif %}
 	
-	{% if flashmsg %}
-	<div data-role="popup" id="flash-popup">
-		{% set x=logging.info("html flashmsg=%r", flashmsg) %}
-		<p>{{flashmsg}}<p>
-	</div>
-	{% endif %}
-	
 	{% if not hide_header %}
     <div data-theme="b" data-role="header" >
     	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false"></a>
@@ -58,21 +51,24 @@
 	{% endif %}
 
     <div data-role="content" class="content-width-limit">
+        {% block flashmsg %}
+	    {% if flashmsg %}
+	        <div id="flashmsg" class="{{flashmsg[1]}}"> {{flashmsg[0]}} </div>
+	        <script type="text/javascript">
+	        $(document).ready(function(){
+	            setTimeout(function(){
+	                $("#flashmsg").fadeOut();
+	            }, 10000);
+	        });
+	        </script>
+	    {% endif %}
+	    {%endblock %}
+	    
         {% block content %}
         {{content}}
         {% endblock %}
     </div>
 
 </div>
-
-<script type="text/javascript">
-	$(document).ready(function() {
-		$("#flash-popup").popup("open");
-		setTimeout(function() {
-		    $("#flash-popup").popup("close");
-		}, 5000);
-	});
-</script>
-
 </body>
 </html>
