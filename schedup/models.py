@@ -21,7 +21,7 @@ class EventGuest(ndb.Model):
     email = ndb.StringProperty()
     # }}
     token = ndb.StringProperty()
-    status = ndb.StringProperty()
+    status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
 
 
 class EventInfo(ndb.Model):

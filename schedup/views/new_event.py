@@ -46,6 +46,7 @@ class NewEventPage(BaseHandler):
             type = self.request.params.get("type"),
             start_window = parse_datetime(self.request.params["fromdate"]),
             end_window = parse_datetime(self.request.params["todate"]),
+            guests = guests,
         )
         evt.put()
         
