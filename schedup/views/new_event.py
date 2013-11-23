@@ -7,8 +7,6 @@ from dateutil.parser import parse as parse_datetime
 from datetime import timedelta
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
-from datetime import datetime
-from xmlrpclib import DateTime
 from schedup.utils import send_email
 from google.appengine.ext import ndb
 import logging
@@ -37,10 +35,14 @@ class NewEventPage(BaseHandler):
             else:
                 gst = EventGuest(email=email, token=self.generate_token())
             guests.append(gst)
+        if not guests:
+            return self.redirect_with_flashmsg("/new", "No emails given", "error")
         
         title = self.request.params["title"]
         fromtime = parse_datetime(self.request.params["fromdate"])
         totime = parse_datetime(self.request.params["todate"])
+        if fromtime > totime:
+            return self.redirect_with_flashmsg("/new", "Start time is later than end time", "error")
         
         owner_token = self.generate_token()
         evt = EventInfo(owner = self.user.key, 
@@ -77,7 +79,8 @@ class NewEventPage(BaseHandler):
         logging.info("Guests: %r", guests)
         
         self.redirect_with_context("/my", 
-            flashmsg = ("Event created successfully, emails have been sent to guests", "ok"), 
+            flashmsg = "Event created successfully, emails have been sent to guests",
+            flashclass = "ok", 
             token = owner_token)
 
 #class ChooseTimeslotsPage(BaseHandler):

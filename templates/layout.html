@@ -53,14 +53,16 @@
     <div data-role="content" class="content-width-limit">
         {% block flashmsg %}
 	    {% if flashmsg %}
-	        <div id="flashmsg" class="{{flashmsg[1]}}"> {{flashmsg[0]}} </div>
+	        <div id="flashmsg" class="{{flashclass}}"> {{flashmsg}} </div>
+            {% if flashtimeout > 0 %}
 	        <script type="text/javascript">
 	        $(document).ready(function(){
 	            setTimeout(function(){
 	                $("#flashmsg").fadeOut();
-	            }, 10000);
+	            }, {{flashtimeout}});
 	        });
 	        </script>
+            {% endif %}
 	    {% endif %}
 	    {%endblock %}
 	    
