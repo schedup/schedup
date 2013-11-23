@@ -27,7 +27,10 @@ class EditEventPage(BaseHandler):
     
     @logged_in
     def get(self, owner_token):
-        self.render_response("layout.html", content = "edit event")
+        evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
+        if not evt:
+            return self.redirect_with_flashmsg("/", "Invalid token!")
+        self.render_response("edit.html",event = evt)
 
 
 

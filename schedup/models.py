@@ -1,5 +1,4 @@
 from google.appengine.ext import ndb
-from google.appengine._internal.django.template.defaultfilters import date
 
 
 class UserProfile(ndb.Model):
@@ -53,6 +52,10 @@ class EventInfo(ndb.Model):
             if guest.user == user.key:
                 return guest.token
         return None
+    
+    
+    def get_guests_by_status(self, status):
+        return [gst for gst in self.guests if gst.status == status]
 
 
 
