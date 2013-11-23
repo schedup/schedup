@@ -6,6 +6,7 @@ import random
 from dateutil.parser import parse as parse_datetime
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
+from schedup.utils import send_email
 
 
 class NewEventPage(BaseHandler):
@@ -37,11 +38,12 @@ class NewEventPage(BaseHandler):
             else:
                 gst = EventGuest(email = email, token = self.generate_token())
             guests.append(gst)
+        title = self.request.params["title"]
         
         owner_token = self.generate_token()
         evt = EventInfo(owner = self.user.key, 
             owner_token = owner_token,
-            title = self.request.params["title"],
+            title = title,
             daytime = daytime,
             type = self.request.params.get("type"),
             start_window = parse_datetime(self.request.params["fromdate"]),
@@ -49,6 +51,13 @@ class NewEventPage(BaseHandler):
             guests = guests,
         )
         evt.put()
+        
+        for guest in guests:
+            send_email("%s invited you to %s" % (self.user.fullname, title),
+                recipient = guest.user.email if guest.user else guest.email,
+                html_body = self.render_template("emails/guest.html", 
+                        fullname = self.user.fullname, title = title, token = guest.token),
+            )
         
         self.redirect_with_flashmsg("/my", "Event created successfully")
         #return self.render_response("calendar.html", title = "Choose Time Slots", 
