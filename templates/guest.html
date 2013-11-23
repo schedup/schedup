@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block header %}
-{{title}}
+New Invitation
 {% endblock %}
 
 {% block content %}
@@ -18,16 +18,19 @@
 <form action="{{post_url}}" method="post" class="validate" id="newevtform">
 	<div data-role="fieldcontain">
         <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-            <input id="radio1" name="status" value="accept" type="radio">
+            <input id="radio1" name="status" value="accept" type="radio" data-icon="check">
             <label for="radio1">
                 ACCEPT
             </label>
-            <input id="radio2" name="status" value="decline" type="radio">
+            <input id="radio2" name="status" value="decline" type="radio" data-icon="delete">
             <label for="radio2">
                 DECLINE
             </label>
         </fieldset>
     </div>
+    
+    <input type="submit" value="Next" data-theme="b" >
+    
 </form>
 
 {% endblock %}

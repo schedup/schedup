@@ -44,6 +44,7 @@
 	
 	{% if flashmsg %}
 	<div data-role="popup" id="flash-popup">
+		{% set x=logging.info("html flashmsg=%r", flashmsg) %}
 		<p>{{flashmsg}}<p>
 	</div>
 	{% endif %}
@@ -61,16 +62,17 @@
         {{content}}
         {% endblock %}
     </div>
+
 </div>
+
 <script type="text/javascript">
 	$(document).ready(function() {
-	    {% if flashmsg %}
 		$("#flash-popup").popup("open");
 		setTimeout(function() {
 		    $("#flash-popup").popup("close");
-		}, 3000);
-		{% endif %}
+		}, 5000);
 	});
 </script>
+
 </body>
 </html>

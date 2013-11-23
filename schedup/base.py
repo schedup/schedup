@@ -10,6 +10,7 @@ from oauth2client.appengine import OAuth2Decorator
 from schedup import settings
 from schedup.settings import SESSION_SECRET
 import inspect
+import logging
 
 
 app = webapp2.WSGIApplication([], 
@@ -50,13 +51,17 @@ class BaseHandler(webapp2.RequestHandler):
     
     def redirect_with_flashmsg(self, url, msg):
         self.session["flashmsg"] = msg
-        self.redirect(url)
+        logging.info("setting flashmsg to %r, redirect to %r", msg, url)
+        return self.redirect(url)
     
     def render_response(self, _template, **params):
         if "flashmsg" not in params:
-            params["flashmsg"] = self.session.pop("flashmsg", None)
+            msg = self.session.pop("flashmsg", None)
+            params["flashmsg"] = msg
+            logging.info("rendering flashmsg=%r", msg)
         if "user" not in params:
             params["user"] = getattr(self, "user", None)
+        params["logging"] = logging
         temp = self.JINJA.get_template(_template)
         output = temp.render(params)
         self.response.write(output)
