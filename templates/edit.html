@@ -22,9 +22,9 @@ Edit Your'e Event
         	{% endif %}
         	{% set user = guest.user %}
         	{% if user %}
-        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{user.get().fullname or user.get().email}}</a></li>
+        		<li data-icon={{ic}} id="skull"><a href="#">{{user.get().fullname or user.get().email}}</a></li>
         	{% else %}
-        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{guest.email}}</a></li>
+        		<li data-icon={{ic}} id="skull"><a href="#">{{guest.email}}</a></li>
         	{% endif %}
         {% endfor %}
         </ul>
