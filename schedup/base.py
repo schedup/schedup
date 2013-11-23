@@ -49,8 +49,8 @@ class BaseHandler(webapp2.RequestHandler):
                 _configured_urls[url] = cls2
             return cls2
     
-    def redirect_with_flashmsg(self, url, msg):
-        self.session["flashmsg"] = msg
+    def redirect_with_flashmsg(self, url, msg, style="note"):
+        self.session["flashmsg"] = (msg, style)
         return self.redirect(url)
     
     def redirect_with_context(self, url, **params):
@@ -60,6 +60,8 @@ class BaseHandler(webapp2.RequestHandler):
     def render_response(self, _template, **params):
         if "flashmsg" not in params:
             msg = self.session.pop("flashmsg", None)
+            if msg and not isinstance(msg, (tuple, list)):
+                msg = (msg, "note")
             params["flashmsg"] = msg
             logging.info("rendering flashmsg=%r", msg)
         if "user" not in params:

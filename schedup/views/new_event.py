@@ -10,6 +10,8 @@ from schedup.models import UserProfile, EventInfo, EventGuest
 from datetime import datetime
 from xmlrpclib import DateTime
 from schedup.utils import send_email
+from google.appengine.ext import ndb
+import logging
 
 
 class NewEventPage(BaseHandler):
@@ -26,13 +28,7 @@ class NewEventPage(BaseHandler):
 
     @logged_in
     def post(self):
-        daytime = []
-        if self.request.params.get("morning", "off") == "on":
-            daytime.append("morning")
-        if self.request.params.get("noon", "off") == "on":
-            daytime.append("noon")
-        if self.request.params.get("evening", "off") == "on":
-            daytime.append("evening")
+        daytime = self.request.params.getall("when")
         guests = []
         for email in self.request.params["guests"].split(";"):
             user = UserProfile.query(UserProfile.email == email).get()
@@ -41,7 +37,7 @@ class NewEventPage(BaseHandler):
             else:
                 gst = EventGuest(email=email, token=self.generate_token())
             guests.append(gst)
-            
+        
         title = self.request.params["title"]
         fromtime = parse_datetime(self.request.params["fromdate"])
         totime = parse_datetime(self.request.params["todate"])
@@ -68,6 +64,8 @@ class NewEventPage(BaseHandler):
         evt.end_time = evt.start_time + timedelta(hours = 2)
         # }}
         evt.put()
+        # clear the cache so /my will show this event
+        ndb.get_context().clear_cache()
         
         for guest in guests:
             send_email("%s invited you to %s" % (self.user.fullname, title),

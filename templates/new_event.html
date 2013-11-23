@@ -1,8 +1,7 @@
 {% extends "layout.html" %} {% block header %} New Event {% endblock %}
 
 {% block content %}
-<form action="{{post_url}}" method="post" class="validate"
-	id="newevtform">
+<form action="{{post_url}}" method="post" class="validate" data-ajax="false" id="newevtform">
 	<div data-role="fieldcontain">
 		<label for="textinput1"> Title </label> <input name="title"
 			id="textinput1" data-mini="true" placeholder="Event Title" value=""

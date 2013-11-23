@@ -28,7 +28,7 @@ class GoogleConnector(object):
             raise ValueError("Get profile failed", headers, body)
 
         by_email = {}
-        for entry in json.loads(body)["feed"]["entry"]:
+        for entry in json.loads(body)["feed"].get("entry", ()):
             if not "gd$email" in entry:
                 continue
             title = entry.get("title", empty).get("$t")

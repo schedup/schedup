@@ -26,7 +26,7 @@ label.error {
 
 #flashmsg {
     text-align: center;
-    background: rgba(202, 82, 82, 0.5);
+    background: rgba(255, 237, 32, 0.5);
     padding: 20px;
     border-radius: 10px;
     font-size: 150%;
@@ -35,13 +35,15 @@ label.error {
 }
 
 #flashmsg.ok {
-    background: rgba(202, 82, 82, 0.5);
+    background: rgba(82, 202, 82, 0.5);
 }
 
 #flashmsg.note {
-    background: rgba(202, 82, 82, 0.5);
+    background: rgba(255, 237, 32, 0.5);
 }
 
 #flashmsg.error {
     background: rgba(202, 82, 82, 0.5);
 }
+
+
