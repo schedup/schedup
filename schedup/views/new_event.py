@@ -65,7 +65,7 @@ class NewEventPage(BaseHandler):
             evt.start_time += timedelta(hours = 12)
         else:
             evt.start_time += timedelta(hours = 20)
-        evt.end_time = evt.start_window + timedelta(hours = 2)
+        evt.end_time = evt.start_time + timedelta(hours = 2)
         # }}
         evt.put()
         
