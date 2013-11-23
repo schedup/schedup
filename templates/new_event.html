@@ -39,13 +39,13 @@
 		<label for="fromdate"> From </label> <input name="fromdate"
 			data-mini="true" id="fromdate" type="date"
 			placeholder="First applicable date" data-role="datebox"
-			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
+			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
 	</div>
 	<div data-role="fieldcontain">
 		<label for="todate"> To </label> <input name="todate" data-mini="true"
 			id="todate" type="date" placeholder="Last applicable date"
 			data-role="datebox"
-			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
+			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
 	</div>
 
 	<div data-role="fieldcontain">
@@ -53,7 +53,7 @@
 		<textarea name="description" id="textarea-a" placeholder="Description"></textarea>
 	</div>
 
-	<input type="submit" value="Next" data-theme="b">
+	<input type="submit" value="Send" data-theme="b">
 </form>
 
 <script type="text/javascript">
@@ -65,6 +65,10 @@
 			tokenDelimiter : ";",
 			preventDuplicates : true,
 		});
+		
+		/*$("#newevtform").submit(function(){
+			
+		});*/
 
 		$("#newevtform").validate({
 			errorPlacement : function(error, element) {
@@ -91,10 +95,12 @@
 				when : {
 					required : true,
 					minlength : 1
-				}
+				},
+			
 			},
 			messages : {
-				when : " Please select at least one checkbox"
+				when : " Please select at least one checkbox",
+				guests : "Invite at least one guest"
 			}
 		});
 	});
