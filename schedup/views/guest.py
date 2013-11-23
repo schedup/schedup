@@ -22,7 +22,11 @@ class GuestPage(BaseHandler):
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         guest.status = self.request.params.get("status")
         evt.put()
-        return self.redirect_with_flashmsg("/", "Thank You!!", "ok")
+        if guest.user:
+            url="/invited"
+        else:
+            url="/"
+        return self.redirect_with_flashmsg(url, "Thank You!!", "ok")
 
 
 class EditEventPage(BaseHandler):
