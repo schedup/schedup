@@ -18,6 +18,8 @@ class GuestPage(BaseHandler):
     
     def post(self, token):
         evt, guest = EventInfo.get_by_guest_token(token)
+        if not evt:
+            return self.redirect_with_flashmsg("/", "Invalid token!")
         guest.status = self.request.params.get("status")
         evt.put()
         return self.redirect_with_flashmsg("/", "Thank You!!")

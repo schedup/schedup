@@ -17,7 +17,7 @@ New Event
         <label for="guestinput">
             Guests
         </label>
-        <input name="guests" id="guestinput" data-mini="true" placeholder="emails" value="" type="text" >
+        <input name="guests" id="guestinput" data-mini="true" placeholder="emails" value="" type="search" >
     </div>
     <div id="checkboxes1" data-role="fieldcontain">
         <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
@@ -58,18 +58,14 @@ New Event
         </fieldset>
     </div>
     <div data-role="fieldcontain">
-        <label for="fromdate">
-            From
-        </label>
-    	<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="First applicable date"
-            data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
+        <label for="fromdate">From</label>
+    	<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="First applicable date" data-role="datebox" 
+            data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
     </div>
     <div data-role="fieldcontain">
-        <label for="todate">
-            To
-        </label>
-    	<input name="todate" data-mini="true" id="todate" type="date" placeholder="Last applicable date"
-    		data-role="datebox" data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a"}'>
+        <label for="todate">To</label>
+    	<input name="todate" data-mini="true" id="todate" type="date" placeholder="Last applicable date" data-role="datebox" 
+    		data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
     </div>
     
     <input type="submit" value="Next" data-theme="b" >
@@ -84,6 +80,10 @@ New Event
 		    tokenDelimiter : ";",
 		    preventDuplicates : true,
 		});
+		
+		/*$("#fromdate").changed(function() {
+			//$("#todate").options();
+		});*/
 		
 		$("#newevtform").validate({
             rules: {

@@ -51,7 +51,10 @@ class BaseHandler(webapp2.RequestHandler):
     
     def redirect_with_flashmsg(self, url, msg):
         self.session["flashmsg"] = msg
-        logging.info("setting flashmsg to %r, redirect to %r", msg, url)
+        return self.redirect(url)
+    
+    def redirect_with_context(self, url, **params):
+        self.session.update(params)
         return self.redirect(url)
     
     def render_response(self, _template, **params):

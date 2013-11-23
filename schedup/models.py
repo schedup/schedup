@@ -8,7 +8,7 @@ class UserProfile(ndb.Model):
     facebook_id = ndb.StringProperty()
 
     def get_owner_events(self):
-        return EventInfo.query(EventInfo.owner == self.key).order(+EventInfo.start_window)
+        return EventInfo.query(EventInfo.owner == self.key)
     
     def get_participating_events(self):
         return EventInfo.query(EventInfo.guests.user == self.key)
@@ -53,7 +53,6 @@ class EventInfo(ndb.Model):
             if guest.user == user.key:
                 return guest.token
         return None
-    
     
     def get_guests_by_status(self, status):
         return [gst for gst in self.guests if gst.status == status]

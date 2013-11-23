@@ -13,6 +13,12 @@ indexes:
 - kind: EventInfo
   properties:
   - name: owner
+  - name: created_at
+    direction: desc
+
+- kind: EventInfo
+  properties:
+  - name: owner
   - name: start_time
 
 - kind: EventInfo

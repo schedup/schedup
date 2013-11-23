@@ -4,6 +4,7 @@ Create new event flow
 import string
 import random
 from dateutil.parser import parse as parse_datetime
+from datetime import timedelta
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
@@ -38,7 +39,10 @@ class NewEventPage(BaseHandler):
             else:
                 gst = EventGuest(email = email, token = self.generate_token())
             guests.append(gst)
+            
         title = self.request.params["title"]
+        fromtime = parse_datetime(self.request.params["fromdate"])
+        totime = parse_datetime(self.request.params["todate"])
         
         owner_token = self.generate_token()
         evt = EventInfo(owner = self.user.key, 
@@ -46,10 +50,20 @@ class NewEventPage(BaseHandler):
             title = title,
             daytime = daytime,
             type = self.request.params.get("type"),
-            start_window = parse_datetime(self.request.params["fromdate"]),
-            end_window = parse_datetime(self.request.params["todate"]),
+            start_window = fromtime,
+            end_window = totime,
             guests = guests,
         )
+        # hack for the first milestone {{
+        evt.start_time = evt.start_window.replace(hour = 0, minute = 0, second = 0)
+        if "morning" in daytime:
+            evt.start_time += timedelta(hours = 8)
+        elif "noon" in daytime:
+            evt.start_time += timedelta(hours = 12)
+        else:
+            evt.start_time += timedelta(hours = 20)
+        evt.end_time = evt.start_window + timedelta(hours = 2)
+        # }}
         evt.put()
         
         for guest in guests:
@@ -59,18 +73,17 @@ class NewEventPage(BaseHandler):
                         fullname = self.user.fullname, title = title, token = guest.token),
             )
         
-        self.redirect_with_flashmsg("/my", "Event created successfully")
-        #return self.render_response("calendar.html", title = "Choose Time Slots", 
-        #    post_url = "/choose/%s" % (owner_token,))
+        self.redirect_with_context("/my", 
+            flashmsg = ("Event created successfully, emails have been sent to guests", "ok"), 
+            token = owner_token)
 
-
-class ChooseTimeslotsPage(BaseHandler):
-    URL = "/choose/(.+)"
-    
-    @logged_in
-    def post(self, owner_token):
-        evt = EventInfo.query(EventInfo.owner_token == owner_token).get() 
-        self.redirect_with_flashmsg("/my", "Event created successfully")
+#class ChooseTimeslotsPage(BaseHandler):
+#    URL = "/choose/(.+)"
+#    
+#    @logged_in
+#    def post(self, owner_token):
+#        evt = EventInfo.query(EventInfo.owner_token == owner_token).get() 
+#        self.redirect_with_flashmsg("/my", "Event created successfully")
 
 
 

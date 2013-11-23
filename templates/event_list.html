@@ -9,19 +9,19 @@
 <ul data-role="listview" data-inset="true">
 	{% for evt in events %}
     <!-- li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li-->
-    	<li>
+    	<li {% if owner and token == evt.owner_token %} data-theme="e" {% endif %}>
 	    {% if owner %}
-	    <a href="/edit/{{evt.owner_token}}">
-	        <h2>{{ evt.title }}</h2>
-	        <p></p>
-	        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
-	    </a>
+		    <a href="/edit/{{evt.owner_token}}">
+		        <h2>{{ evt.title }}</h2>
+		        <p></p>
+		        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
+		    </a>
 	    {% else %}
-	    <a href="/guest/{{evt.get_token_for(user)}}">
-	        <h2>{{ evt.title }}</h2>
-	        <p>{{evt.type}}</p>
-	        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
-	    </a>
+		    <a href="/guest/{{evt.get_token_for(user)}}">
+		        <h2>{{ evt.title }}</h2>
+		        <p>{{evt.type}}</p>
+		        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
+		    </a>
 		{% endif %}
     	</li>
     {% endfor %}
