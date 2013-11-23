@@ -34,7 +34,7 @@
 		    <li data-role="list-divider">Me</li>
 		    <li data-icon="plus"><a href="/new">New Event</a></li>
 		    <li data-icon="edit"><a href="/my">My Events</a></li>
-		    <li><a href="/invited">Invited To <span class="ui-li-count">{{invited_to_count or 0}}</span></a></li>
+		    <li><a href="/invited">Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
 		    <li data-icon="gear"><a href="/profile">Profile</a></li>
 		    <li data-role="list-divider">SchedUp</li>
 		    <li data-icon="info"><a href="/about">About</a></li>
