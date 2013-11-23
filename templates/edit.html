@@ -6,52 +6,34 @@ Edit Your'e Event
 
 {% block content %}
 
-<h1>{{event.title}}</h1>
-<br>
-<h4 id="startTime">Start Time: {{event.start_time}}</h4>
-<br>
-<h4 id="endTime">End Time: {{event.end_time}}</h4>
-<br>
+<h1>{{event.title}}<a href="index.html" data-role="button" data-icon="edit" data-iconpos="notext">Edit Title</a></h1>
+<h4 id="startTime"> From: {{event.start_time}} &nbsp; &nbsp; To: {{event.end_time}}</h4>
 <div data-role="collapsible-set" data-theme="c" data-content-theme="d">
     <div data-role="collapsible">
-        <h3>Accepeted</h3>
-        
-        {% for guest in event.get_guests_by_status("accept") %}
-        	{% set user = guest.user %}
-        	{% if user %}
-        		<li>{{user.fullname}}</li> 
+        <h4>Guest List</h4>
+        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search guests..." data-inset="true">
+        {% for guest in event.guests %}
+        	{% if guest.status == "accept" %}
+        		{% set ic = "check" %}
+        	{% elif guest.status == "decline" %}
+        		{% set ic = "delete" %}
         	{% else %}
-        		<li>{{guest.email}}</li>
+        		{% set ic = "alert" %}
         	{% endif %}
-        {% endfor %}
-    </div>
-    <div data-role="collapsible">
-        <h3>Declined</h3>
-        {% for guest in event.get_guests_by_status("decline") %}
         	{% set user = guest.user %}
         	{% if user %}
-        		<li>{{user.fullname}}</li> 
+        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{user.get().fullname or user.get().email}}</a></li>
         	{% else %}
-        		<li>{{guest.email}}</li>
-        	{% endif %}
-        {% endfor %}
-    </div>
-    <div data-role="collapsible">
-        <h3>Pending</h3>
-        <ul>
-        {% for guest in event.get_guests_by_status("pending") %}
-        	{% set user = guest.user %}
-        	{% if user %}
-        		<li>{{user.get().fullname or user.get().email}}</li> 
-        	{% else %}
-        		<li>{{guest.email}}</li>
+        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{guest.email}}</a></li>
         	{% endif %}
         {% endfor %}
         </ul>
     </div>
-</div>
+</div>   
+<a href="index.html" data-role="button" data-icon="add" data-iconpos="notext">Add Guest</a>
 <br>
-<p>Event Description:...</p>
+<h3>Event Description<a href="index.html" data-role="button" data-icon="edit" data-iconpos="notext">Edit Description</a></h3>
+<p>{{event.description}}</p>
 <br>
 
 
