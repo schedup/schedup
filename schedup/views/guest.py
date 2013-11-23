@@ -63,7 +63,7 @@ class SendEventPage(BaseHandler):
         logging.info("resp = %r", resp)
         evt.evtid = resp["id"]
         evt.put()
-        self.redirect_with_flashmsg("/", "Invites sent", "ok")
+        self.redirect_with_flashmsg("/my", "Invites sent", "ok")
 
 class CancelEventPage(BaseHandler):
     URL = "/cancel/(.+)"
@@ -77,7 +77,7 @@ class CancelEventPage(BaseHandler):
         evt.put()
         if evt.evtid:
             self.gconn.remove_event("primary", evt.evtid, send_notifications = True)
-        self.redirect_with_flashmsg("/", "Event canceled", "ok")
+        self.redirect_with_flashmsg("/my", "Event %r canceled" % (evt.title,), "ok")
 
 
 
