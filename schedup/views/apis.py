@@ -57,8 +57,9 @@ class GetUserCalendaerList(BaseHandler):
     @logged_in
     @api_call()
     def get(self):
-        return [{"id":cal["id"], "name":cal["summary"]} for cal in self.gconn.list_calendars()["items"] 
-            if not cal.get("hidden", False)]
+        return [{"id":cal["id"], "name":cal["summary"], "timezone" : cal["timeZone"]}
+            for cal in self.gconn.list_calendars()["items"] 
+                if not cal.get("hidden", False)]
 
 class GetEventTimeslots(BaseHandler):
     URL = "/api/get-event-slots"
