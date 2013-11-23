@@ -6,35 +6,45 @@ Edit Your'e Event
 
 {% block content %}
 
-<h1>{{event.title}}<a href="index.html" data-role="button" data-icon="edit" data-iconpos="notext">Edit Title</a></h1>
-<h4 id="startTime"> From: {{event.start_time}} &nbsp; &nbsp; To: {{event.end_time}}</h4>
+<form action="{{post_url}}" method="post">
+
+<h1>{{event.title}}<a href="#" data-role="button" data-icon="edit" data-iconpos="notext" data-inline="true" title="Edit title"></a></h1>
+<h4>By {{user.fullname or user.email}} </h4>
+<h4>From: {{event.start_time}}</h4>
+<h4>To: {{event.end_time}}</h4>
+
+{% if event.description %} 
+<h4>Description<a href="#" data-role="button" data-icon="edit" data-iconpos="notext" data-inline="true" title="Edit description"></a></h4>
+<p>{{event.description}}</p>
+{% endif %}
+
 <div data-role="collapsible-set" data-theme="c" data-content-theme="d">
-    <div data-role="collapsible">
+    <div data-role="collapsible" data-collapsed="false">
         <h4>Guest List</h4>
-        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search guests..." data-inset="true">
+        <!-- a href="#" data-role="button" data-icon="edit" data-iconpos="notext" title="Add guests"></a-->
+        <ul data-role="listview" data-inset="true">
         {% for guest in event.guests %}
         	{% if guest.status == "accept" %}
         		{% set ic = "check" %}
         	{% elif guest.status == "decline" %}
         		{% set ic = "delete" %}
         	{% else %}
-        		{% set ic = "alert" %}
+        		{% set ic = "false" %}
         	{% endif %}
         	{% set user = guest.user %}
         	{% if user %}
-        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{user.get().fullname or user.get().email}}</a></li>
+        		<li data-icon="{{ic}}" data-iconpos="left"><a href="#">{{user.get().fullname or user.get().email}}</a></li>
         	{% else %}
-        		<li data-icon={{ic}} id="skull"><a href="#" data-theme="b">{{guest.email}}</a></li>
+        		<li data-icon="{{ic}}" data-iconpos="left"><a href="#">{{guest.email}}</a></li>
         	{% endif %}
         {% endfor %}
         </ul>
     </div>
-</div>   
-<a href="index.html" data-role="button" data-icon="add" data-iconpos="notext">Add Guest</a>
-<br>
-<h3>Event Description<a href="index.html" data-role="button" data-icon="edit" data-iconpos="notext">Edit Description</a></h3>
-<p>{{event.description}}</p>
-<br>
+</div>
+</form>
 
+<a href="/send/{{event.owner_token}}" data-theme="b" data-role="button" data-icon="check" data-iconpos="right">Send Invites</a>
+<a href="/cancel/{{event.owner_token}}" data-theme="c" data-role="button" data-icon="delete" data-iconpos="right">Cancel Event</a>
 
 {% endblock %}
+

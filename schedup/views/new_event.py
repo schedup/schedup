@@ -74,6 +74,8 @@ class NewEventPage(BaseHandler):
                         fullname = self.user.fullname, title = title, token = guest.token),
             )
         
+        logging.info("Guests: %r", guests)
+        
         self.redirect_with_context("/my", 
             flashmsg = ("Event created successfully, emails have been sent to guests", "ok"), 
             token = owner_token)
