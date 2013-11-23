@@ -1,3 +1,13 @@
+label.error {
+	color: red;
+	font-size: 16px;
+	font-weight: normal;
+	line-height: 1.4;
+	margin-top: 0.5em;
+	width: 100%;
+	float: none;
+}
+
 @media screen and (min-width: 900px) {
 	.content-width-limit {
 		max-width: 800px;
@@ -13,5 +23,3 @@
 		margin-left: auto;
 	}
 }
-
-
