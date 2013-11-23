@@ -56,7 +56,7 @@ class GoogleConnector(object):
             timeMax = end_date.strftime("%Y-%m-%dT23:59:59Z")).execute(http = self.oauth.http())
         return entries["items"]
     
-    def create_event(self, calendar_id, event_info):
+    def create_event(self, calendar_id, event_info, send_notifications = False):
         '''
         event_info = {
           'summary': 'Appointment',
@@ -75,7 +75,11 @@ class GoogleConnector(object):
         }
         '''
         return self._calendar_service.events().insert(calendarId=calendar_id, 
-            body=event_info).execute(http = self.oauth.http())        
+            body=event_info, sendNotifications = send_notifications).execute(http = self.oauth.http())        
+    
+    def remove_event(self, calendar_id, event_id, send_notifications = False):
+        return self._calendar_service.events().delete(calendarId=calendar_id, eventId=event_id, 
+            sendNotifications = send_notifications).execute(http = self.oauth.http())
     
     def get_profile(self):
         headers, body = self.oauth.http().request("https://www.googleapis.com/oauth2/v2/userinfo?alt=json")

@@ -12,6 +12,14 @@ class UserProfile(ndb.Model):
     
     def get_participating_events(self):
         return EventInfo.query(EventInfo.guests.user == self.key)
+    
+    def count_invited_to(self):
+        count = 0
+        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending"):
+            for guest in evt.guests:
+                if guest.user == self.key and guest.status == "pending":
+                    count += 1
+        return count
 
 
 class EventGuest(ndb.Model):
@@ -28,6 +36,8 @@ class EventInfo(ndb.Model):
     owner_token = ndb.StringProperty(required = True)
     guests = ndb.StructuredProperty(EventGuest, repeated = True)
     created_at = ndb.DateTimeProperty(auto_now_add = True)
+    status = ndb.StringProperty(choices=["sent","canceled","pending"], default="pending")
+    evtid = ndb.StringProperty()
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()
