@@ -49,11 +49,12 @@ class SendEventPage(BaseHandler):
             'description': evt.description,
             'location': '',
             'status':'confirmed',
-            'start': {'dateTime': evt.start_time,},
-            'end': {'dateTime': evt.end_time},
+            'start': {'dateTime': evt.start_time.isoformat() + "+02:00",},
+            'end': {'dateTime': evt.end_time.isoformat() + "+02:00"},
             'attendees': [{'email': guest.email, 'responseStatus':'accepted'}
                 for guest in evt.guests if guest.status == "accept"],
         }
+        logging.info("evt=%r", event_details)
         resp = self.gconn.create_event("primary", event_details, send_notifications = True)
         logging.info("resp = %r", resp)
         evt.evtid = resp["id"]
