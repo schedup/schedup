@@ -6,51 +6,84 @@ New Invitation
 
 {% block content %}
 
-<h1>Youv'e Been Invited To: {{event.title}}</h1>
-<h4 id="startTime"> From: {{event.start_time}} &nbsp; &nbsp; To: {{event.end_time}}</h4>
+
+<form action="{{post_url}}" method="post" class="validate" id="voteform" data-ajax="false">
+
+<h1>{{event.title}}</h1>
+<h4>By {{event.owner.get().fullname or event.owner.get().email}} </h4>
+<h4>From: {{event.start_time}}</h4>
+<h4>To: {{event.end_time}}</h4>
+
+{% if event.description %} 
+<h4>Description</h4>
+<p>{{event.description}}</p>
+{% endif %}
+
 <div data-role="collapsible-set" data-theme="c" data-content-theme="d">
-    <div data-role="collapsible">
+    <div data-role="collapsible" data-collapsed="false">
         <h4>Guest List</h4>
-        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search guests..." data-inset="true">
+        <!-- a href="#" data-role="button" data-icon="edit" data-iconpos="notext" title="Add guests"></a-->
+        <ul data-role="listview" data-inset="true">
         {% for guest in event.guests %}
         	{% if guest.status == "accept" %}
         		{% set ic = "check" %}
         	{% elif guest.status == "decline" %}
         		{% set ic = "delete" %}
         	{% else %}
-        		{% set ic = "alert" %}
+        		{% set ic = "false" %}
         	{% endif %}
         	{% set user = guest.user %}
         	{% if user %}
-        		<li data-icon={{ic}} id="skull"><a href="#">{{user.get().fullname or user.get().email}}</a></li>
+        		<li data-icon="{{ic}}" data-iconpos="left"><a href="#">{{user.get().fullname or user.get().email}}</a></li>
         	{% else %}
-        		<li data-icon={{ic}} id="skull"><a href="#">{{guest.email}}</a></li>
+        		<li data-icon="{{ic}}" data-iconpos="left"><a href="#">{{guest.email}}</a></li>
         	{% endif %}
         {% endfor %}
         </ul>
     </div>
 </div>
-<br>
-<h3>Event Description</h3>
-<p>{{event.description}}</p>
-<br>
 
-<form action="{{post_url}}" method="post" class="validate" id="newevtform">
-	<div data-role="fieldcontain">
-        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-            <input id="radio1" name="status" value="accept" type="radio" data-icon="check">
-            <label for="radio1">
-                ACCEPT
-            </label>
-            <input id="radio2" name="status" value="decline" type="radio" data-icon="delete">
-            <label for="radio2">
-                DECLINE
-            </label>
-        </fieldset>
-    </div>
+<div data-role="fieldcontain">
+    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+        <input id="radio1" name="status" value="accept" type="radio" data-icon="check" {% if the_guest.status=="accept" %}checked{%endif%}>
+        <label for="radio1">
+            ACCEPT
+        </label>
+        <input id="radio2" name="status" value="decline" type="radio" data-icon="delete" {% if the_guest.status=="decline" %}checked{%endif%}>
+        <label for="radio2">
+            DECLINE
+        </label>
+    </fieldset>
+</div>
     
-    <input type="submit" value="Next" data-theme="b" >
+<input type="submit" value="Vote" data-theme="b" >
     
 </form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$("#voteform").validate({
+			errorPlacement : function(error, element) {
+				if (element.attr("type")=="radio"){
+					error.appendTo(element.parent().parent());
+				}
+				else{
+					error.appendTo(element.parent());
+				}
+			},
+			rules : {
+				status : {
+					required : true
+				},			
+			},
+			messages : {
+				status : "You must select one",
+			}
+		});
+	});
+	
+</script>
+
 
 {% endblock %}
