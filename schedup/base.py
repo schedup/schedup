@@ -50,7 +50,8 @@ class BaseHandler(webapp2.RequestHandler):
             return cls2
     
     def redirect_with_flashmsg(self, url, msg, style="note"):
-        self.session["flashmsg"] = (msg, style)
+        self.session["flashmsg"] = msg
+        self.session["flashclass"] = style
         return self.redirect(url)
     
     def redirect_with_context(self, url, **params):
@@ -58,17 +59,16 @@ class BaseHandler(webapp2.RequestHandler):
         return self.redirect(url)
     
     def render_response(self, _template, **params):
-        if "flashmsg" not in params:
-            msg = self.session.pop("flashmsg", None)
-            if msg and not isinstance(msg, (tuple, list)):
-                msg = (msg, "note")
-            params["flashmsg"] = msg
-            logging.info("rendering flashmsg=%r", msg)
-        if "user" not in params:
+        if not params.get("flashmsg"):
+            params["flashmsg"] = self.session.pop("flashmsg", None)
+        if "flashclass" not in params:
+            params["flashclass"] = self.session.pop("flashclass", "note")
+        if "flashtimeout" not in params:
+            params["flashtimeout"] = self.session.pop("flashtimeout", 10) * 1000
+        if not params.get("user"):
             params["user"] = getattr(self, "user", None)
         if "pageid" not in params:
             params["pageid"] = self.__class__.__name__
-        params["logging"] = logging
         temp = self.JINJA.get_template(_template)
         output = temp.render(params)
         self.response.write(output)

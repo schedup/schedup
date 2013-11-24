@@ -13,8 +13,12 @@ class GuestPage(BaseHandler):
         evt, guest = EventInfo.get_by_guest_token(token)
         logging.info("evt=%r, guest=%r", evt, guest)
         if not evt:
-            return self.redirect_with_flashmsg("/", "Invalid token!")
-        self.render_response("guest.html", post_url = "/guest/%s" % (token,), event = evt, the_guest = guest)
+            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+        self.render_response("guest.html", post_url = "/guest/%s" % (token,), event = evt, 
+            the_guest = guest, 
+            flashmsg = "Event was canceled" if evt.status == "canceled" else None,
+            flashclass = "error", 
+            flashtimeout = -1)
 
     def post(self, token):
         evt, guest = EventInfo.get_by_guest_token(token)
@@ -77,7 +81,7 @@ class CancelEventPage(BaseHandler):
         evt.put()
         if evt.evtid:
             self.gconn.remove_event("primary", evt.evtid, send_notifications = True)
-        self.redirect_with_flashmsg("/my", "Event %r canceled" % (evt.title,), "ok")
+        self.redirect_with_flashmsg("/my", "Event '%s' canceled" % (evt.title,), "note")
 
 
 

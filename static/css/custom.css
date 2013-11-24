@@ -46,4 +46,13 @@ label.error {
     background: rgba(202, 82, 82, 0.5);
 }
 
-
+.input-error {
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	padding: 5px 0;
+	margin: 5px auto 0 auto;
+	border-radius: 5px;
+	width: 300px;
+	background: rgba(202, 82, 82, 0.5);
+}

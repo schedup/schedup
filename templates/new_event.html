@@ -1,55 +1,65 @@
 {% extends "layout.html" %} {% block header %} New Event {% endblock %}
 
 {% block content %}
-<form action="{{post_url}}" method="post" class="validate" data-ajax="false" id="newevtform">
+<form action="{{post_url}}" method="post" data-ajax="false" id="newevtform">
 	<div data-role="fieldcontain">
-		<label for="textinput1"> Title </label> <input name="title"
-			id="textinput1" data-mini="true" placeholder="Event Title" value=""
+		<label for="titleinput"> Title </label> 
+		<input name="title"
+			id="titleinput" data-mini="true" placeholder="Event Title" value=""
 			type="text" autocomplete="off">
+		<div class="input-error" id="titleinput-error">This field is required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="guestinput"> Guests </label> <input name="guests"
-			id="guestinput" data-mini="true" placeholder="Emails" value=""
-			type="text">
+		<label for="guestinput"> Guests </label> 
+		<input name="guests"
+			id="guestinput" data-mini="true" placeholder="Guest emails" value=""
+			type="search" data-clear-btn="false">
+        <div class="input-error" id="guestinput-error">At least one email address is required</div>
 	</div>
 	<div id="checkboxes1" data-role="fieldcontain">
-		<fieldset data-role="controlgroup" data-type="horizontal"
+		<fieldset data-role="controlgroup" data-type="horizontal" id="fieldtype"
 			data-mini="true">
 			<legend> When </legend>
-			<input id="checkbox1" name="when" type="checkbox" value="morning" > 
+			<input id="checkbox1" name="when" type="checkbox" value="morning" >
 			<label for="checkbox1">	Morning </label> 
 			<input id="checkbox2" name="when"	type="checkbox" value="noon"> 
 			<label for="checkbox2">	Noon </label> 
-			<input id="checkbox6" name="when" type="checkbox" value="evening"> 
-			<label for="checkbox6">	Evening </label>
+			<input id="checkbox3" name="when" type="checkbox" value="evening" checked> 
+			<label for="checkbox3">	Evening </label>
 		</fieldset>
+        <div class="input-error" id="when-error">At least one time of day is required</div>
 	</div>
 	<div data-role="fieldcontain">
 		<fieldset data-role="controlgroup" data-type="horizontal"
 			data-mini="true">
 			<legend> Type </legend>
 			<input id="radio1" name="type" value="business" type="radio">
-			<label for="radio1"> Business </label> <input id="radio2" name="type"
-				value="friends" type="radio"> <label for="radio2">
-				Friends </label> <input id="radio3" name="type" value="family" type="radio">
+			<label for="radio1"> Business </label> 
+			<input id="radio2" name="type" value="friends" type="radio" checked> 
+			<label for="radio2"> Friends </label> 
+			<input id="radio3" name="type" value="family" type="radio">
 			<label for="radio3"> Family </label>
 		</fieldset>
+        <div class="input-error" id="type-error">Please choose one</div>
 	</div>
 	<div data-role="fieldcontain">
 		<label for="fromdate"> From </label> <input name="fromdate"
 			data-mini="true" id="fromdate" type="date"
 			placeholder="First applicable date" data-role="datebox"
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+        <div class="input-error" id="fromdate-error">Required</div>
 	</div>
 	<div data-role="fieldcontain">
 		<label for="todate"> To </label> <input name="todate" data-mini="true"
 			id="todate" type="date" placeholder="Last applicable date"
 			data-role="datebox"
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+        <div class="input-error" id="todate-error">Required</div>
+        <div class="input-error" id="todate-error2">End date must be later than start date</div>
 	</div>
 
 	<div data-role="fieldcontain">
-		<label for="textarea-a">Details & Notes</label>
+		<label for="textarea-a">Details</label>
 		<textarea name="description" id="textarea-a" placeholder="Description"></textarea>
 	</div>
 
@@ -66,43 +76,86 @@
 			preventDuplicates : true,
 		});
 		
-		/*$("#newevtform").submit(function(){
-			
-		});*/
-
-		$("#newevtform").validate({
-			errorPlacement : function(error, element) {
-				if (element.attr("type")=="checkbox"){
-					error.appendTo(element.parent().parent());
-				}
-				else{
-					error.appendTo(element.parent());
-				}
-			},
-			rules : {
-				title : {
-					required : true
-				},
-				guests : {
-					required : true
-				},
-				fromdate : {
-					required : true
-				},
-				todate : {
-					required : true
-				},
-				when : {
-					required : true,
-					minlength : 1
-				},
-			
-			},
-			messages : {
-				when : " Please select at least one checkbox",
-				guests : "Invite at least one guest"
+		$("#guestinput").change(function(){
+			if ($(this).val() == "") {
+				$(this).tokenInput("clear");
 			}
 		});
+		
+		$("#newevtform").submit(function(event){
+			var succ = true;
+			var first = null;
+			
+			function check_when()
+			{
+				var truth=$("#checkbox1").prop("checked") || $("#checkbox2").prop("checked") || $("#checkbox3").prop("checked");
+				if (!truth) {
+                    var msg = $("#when-error");
+                    msg.show();
+                    function onchg(){
+                        msg.fadeOut();
+                    }
+                    $("#checkbox1").change(onchg);
+                    $("#checkbox2").change(onchg);
+                    $("#checkbox3").change(onchg);
+				}
+				return {truth:truth,obj:$("#checkbox1")};
+			}
+			function check_endtime_gt_startime()
+			{
+				var truth=$("#fromdate").val() <= $("#todate").val()
+				if (!truth) {
+                    var msg = $("#todate-error2");
+                    msg.show();
+                    function onchg(){
+                        msg.fadeOut();
+                    }
+                    $("#fromdate").change(onchg);
+                    $("#todate").change(onchg);
+				}
+                return {truth:truth,obj:$("#todate")};
+			}
+			
+			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 
+			                   check_when, check_endtime_gt_startime];
+			
+			for (var i in to_validate) {
+				var selector = to_validate[i];
+				if (typeof(selector) == "function") {
+					res = selector();
+					if (!res.truth) {
+						succ = false;
+                        if (!first) {
+                            first = res.obj;
+                        }
+					}
+				}
+				else {
+					var obj = $(selector);
+		            if (!obj.val()) {
+	                    succ = false;
+		                if (!first) {
+		                    first = obj;
+		                }
+		                var err = $(selector + "-error");
+		                err.show();
+		                obj.change((function(err){
+		                	return (function(){
+		                	    err.fadeOut();
+		                	});
+		                })(err));
+		            }
+				}
+			}
+			if (!succ) {
+				event.preventDefault();
+			}
+			if (first) {
+				first.focus();
+			}
+			return succ;
+		});
+
 	});
 	
 </script>
