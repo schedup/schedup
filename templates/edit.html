@@ -22,7 +22,7 @@ Edit Your'e Event
     <div data-role="collapsible" data-collapsed="false">
         <h4>Guest List</h4>
         <!-- a href="#" data-role="button" data-icon="edit" data-iconpos="notext" title="Add guests"></a-->
-        <ul data-role="listview" data-inset="true">
+        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search guest..." data-inset="true">
         {% for guest in event.guests %}
         	{% if guest.status == "accept" %}
         		{% set ic = "check" %}
