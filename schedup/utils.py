@@ -1,5 +1,4 @@
 from google.appengine.api import mail
-from schedup.settings import EMAIL_ADDRESS
 
 
 def send_email(subject, recipient, reply_to = None, on_behalf_of = None,
@@ -17,7 +16,7 @@ def send_email(subject, recipient, reply_to = None, on_behalf_of = None,
         html_body - HTML body
     """
 
-    message = mail.EmailMessage(sender = EMAIL_ADDRESS, subject = subject)
+    message = mail.EmailMessage(sender = "SchedUp <service@sched-up.appspotmail.com>", subject = subject)
     message.to = recipient
 
     if bcc:

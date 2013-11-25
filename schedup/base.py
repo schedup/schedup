@@ -5,19 +5,17 @@ import functools
 import json
 import sys
 import traceback
+import inspect
 from webapp2_extras import sessions
 from oauth2client.appengine import OAuth2Decorator
 from schedup import settings
-from schedup.settings import SESSION_SECRET
-import inspect
-import logging
 
 
-app = webapp2.WSGIApplication([], 
+app = webapp2.WSGIApplication([],
     debug = True, #os.environ['SERVER_SOFTWARE'].startswith('Dev'),
     config = {
         'webapp2_extras.sessions' : {
-            'secret_key': SESSION_SECRET,
+            'secret_key': settings.SESSION_SECRET,
         }
     }
 )
@@ -25,7 +23,13 @@ app = webapp2.WSGIApplication([],
 oauth = OAuth2Decorator(
     client_id = settings.CLIENT_ID, 
     client_secret = settings.CLIENT_SECRET,
-    scope = settings.OAUTH_SCOPES)
+    scope = [
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/calendar',
+        'https://www.google.com/m8/feeds',
+    ],
+)
 app.router.add((oauth.callback_path, oauth.callback_handler()))
 
 _configured_urls = {}
