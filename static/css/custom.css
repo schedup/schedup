@@ -56,3 +56,53 @@ label.error {
 	width: 300px;
 	background: rgba(202, 82, 82, 0.5);
 }
+
+.disable-select {
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
+}
+
+#calendar-grid {
+	display: table;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    cursor: crosshair;
+}
+
+.calendar-column {
+    display: table-row;
+    margin: 0;
+    padding: 0;
+}
+
+.calendar-cell {
+	width: 70px;
+    display: table-cell;
+    height: 50px;
+	background: #aaa;
+	margin: 2px;
+	padding: 0;
+	z-index: 2;
+}
+
+.calendar-cell-selected {
+	background: yellow !important;
+}
+
+.calendar-event {
+	position: absolute;
+}
+
+
+
+
+
+
+
+
+
+
+

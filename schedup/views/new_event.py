@@ -10,6 +10,7 @@ from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from google.appengine.ext import ndb
 import logging
+import json
 
 
 class NewEventPage(BaseHandler):
@@ -83,13 +84,19 @@ class NewEventPage(BaseHandler):
             flashclass = "ok", 
             token = owner_token)
 
-#class ChooseTimeslotsPage(BaseHandler):
-#    URL = "/choose/(.+)"
-#    
-#    @logged_in
-#    def post(self, owner_token):
-#        evt = EventInfo.query(EventInfo.owner_token == owner_token).get() 
-#        self.redirect_with_flashmsg("/my", "Event created successfully")
+
+class ChooseTimeslotsPage(BaseHandler):
+    URL = "/choose/(.+)"
+    
+    @logged_in
+    def get(self, owner_token):
+        days = [28, 29, 30, 31]
+        hours = [16, 17, 18, 19, 20, 21, 22]
+        events = [{"title":"foo", "day": 28, "hour" : 18, "duration" : 2}]
+        self.render_response("calendar.html", days = days, hours = hours, events_json = json.dumps(events))
+         
+        #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
+        #self.redirect_with_flashmsg("/my", "Event created successfully")
 
 
 

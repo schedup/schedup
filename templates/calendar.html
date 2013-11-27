@@ -6,7 +6,40 @@
 
 {% block content %}
 
-Here you'll see the calendar
+<div id="calendar-grid" class="disable-select">
+{% for hour in hours %}
+    <div class="calendar-row">
+    {% for day in days %}
+        <div class="calendar-cell" id="cal-cell-{{day}}-{{hour}}"></div>
+    {% endfor %}
+    </div>
+{% endfor %}
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".calendar-cell").on("tap", function(){
+		$(this).toggleClass("calendar-cell-selected");
+	});
+	
+	var events = {{events_json|safe}};
+    console.log("$$$" + events);
+	
+	var grid = $("#calendar-grid");
+	for (var i in events) {
+		var evt = events[i];
+		console.log("!!!" + evt);
+		var evtdiv = $("<div class='calendar-event' id='calendar-event-" + evt.day + "-" + evt.hour + "'>");
+		var title = $("<span class='calendar-event-title'>");
+		title.text(evt.title);
+		evtdiv.append(title);
+		grid.append(evtdiv);
+        evtdiv.css("top", "100px");
+        evtdiv.css("left", "70px");
+	}
+	
+});
+</script>
 
 {% endblock %}
 
