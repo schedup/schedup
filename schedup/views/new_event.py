@@ -151,13 +151,14 @@ class ChooseTimeslotsPage(BaseHandler):
             post_url = "/choose/%s" % (owner_token,),
         )
         
-        #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
-        #self.redirect_with_flashmsg("/my", "Event created successfully")
-        
-        
     def post(self, owner_token):
         selected = json.loads(self.request.body)
         logging.info("selected=%r", selected)
+
+        the_event = EventInfo.get_by_owner_token(owner_token)
+        the_event.owner_selected_times = selected
+        the_event.put()
+        
         res = ""
         json_data = json.dumps(res)
         self.response.content_type = "application/json"
