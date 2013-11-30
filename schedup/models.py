@@ -1,5 +1,4 @@
 from google.appengine.ext import ndb
-from google.appengine.api.validation import Repeated
 
 
 class UserProfile(ndb.Model):
@@ -21,6 +20,7 @@ class UserProfile(ndb.Model):
                 if guest.user == self.key and guest.status == "pending":
                     count += 1
         return count
+
 
                
 class EventGuest(ndb.Model):
