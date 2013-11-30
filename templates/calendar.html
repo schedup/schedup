@@ -30,7 +30,7 @@ $(document).ready(function(){
     
     var last_cell = null;
     
-	$("#calendar-grid").on("mousemove", function(e){
+	$("#calendar-grid").on("vmousemove", function(e){
 	    var elem = $(this);
 	    var clickElem = $(document.elementFromPoint(e.pageX, e.pageY));
 	    
@@ -43,6 +43,8 @@ $(document).ready(function(){
 			e.preventDefault();
 		}
 	});
+	
+	
 	
 	var events = {{events_json|safe}};
 	
