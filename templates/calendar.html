@@ -30,7 +30,7 @@ $(document).ready(function(){
     
     var last_cell = null;
     
-	$("#calendar-grid").on("vmousemove", function(e){
+	/*$("#calendar-grid").on("vmousemove", function(e){
 	    var elem = $(this);
 	    var clickElem = $(document.elementFromPoint(e.pageX, e.pageY));
 	    
@@ -42,9 +42,11 @@ $(document).ready(function(){
 			clickElem.toggleClass("calendar-cell-selected");
 			e.preventDefault();
 		}
+	});*/
+	
+	$(".calendar-cell").on("tap", function(e) {
+	    $(this).toggleClass("calendar-cell-selected");
 	});
-	
-	
 	
 	var events = {{events_json|safe}};
 	
