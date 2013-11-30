@@ -6,14 +6,23 @@
 
 {% block content %}
 
+<div class="calendar-container">
 <div id="calendar-grid" class="disable-select">
+<div class="calendar-days">
+    <div class="calendar-day-cell calendar-day-cell-x"></div>
+    {% for day in days %}
+        <div class="calendar-day-cell">{{day}}</div>
+    {% endfor %}
+</div>
 {% for hour in hours %}
     <div class="calendar-row">
-    {% for day in days %}
-        <div class="calendar-cell" id="cal-cell-{{day}}-{{hour}}"></div>
-    {% endfor %}
+	    <div class="calendar-hour">{{hour}}</div>
+	    {% for day in days %}
+	        <div class="calendar-cell" id="cal-cell-{{day}}-{{hour}}"></div>
+	    {% endfor %}
     </div>
 {% endfor %}
+</div>
 </div>
 
 <script type="text/javascript">
@@ -23,21 +32,28 @@ $(document).ready(function(){
 	});
 	
 	var events = {{events_json|safe}};
-    console.log("$$$" + events);
 	
-	var grid = $("#calendar-grid");
-	for (var i in events) {
-		var evt = events[i];
-		console.log("!!!" + evt);
-		var evtdiv = $("<div class='calendar-event' id='calendar-event-" + evt.day + "-" + evt.hour + "'>");
-		var title = $("<span class='calendar-event-title'>");
-		title.text(evt.title);
-		evtdiv.append(title);
-		grid.append(evtdiv);
-        evtdiv.css("top", "100px");
-        evtdiv.css("left", "70px");
+	if (events.length) {
+		var hoffset = $(".calendar-hour").outerWidth();
+		var voffset = $(".calendar-days").outerHeight();
+		var evtwidth = $(".calendar-cell").outerWidth();
+        var evtheight = $(".calendar-cell").outerHeight();
+        console.log(hoffset, voffset, evtwidth, evtheight);
+		
+		var grid = $("#calendar-grid");
+		for (var i in events) {
+			var evt = events[i];
+			var evtdiv = $("<div class='calendar-event' id='calendar-event-" + evt.day + "-" + evt.hour + "'>");
+			var title = $("<span class='calendar-event-title'>");
+			title.text(evt.title);
+			evtdiv.append(title);
+			grid.append(evtdiv);
+	        console.log(evt.hour, evt.day);
+	        evtdiv.css("top", voffset + (evt.hour - {{min_hour}}) * evtheight);
+	        evtdiv.css("left", hoffset + (evt.day - {{min_day}}) * evtwidth + 3);
+	        evtdiv.css("height", evt.duration * evtheight - 3);
+		}
 	}
-	
 });
 </script>
 

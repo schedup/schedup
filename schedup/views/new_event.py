@@ -92,8 +92,9 @@ class ChooseTimeslotsPage(BaseHandler):
     def get(self, owner_token):
         days = [28, 29, 30, 31]
         hours = [16, 17, 18, 19, 20, 21, 22]
-        events = [{"title":"foo", "day": 28, "hour" : 18, "duration" : 2}]
-        self.render_response("calendar.html", days = days, hours = hours, events_json = json.dumps(events))
+        events = [{"title":"foo", "day": 29, "hour" : 20, "duration" : 2}]
+        self.render_response("calendar.html", days = days, hours = hours, 
+            events_json = json.dumps(events), min_hour = min(hours), min_day = min(days))
          
         #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
         #self.redirect_with_flashmsg("/my", "Event created successfully")
