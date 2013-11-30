@@ -13,6 +13,7 @@ New Invitation
 <h4>By {{event.owner.get().fullname or event.owner.get().email}} </h4>
 <h4>From: {{event.start_time}}</h4>
 <h4>To: {{event.end_time}}</h4>
+<h4> Event Type: {{event.type}}</h4>
 
 {% if event.description %} 
 <h4>Description</h4>
@@ -45,8 +46,8 @@ New Invitation
 
 {% if event.status != "canceled" %}
 <div data-role="fieldcontain">
-	<a href="/decline/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="c" data-icon="delete" data-iconpos="right">I'm not going</a>
-	<a href="/choose/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="b" data-icon="arrow-r" data-iconpos="right">Go To Vote!</a>
+	<a href="/decline/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="c" data-icon="delete" data-iconpos="right" data-ajax="false">I'm not going</a>
+	<a href="/choose/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Go To Vote!</a>
 </div>
 {% endif%}
 

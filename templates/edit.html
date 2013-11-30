@@ -6,12 +6,11 @@ Edit Your'e Event
 
 {% block content %}
 
-<form action="{{post_url}}" method="post">
-
 <h1>{{event.title}}<a href="#" data-role="button" data-icon="edit" data-iconpos="notext" data-inline="true" title="Edit title"></a></h1>
 <!-- h4>By {{user.fullname or user.email}} </h4-->
 <h4>From: {{event.start_time}}</h4>
 <h4>To: {{event.end_time}}</h4>
+<h4> Event Type: {{event.type}}</h4>
 
 {% if event.description %} 
 <h4>Description<a href="#" data-role="button" data-icon="edit" data-iconpos="notext" data-inline="true" title="Edit description"></a></h4>
@@ -41,8 +40,8 @@ Edit Your'e Event
         </ul>
     </div>
 </div>
-</form>
 
+<a href="/choose/{{event.owner_token}}" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Check Votes</a>
 <a href="/send/{{event.owner_token}}" data-theme="b" data-role="button" data-icon="check" data-iconpos="right" data-ajax="false">Send Invites</a>
 <a href="/cancel/{{event.owner_token}}" data-theme="c" data-role="button" data-icon="delete" data-iconpos="right" data-ajax="false">Cancel Event</a>
 
