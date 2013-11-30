@@ -69,7 +69,10 @@ class EventInfo(ndb.Model):
     def get_guests_by_status(self, status):
         return [gst for gst in self.guests if gst.status == status]
 
-
+    @classmethod
+    def get_by_owner_token(cls, owner_token):
+        return cls.query(cls.owner_token == owner_token).get()
+    
     def has_responded(self,user):
         for guest in self.guests:
             if guest.user==user.key:

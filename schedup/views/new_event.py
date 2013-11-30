@@ -3,9 +3,9 @@ Create new event flow
 """
 import string
 import random
-from dateutil.parser import parse as parse_datetime
+from dateutil.parser import parse as parse_datetime, parse
 from datetime import timedelta
-from schedup.base import BaseHandler, logged_in
+from schedup.base import BaseHandler, logged_in, maybe_logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from google.appengine.ext import ndb
@@ -58,7 +58,7 @@ class NewEventPage(BaseHandler):
             duration=int(float(self.request.params["slider-step"])*60),
         )
         # hack for the first milestone {{
-        evt.start_time = evt.start_window.replace(hour = 0, minute = 0, second = 0)
+        evt.start_time = evt.start_window
         if "morning" in daytime:
             evt.start_time += timedelta(hours = 8)
         elif "noon" in daytime:
@@ -89,22 +89,85 @@ class NewEventPage(BaseHandler):
 class ChooseTimeslotsPage(BaseHandler):
     URL = "/choose/(.+)"
     
-    @logged_in
+    @maybe_logged_in
     def get(self, owner_token):
-        days = [28, 29, 30, 31]
-        hours = [16, 17, 18, 19, 20, 21, 22]
-        events = [{"title":"foo", "day": 29, "hour" : 20, "duration" : 2}]
+        the_event = EventInfo.get_by_owner_token(owner_token)
+        logging.info("evt=%r", the_event)
+        if not the_event:
+            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+        
+        days = []
+        s = the_event.start_window
+        while s <= the_event.end_window:
+            days.append((s.day, ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][s.weekday()]))
+            s += timedelta(days=1)
+
+        hours = set()
+        if "morning" in the_event.daytime:
+            hours.update(range(8,13))
+        if "noon" in the_event.daytime:
+            hours.update(range(12,17))
+        if "evening" in the_event.daytime:
+            hours.update(range(17,24))
+        hours = range(min(hours), max(hours)+1)
+        
+        logging.info("hours = %r", hours)
+        
+        timemap = {}
+        for gst in the_event.guests:
+            for ts, duration in (gst.selected_times if gst.selected_times else ()):
+                for halfhour in range(duration // 30):
+                    k = ts + timedelta(minutes=halfhour * 30)
+                    if k not in timemap:
+                        timemap[k] = 0
+                    timemap[k] += 1
+        
+        suggested = []
+        #count = len(the_event.guests)+1
+        #for slot, count in timemap.items():
+        #    suggested.append({"going" : slot,
+        #        "count" : count,
+        #        "day":5,
+        #        "hour":6,
+        #        "duration":1.5,
+        #        })
+        
+        events = []
+        if self.user:
+            for evt in self.gconn.get_events("primary", the_event.start_window, the_event.end_window):
+                start = parse(evt["start"]["dateTime"])
+                end = parse(evt["end"]["dateTime"])
+                events.append({
+                    "title" : evt["summary"], 
+                    "day" : (start.date() - the_event.start_window).days,
+                    "hour" : start.hour + start.minute / 60.0, 
+                    "duration" : (end - start).total_seconds() / (60*60.0),
+                })
+        
         self.render_response("calendar.html", days = days, hours = hours, 
-            events_json = json.dumps(events), min_hour = min(hours), min_day = min(days))
+            events_json = json.dumps(events), min_hour = min(hours),
+            suggested_json = json.dumps(suggested),
+            title = "Choose Times",
+            post_url = "/choose/%s" % (owner_token,),
+        )
         
         #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
         #self.redirect_with_flashmsg("/my", "Event created successfully")
+        
+        
+    def post(self, owner_token):
+        selected = json.loads(self.request.body.read())
+
 class ChooseTimeslotsPageForGuest(BaseHandler):
     URL = "/guestChoose/(.+)"
     
     def get(self, token):
         pass
         
+    
+
+
+
 
 
 
