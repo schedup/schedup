@@ -83,7 +83,13 @@ class CancelEventPage(BaseHandler):
             self.gconn.remove_event("primary", evt.evtid, send_notifications = True)
         self.redirect_with_flashmsg("/my", "Event '%s' canceled" % (evt.title,), "note")
 
-
-
+class GuestDeclined(BaseHandler):
+    URL = "/decline/(.+)"
+    
+    def get(self, token):
+        evt, guest = EventInfo.get_by_guest_token(token)
+        guest.status = "decline"
+        evt.put()
+        self.redirect_with_context("/my")
 
 

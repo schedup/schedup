@@ -7,7 +7,7 @@ New Invitation
 {% block content %}
 
 
-<form action="{{post_url}}" method="post" class="validate" id="voteform" data-ajax="false">
+
 
 <h1>{{event.title}}</h1>
 <h4>By {{event.owner.get().fullname or event.owner.get().email}} </h4>
@@ -43,49 +43,16 @@ New Invitation
     </div>
 </div>
 
-<div data-role="fieldcontain">
-    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-        <input id="radio1" name="status" value="accept" type="radio" data-icon="check" {% if the_guest.status=="accept" %}checked{%endif%}>
-        <label for="radio1">
-            ACCEPT
-        </label>
-        <input id="radio2" name="status" value="decline" type="radio" data-icon="delete" {% if the_guest.status=="decline" %}checked{%endif%}>
-        <label for="radio2">
-            DECLINE
-        </label>
-    </fieldset>
-</div>
-
 {% if event.status != "canceled" %}
-<input type="submit" value="Vote" data-theme="b" >
+<div data-role="fieldcontain">
+	<a href="/choose/{{the_guest.token}}" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Go To Vote!</a>
+	<a href="/decline/{{the_guest.token}}" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">I'm not going</a>
+</div>
 {% endif%}
 
-</form>
 
-<script type="text/javascript">
-	$(document).ready(function() {
 
-		$("#voteform").validate({
-			errorPlacement : function(error, element) {
-				if (element.attr("type")=="radio"){
-					error.appendTo(element.parent().parent());
-				}
-				else{
-					error.appendTo(element.parent());
-				}
-			},
-			rules : {
-				status : {
-					required : true
-				},			
-			},
-			messages : {
-				status : "You must select one",
-			}
-		});
-	});
-	
-</script>
+
 
 
 {% endblock %}
