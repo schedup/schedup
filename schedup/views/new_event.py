@@ -99,7 +99,12 @@ class ChooseTimeslotsPage(BaseHandler):
         
         #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
         #self.redirect_with_flashmsg("/my", "Event created successfully")
-
+class ChooseTimeslotsPageForGuest(BaseHandler):
+    URL = "/guestChoose/(.+)"
+    
+    def get(self, token):
+        pass
+        
 
 
 

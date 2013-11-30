@@ -87,6 +87,7 @@ class GoogleConnector(object):
             raise ValueError("Get profile failed", headers, body)
         return json.loads(body)
 
-
-
+    def update_event(self, calendar_id, event_id, event_info, send_notifications = True):
+        return self._calendar_service.events().update(calendarId=calendar_id, eventId=event_id, 
+            body=event_info, sendNotifications = send_notifications).execute(http = self.oauth.http())  
 
