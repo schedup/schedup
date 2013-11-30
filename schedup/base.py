@@ -68,7 +68,7 @@ class BaseHandler(webapp2.RequestHandler):
         if "flashclass" not in params:
             params["flashclass"] = self.session.pop("flashclass", "note")
         if "flashtimeout" not in params:
-            params["flashtimeout"] = self.session.pop("flashtimeout", 10) * 1000
+            params["flashtimeout"] = self.session.pop("flashtimeout", 10) * 500
         if not params.get("user"):
             params["user"] = getattr(self, "user", None)
         if "pageid" not in params:

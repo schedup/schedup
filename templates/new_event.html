@@ -33,31 +33,34 @@
 		<fieldset data-role="controlgroup" data-type="horizontal"
 			data-mini="true">
 			<legend> Type </legend>
-			<input id="radio1" name="type" value="business" type="radio">
+			<input id="radio1" name="type" value="Business" type="radio">
 			<label for="radio1"> Business </label> 
-			<input id="radio2" name="type" value="friends" type="radio" checked> 
+			<input id="radio2" name="type" value="Friends" type="radio" checked> 
 			<label for="radio2"> Friends </label> 
-			<input id="radio3" name="type" value="family" type="radio">
+			<input id="radio3" name="type" value="Family" type="radio">
 			<label for="radio3"> Family </label>
 		</fieldset>
         <div class="input-error" id="type-error">Please choose one</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="fromdate"> From </label> <input name="fromdate"
+		<label for="fromdate"> Start Time Span </label> <input name="fromdate"
 			data-mini="true" id="fromdate" type="date"
 			placeholder="First applicable date" data-role="datebox"
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
         <div class="input-error" id="fromdate-error">Required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="todate"> To </label> <input name="todate" data-mini="true"
+		<label for="todate">  </label> <input name="todate" data-mini="true"
 			id="todate" type="date" placeholder="Last applicable date"
 			data-role="datebox"
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
         <div class="input-error" id="todate-error">Required</div>
         <div class="input-error" id="todate-error2">End date must be later than start date</div>
 	</div>
-
+	<div data-role="fieldcontain">
+		<label for="slider-step">Duration (Hours)</label>
+		<input type="range" name="slider-step" id="slider-step" value="2" min="0" max="5" step="0.5" />
+	</div>
 	<div data-role="fieldcontain">
 		<label for="textarea-a">Details</label>
 		<textarea name="description" id="textarea-a" placeholder="Description"></textarea>
