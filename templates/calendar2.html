@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block header %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+
+<div class="calendar-container disable-select">
+<table id="calendar-grid" cellpadding="0" cellspacing="0"><tr>
+	<td class="cal-hours-column">
+    <div class="cal-hour-x"></div>
+	{% for hour in hours %}
+	   <div class="cal-hour-cell" data-cell-row="{{hour*2}}"><div class="cal-hour-text">{{hour}}</div></div>
+       <div class="cal-hour-cell-30" data-cell-row="{{hour*2+1}}"></div>
+	{% endfor %}
+	</td>
+{% for day in days %}
+    <td class="cal-day-column" id="column-{{day.index}}">
+    <div class="cal-day-title" data-cell-col="{{day.index}}">
+        <span class="weekday">{{day.weekday}}</span> <span class="date">{{day.date}}</span>
+    </div>
+    {% for hour in hours %}
+       <div class="cal-day-cell" id="cell-{{day.index}}-{{hour}}" data-cell-row="{{hour*2}}" data-cell-col="{{day.index}}"></div>
+       <div class="cal-day-cell cal-day-cell-30" id="cell-{{day.index}}-{{hour}}-30" data-cell-row="{{hour*2+1}}" data-cell-col="{{day.index}}"></div>
+    {% endfor %}
+    </td>
+{% endfor %}
+</tr>
+</table>
+</div>
+
+<p>
+<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">
+Send</button>
+</p>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    
+    var taphold_target = null;
+    var first = null;
+	$(".cal-day-cell").on("taphold", function(e){
+		console.log("taphold", this);
+		taphold_target = $(this);
+		taphold_target.toggleClass("cal-day-cell-selected");
+		first = null;
+		$(".cal-day-cell-sel-start").each(function(){$(this).removeClass("cal-day-cell-sel-start");});
+	});
+	
+	$(".cal-day-cell").on("tap", function(){
+		var elem = $(this);
+		if (elem.is(taphold_target)) {
+	        taphold_target = null;
+	        first = null;
+			return false;
+		}
+		
+        console.log("tap", this);
+
+		if (first == null) {
+	        first = elem;
+	        elem.toggleClass("cal-day-cell-sel-start");
+	        return false;
+		}
+
+        first.removeClass("cal-day-cell-sel-start");
+        elem.removeClass("cal-day-cell-sel-start");
+
+        var r1 = parseInt(first.data("cell-row"));
+        var c1 = parseInt(first.data("cell-col"));
+        var r2 = parseInt(elem.data("cell-row"));
+        var c2 = parseInt(elem.data("cell-col"));
+
+        if (r2 < r1) {
+            var tmp = r2;
+            r2 = r1;
+            r1 = tmp;
+        }
+        if (c2 < c1) {
+            var tmp = c2;
+            c2 = c1;
+            c1 = tmp;
+        }
+
+        var all_have = true;
+        for (var r = r1; all_have && r <= r2; r++) {
+            for (var c = c1; all_have && c <= c2; c++) {
+                var cell = $(".cal-day-cell[data-cell-row='"+r+"'][data-cell-col='"+c+"']");
+                if (!cell.hasClass("cal-day-cell-selected")){
+                	all_have = false;
+                }
+            }
+        }
+        
+        for (var r = r1; r <= r2; r++) {
+            for (var c = c1; c <= c2; c++) {
+                var cell = $(".cal-day-cell[data-cell-row='"+r+"'][data-cell-col='"+c+"']");
+                if (all_have) {
+                    cell.removeClass("cal-day-cell-selected");
+                }
+                else {
+                    cell.addClass("cal-day-cell-selected");
+                }
+            }
+        }
+		
+		first = null;
+		return false;
+	});
+	
+	$(".cal-day-title").on("taphold dblclick", function() {
+		var col = $(this).data("cell-col");
+		var c1 = $(".cal-day-cell[data-cell-col='" + col + "']");
+		var c1_has = _.every(c1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+		
+		if (c1_has) {
+			c1.removeClass("cal-day-cell-selected");
+		}
+		else {
+			c1.addClass("cal-day-cell-selected");
+		}
+	});
+
+	$(".cal-hour-cell").on("taphold dblclick", function() {
+	     var row = $(this).data("cell-row");
+	     var r1 = $(".cal-day-cell[data-cell-row='" + row + "']");
+         var r2 = $(".cal-day-cell[data-cell-row='" + (row + 1)+ "']");
+	     var r1_has = _.every(r1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+         var r2_has = _.every(r2.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+	     
+	     if (r1_has && r2_has) {
+	    	 r1.removeClass("cal-day-cell-selected");
+             r2.removeClass("cal-day-cell-selected");
+	     }
+	     else {
+             r1.addClass("cal-day-cell-selected");
+             r2.addClass("cal-day-cell-selected");
+	     }
+	});
+
+    $(".cal-hour-cell-30").on("taphold dblclick", function() {
+        var row = $(this).data("cell-row");
+        var r1 = $(".cal-day-cell[data-cell-row='" + row + "']");
+        var r1_has = _.every(r1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+        
+        if (r1_has) {
+            r1.removeClass("cal-day-cell-selected");
+        }
+        else {
+            r1.addClass("cal-day-cell-selected");
+        }
+    });
+
+});
+</script>
+
+{% endblock %}
+

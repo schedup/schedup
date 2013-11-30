@@ -127,40 +127,23 @@ def maybe_logged_in(method):
         return method(self, *args)
     return method2
 
-
-def api_call(**signature):
-    def deco(method):
-        argnames, _, _, defaults = inspect.getargspec(method)
-        optional_argsnames = frozenset(argnames[-len(defaults):] if defaults else ())
+def json_handler(method):
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        try:
+            res = method(self, *args, **kwargs)
+        except Exception as ex:
+            res = {"status" : "error", "exception" : repr(ex)}
+            if app.debug:
+                res["traceback"] = "".join(traceback.format_exception(*sys.exc_info())).splitlines()
+            self.response.status = 500
+        else:
+            self.response.status = 200
         
-        @functools.wraps(method)
-        def method2(self):
-            try:
-                kwargs = {}
-                for name, tp in signature.items():
-                    if name not in self.request.params:
-                        if name not in optional_argsnames:
-                            raise KeyError("Missing parameter: %s" % (name,))
-                    else:
-                        kwargs[name] = tp(self.request.params[name])
-                
-                res = method(self, **kwargs)
-            except Exception as ex:
-                result = {"status" : "error", "exception" : repr(ex)}
-                if app.debug:
-                    result["traceback"] = "".join(traceback.format_exception(*sys.exc_info())).splitlines()
-                self.response.status = 500
-            else:
-                result = {"status" : "ok", "value" : res}
-                self.response.status = 200
-            
-            json_data = json.dumps(result)
-            self.response.content_type = 'application/json'
-            self.response.write(json_data)
-        return method2
-    return deco
-
-
+        json_data = json.dumps(res)
+        self.response.content_type = 'application/json'
+        self.response.write(json_data)
+    return wrapper
 
 
 
