@@ -112,8 +112,12 @@ $(document).ready(function(){
 			data: JSON.stringify(selected),
 			traditional: true,
 			success : function(){
-			    alert("yes");
+			    console.log("hurra");
+			},
+			error : function(x){
+			    console.log("oh nos", x);
 			}
+
 	    });
 	});
 	

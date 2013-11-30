@@ -156,7 +156,13 @@ class ChooseTimeslotsPage(BaseHandler):
         
         
     def post(self, owner_token):
-        selected = json.loads(self.request.body.read())
+        selected = json.loads(self.request.body)
+        logging.info("selected=%r", selected)
+        res = ""
+        json_data = json.dumps(res)
+        self.response.content_type = "application/json"
+        self.response.write(json_data)
+
 
 class ChooseTimeslotsPageForGuest(BaseHandler):
     URL = "/guestChoose/(.+)"
@@ -165,10 +171,6 @@ class ChooseTimeslotsPageForGuest(BaseHandler):
         pass
         
     
-
-
-
-
 
 
 
