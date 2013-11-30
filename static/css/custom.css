@@ -90,15 +90,20 @@ label.error {
 .calendar-cell {
     display: table-cell;
     min-width: 70px;
-    min-height: 50px;
+    min-height: 25px;
     width: 70px;
-    height: 50px;
+    height: 25px;
     background: #eee;
 	margin: 0;
 	padding: 0;
 	border-left: 3px solid white;
-    border-bottom: 3px solid white;
+	/*border-bottom: 1px solid white;*/
     cursor: crosshair;
+}
+
+.calendar-cell-half {
+    background: #ddd;
+    border-bottom: 3px solid white;
 }
 
 .calendar-cell-selected {
@@ -107,10 +112,20 @@ label.error {
 
 .calendar-event {
 	position: absolute;
-	opacity: 0.20;
-	background-color: red;
+	opacity: 0.80;
+	background-color: rgba(0,0,0,0.4);
     width: 70px;
-    height: 50px;
+    height: 40px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.calendar-slot {
+	position: absolute;
+	opacity: 0.80;
+	background-color: rgba(255,255,0,0.4);
+    width: 70px;
+    height: 40px;
     overflow: hidden;
     pointer-events: none;
 }
@@ -138,6 +153,12 @@ label.error {
     background: rgba(207, 220, 255, 0.67);
     border-left: 3px solid white;
     border-bottom: 3px solid white;
+    font-size: 80%;
+    font-weight: bold;
+}
+
+.day-weekend {
+	background: rgba(159, 180, 236, 0.9);
 }
 
 .calendar-day-cell-x {
@@ -151,11 +172,16 @@ label.error {
     padding: 0;
     text-align: center;
     width: 30px;
-    line-height: 50px;
+    min-width: 30px;
+    line-height: 25px;
+    font-size: 80%;
     background: rgba(207, 220, 255, 0.67);
-    border-bottom: 3px solid white;
+    font-weight: bold;
 }
 
+.calendar-hour-half {
+    border-bottom: 3px solid white;
+}
 
 
 

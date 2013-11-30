@@ -51,6 +51,15 @@
 	        $('#sidepanel').panel('close');
 	      }
 	    });
+	    
+	    //$(window).on("navigate", function(event, data){
+		$(document).bind( "pagebeforechange", function( event, data ) {
+		  console.log(event, data);
+		  /*if( data.state.direction == "back" && $("#sidepanel").hasClass("ui-panel-open")) {
+		        event.preventDefault();
+		        $('#sidepanel').panel('close');
+		  }*/
+	    });
 	});
 	</script>	
 	{% endif %}

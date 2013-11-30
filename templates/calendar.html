@@ -10,20 +10,32 @@
 <div id="calendar-grid" class="disable-select">
 <div class="calendar-days">
     <div class="calendar-day-cell calendar-day-cell-x"></div>
-    {% for day in days %}
-        <div class="calendar-day-cell">{{day}}</div>
+    {% for day, dayname in days %}
+        <div class="calendar-day-cell {% if dayname == 'Fr' or dayname == 'Sa' %}day-weekend{%endif%}">
+        {{day}} [{{dayname}}]</div>
     {% endfor %}
 </div>
 {% for hour in hours %}
     <div class="calendar-row">
 	    <div class="calendar-hour">{{hour}}</div>
-	    {% for day in days %}
-	        <div class="calendar-cell" id="cal-cell-{{day}}-{{hour}}"></div>
+	    {% for day, _ in days %}
+	        <div class="calendar-cell" id="cal-cell-{{day}}-{{hour}}" data-hour="{{day}},{{hour}}"></div>
+	    {% endfor %}
+    </div>
+    <div class="calendar-row">
+	    <div class="calendar-hour calendar-hour-half"></div>
+	    {% for day, _ in days %}
+	        <div class="calendar-cell calendar-cell-half" id="cal-cell-{{day}}-{{hour}}-half"
+	        data-hour="{{day}},{{hour}}.5"></div>
 	    {% endfor %}
     </div>
 {% endfor %}
 </div>
 </div>
+
+<p>
+<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
+</p>
 
 <script type="text/javascript">
 $(document).ready(function(){
@@ -44,20 +56,20 @@ $(document).ready(function(){
 		}
 	});*/
 	
-	$(".calendar-cell").on("tap", function(e) {
+	$(".calendar-cell").on("click", function(e) {
 	    $(this).toggleClass("calendar-cell-selected");
 	});
 	
 	var events = {{events_json|safe}};
 	
+	var hoffset = $(".calendar-hour").outerWidth();
+	var voffset = $(".calendar-days").outerHeight();
+	var evtwidth = $(".calendar-cell").outerWidth();
+	var evtheight = $(".calendar-cell").outerHeight() + $(".calendar-cell-half").outerHeight();
+
+	var grid = $("#calendar-grid");
+	
 	if (events.length) {
-		var hoffset = $(".calendar-hour").outerWidth();
-		var voffset = $(".calendar-days").outerHeight();
-		var evtwidth = $(".calendar-cell").outerWidth();
-        var evtheight = $(".calendar-cell").outerHeight();
-        console.log(hoffset, voffset, evtwidth, evtheight);
-		
-		var grid = $("#calendar-grid");
 		for (var i in events) {
 			var evt = events[i];
 			var evtdiv = $("<div class='calendar-event' id='calendar-event-" + evt.day + "-" + evt.hour + "'>");
@@ -67,10 +79,44 @@ $(document).ready(function(){
 			grid.append(evtdiv);
 	        console.log(evt.hour, evt.day);
 	        evtdiv.css("top", voffset + (evt.hour - {{min_hour}}) * evtheight);
-	        evtdiv.css("left", hoffset + (evt.day - {{min_day}}) * evtwidth + 3);
+	        evtdiv.css("left", hoffset + evt.day * evtwidth + 3);
 	        evtdiv.css("height", evt.duration * evtheight - 3);
 		}
 	}
+
+	var suggested = {{suggested_json|safe}};
+
+	if (suggested.length) {
+		for (var i in suggested) {
+			var evt = suggested[i];
+			var evtdiv = $("<div class='calendar-slot' id='calendar-slot-" + evt.day + "-" + evt.hour + "'>");
+			var title = $("<span class='calendar-event-title'>");
+			title.text("["+evt.going + "/" + evt.count + "]");
+			evtdiv.append(title);
+			grid.append(evtdiv);
+	        console.log(evt.hour, evt.day);
+	        evtdiv.css("top", voffset + (evt.hour - {{min_hour}}) * evtheight);
+	        evtdiv.css("left", hoffset + evt.day * evtwidth + 3);
+	        evtdiv.css("height", evt.duration * evtheight - 3);
+		}
+	}
+	
+	$("#savebtn").on("click", function(){
+	    var selected = $.map($(".calendar-cell-selected"), function(elem){return $(elem).data("hour");});
+	    console.log(selected);
+	    
+	    $.ajax("{{post_url}}", {
+			cache : false,
+			type: "POST",
+			dataType : "json",
+			data: JSON.stringify(selected),
+			traditional: true,
+			success : function(){
+			    alert("yes");
+			}
+	    });
+	});
+	
 });
 </script>
 
