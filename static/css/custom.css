@@ -153,7 +153,7 @@ label.error {
     width: 30px;
     line-height: 50px;
     background: rgba(207, 220, 255, 0.67);
-    border-bottom: 3px solid rgba(255, 255, 255, 0.99);
+    border-bottom: 3px solid white;
 }
 
 

@@ -27,8 +27,21 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-	$(".calendar-cell").on("tap", function(){
-		$(this).toggleClass("calendar-cell-selected");
+    
+    var last_cell = null;
+    
+	$("#calendar-grid").on("mousemove", function(e){
+	    var elem = $(this);
+	    var clickElem = $(document.elementFromPoint(e.pageX, e.pageY));
+	    
+	    if (e.which != 0 && clickElem.hasClass("calendar-cell")) {
+		    if (last_cell != null && last_cell.attr("id") == clickElem.attr("id")) {
+				return;
+		    }
+		    last_cell = clickElem;
+			clickElem.toggleClass("calendar-cell-selected");
+			e.preventDefault();
+		}
 	});
 	
 	var events = {{events_json|safe}};
