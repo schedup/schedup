@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from google.appengine.api.validation import Repeated
 
 
 class UserProfile(ndb.Model):
@@ -21,13 +22,14 @@ class UserProfile(ndb.Model):
                     count += 1
         return count
 
-
+               
 class EventGuest(ndb.Model):
     # extactly one of these must be set {{
     user = ndb.KeyProperty(UserProfile)
     email = ndb.StringProperty()
     # }}
     token = ndb.StringProperty()
+    selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
 
 
@@ -45,7 +47,7 @@ class EventInfo(ndb.Model):
     description = ndb.StringProperty()
     start_window = ndb.DateProperty(required = True)
     end_window = ndb.DateProperty(required = True)
-    
+    duration = ndb.IntegerProperty(required = True)
     start_time = ndb.DateTimeProperty()
     end_time = ndb.DateTimeProperty()
     

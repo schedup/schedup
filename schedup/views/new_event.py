@@ -55,6 +55,7 @@ class NewEventPage(BaseHandler):
             end_window = totime,
             guests = guests,
             description=self.request.params["description"],
+            duration=int(float(self.request.params["slider-step"])*60),
         )
         # hack for the first milestone {{
         evt.start_time = evt.start_window.replace(hour = 0, minute = 0, second = 0)
@@ -79,8 +80,8 @@ class NewEventPage(BaseHandler):
         
         logging.info("Guests: %r", guests)
         
-        self.redirect_with_context("/my", 
-            flashmsg = "Event created successfully, emails have been sent to guests",
+        self.redirect_with_context("/choose/" + owner_token , 
+            flashmsg = "Invites for voting sent, Please Vote",
             flashclass = "ok", 
             token = owner_token)
 
