@@ -4,7 +4,7 @@ Create new event flow
 import string
 import random
 from dateutil.parser import parse as parse_datetime, parse
-from datetime import timedelta
+from datetime import timedelta, date
 from schedup.base import BaseHandler, logged_in, maybe_logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
@@ -92,7 +92,6 @@ class ChooseTimeslotsPage(BaseHandler):
     @maybe_logged_in
     def get(self, owner_token):
         the_event = EventInfo.get_by_owner_token(owner_token)
-        logging.info("evt=%r", the_event)
         if not the_event:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
@@ -144,20 +143,50 @@ class ChooseTimeslotsPage(BaseHandler):
                     "duration" : (end - start).total_seconds() / (60*60.0),
                 })
         
-        self.render_response("calendar.html", days = days, hours = hours, 
+        self.render_response("calendar2.html", days = days, hours = hours, 
             events_json = json.dumps(events), min_hour = min(hours),
             suggested_json = json.dumps(suggested),
-            title = "Choose Times",
+            title = the_event.title,
             post_url = "/choose/%s" % (owner_token,),
         )
-        
-        #evt = EventInfo.query(EventInfo.owner_token == owner_token).get()
-        #self.redirect_with_flashmsg("/my", "Event created successfully")
     
     def post(self, owner_token):
-        selected = json.loads(self.request.body.read())
+        selected = json.loads(self.request.body)
+        logging.info("selected=%r", selected)
+
+        the_event = EventInfo.get_by_owner_token(owner_token)
+        the_event.owner_selected_times = selected
+        the_event.put()
+        
+        res = ""
+        json_data = json.dumps(res)
+        self.response.content_type = "application/json"
+        self.response.write(json_data)
 
 
+class ChooseTimeslotsPageForGuest(BaseHandler):
+    URL = "/guestChoose/(.+)"
+    
+    def get(self, token):
+        pass
+    
+    
+    
+class CalendarTest(BaseHandler):
+    URL = "/cal"
+
+    def get(self):
+        days = []
+        today = date.today()
+        for d in range(7):
+            d = today + timedelta(days = d)
+            days.append({"date" : d.strftime("%d %b"), "index" : d.toordinal(),
+                "weekday":["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.weekday()]})
+        
+        self.render_response("calendar2.html", 
+            days = days,
+            hours=[8,9,10,11,12])
+    
 
 
 

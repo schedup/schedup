@@ -72,116 +72,123 @@ label.error {
 	padding: 0;
 	overflow-x: auto;
 	cursor: default;
+    background: white;
 }
 
 #calendar-grid {
-	display: table;
     margin: 0;
     padding: 0;
     position: relative;
 }
 
-.calendar-row {
-    display: table-row;
+.cal-hours-column {
     margin: 0;
     padding: 0;
+    width: 28px;
+    min-width: 28px;
+    border-right: 1px solid rgba(0,0,0,0.06);
 }
 
-.calendar-cell {
-    display: table-cell;
-    min-width: 70px;
-    min-height: 25px;
-    width: 70px;
+.cal-hour-x {
+	height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.cal-hour-cell {
+	width: 28px;
+    min-width: 28px;
     height: 25px;
-    background: #eee;
-	margin: 0;
-	padding: 0;
-	border-left: 3px solid white;
-	/*border-bottom: 1px solid white;*/
-    cursor: crosshair;
+    border-bottom: 1px dotted rgba(0,0,0,0.06);
 }
 
-.calendar-cell-half {
-    background: #ddd;
-    border-bottom: 3px solid white;
-}
-
-.calendar-cell-selected {
-	background: rgba(0, 255, 10, 0.61) !important;
-}
-
-.calendar-event {
-	position: absolute;
-	opacity: 0.80;
-	background-color: rgba(0,0,0,0.4);
-    width: 70px;
-    height: 40px;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.calendar-slot {
-	position: absolute;
-	opacity: 0.80;
-	background-color: rgba(255,255,0,0.4);
-    width: 70px;
-    height: 40px;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.calendar-event-title {
-	display: block;
-	padding: 3px;
-    text-align: center;
+.cal-hour-text {
+	font-size: 80%;
     font-weight: bold;
+    text-align: right;
+    padding: 2px 4px 0 0;
 }
 
-.calendar-days {
-    display: table-row;
-    margin: 0;
-    padding: 0;
-    height: 30px;
-    line-height: 30px;
+.cal-hour-cell-30 {
+    height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-size: 50%;
+    text-align: right;
 }
 
-.calendar-day-cell {
-    display: table-cell;
+.cal-day-column {
     margin: 0;
     padding: 0;
+    width: 70px;
+    min-width: 70px;
+    border-right: 1px solid rgba(0,0,0,0.06);
+}
+
+.cal-day-title {
+    width: 70px;
+    min-width: 70px;
+    height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background-color: rgb(216, 229, 255);
     text-align: center;
-    background: rgba(207, 220, 255, 0.67);
-    border-left: 3px solid white;
-    border-bottom: 3px solid white;
+}
+
+.cal-day-title .weekday {
     font-size: 80%;
     font-weight: bold;
 }
 
-.day-weekend {
-	background: rgba(159, 180, 236, 0.9);
+.cal-day-title .date {
+    font-size: 70%;
 }
 
-.calendar-day-cell-x {
-	background: transparent !important;
-	border: none;
+.cal-day-cell {
+    width: 70px;
+    min-width: 70px;
+    height: 25px;
+    border-bottom: 1px dotted rgba(0,0,0,0.06);
 }
 
-.calendar-hour {
-    display: table-cell;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    width: 30px;
-    min-width: 30px;
-    line-height: 25px;
-    font-size: 80%;
-    background: rgba(207, 220, 255, 0.67);
-    font-weight: bold;
+.cal-day-cell-30 {
+    border-bottom: 1px solid rgba(0,0,0,0.1) !important;
 }
 
-.calendar-hour-half {
-    border-bottom: 3px solid white;
+.cal-day-cell-selected {
+    background-color: rgba(131, 214, 99, 0.9);
 }
+
+.cal-day-cell-sel-start {
+    background-color: rgba(122, 229, 80, 0.9);
+	
+	animation-name: blinker;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+
+    -webkit-animation-name: blinker;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-moz-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
 
 
 

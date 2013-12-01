@@ -8,12 +8,12 @@ import schedup.views.profile
 
 class MainPage(BaseHandler):
     URL = "/"
-    
+    @maybe_logged_in
     def get(self):
-        #if self.user:
-        #    self.redirect("/my")
-        #else:
-        self.render_response('landing.html', hide_header = True)
+        if self.user:
+            self.redirect("/my")
+        else:
+            self.render_response('landing.html', hide_header = True)
 
 class AboutPage(BaseHandler):
     URL = "/about"

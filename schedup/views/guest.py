@@ -51,7 +51,7 @@ class SendEventPage(BaseHandler):
         evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
-        evt.status="sent"
+        
         event_details = {
             'summary': evt.title,
             'description': evt.description,
@@ -62,12 +62,28 @@ class SendEventPage(BaseHandler):
             'attendees': [{'email': guest.email, 'responseStatus':'accepted'}
                 for guest in evt.guests if guest.status == "accept"],
         }
-        logging.info("evt=%r", event_details)
-        resp = self.gconn.create_event("primary", event_details, send_notifications = True)
-        logging.info("resp = %r", resp)
-        evt.evtid = resp["id"]
-        evt.put()
-        self.redirect_with_flashmsg("/my", "Invites sent", "ok")
+        logging.info("log: event status = %r", evt.status)
+        if (evt.status == "pending"):    
+            evt.status="sent"
+            event_details = {
+                'summary': evt.title,
+                'description': evt.description,
+                'location': '',
+                'status':'confirmed',
+                'start': {'dateTime': evt.start_time.isoformat() + "+02:00",},
+                'end': {'dateTime': evt.end_time.isoformat() + "+02:00"},
+                'attendees': [{'email': guest.email, 'responseStatus':'accepted'}
+                    for guest in evt.guests if guest.status == "accept"],
+            }
+            logging.info("evt=%r", event_details)
+            resp = self.gconn.create_event("primary", event_details, send_notifications = True)
+            logging.info("resp = %r", resp)
+            evt.evtid = resp["id"]
+            evt.put()
+            return self.redirect_with_flashmsg("/my", "Invites sent", "ok")
+        elif (evt.status == "sent"):
+            resp = self.gconn.update_event("primary",evt.evtid, event_details, send_notifications = True)
+            return self.redirect_with_flashmsg("/my", "Updates sent", "ok")
 
 class CancelEventPage(BaseHandler):
     URL = "/cancel/(.+)"

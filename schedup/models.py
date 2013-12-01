@@ -40,6 +40,7 @@ class EventInfo(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add = True)
     status = ndb.StringProperty(choices=["sent","canceled","pending"], default="pending")
     evtid = ndb.StringProperty()
+    owner_selected_times= ndb.PickleProperty()
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()

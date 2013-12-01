@@ -47,7 +47,7 @@ New Invitation
 {% if event.status != "canceled" %}
 <div data-role="fieldcontain">
 	<a href="/decline/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="c" data-icon="delete" data-iconpos="right" data-ajax="false">I'm not going</a>
-	<a href="/choose/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Go To Vote!</a>
+	<a href="/guestChoose/{{the_guest.token}}" data-role="button" data-inline="true" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Go To Vote!</a>
 </div>
 {% endif%}
 
