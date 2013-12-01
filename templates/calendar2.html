@@ -10,6 +10,17 @@
 
 {% block content %}
 
+<div id="prevnext-bar">
+<table style="width:100%;"><tr>
+<td>
+<a href="#" id="prev-btn" data-role="button" data-theme="a" data-inline="true" data-icon="arrow-l" data-iconpos="notext"></a>
+</td>
+<td style="text-align:right;">
+<a href="#" id="next-btn" data-role="button" data-theme="a" data-inline="true" data-icon="arrow-r" data-iconpos="notext"></a>
+</td>
+</tr></table>
+</div>
+
 <div class="calendar-container disable-select">
 <table id="calendar-grid" cellpadding="0" cellspacing="0"><tr>
 	<td class="cal-hours-column">
@@ -154,6 +165,24 @@ $(document).ready(function(){
         else {
             r1.addClass("cal-day-cell-selected");
         }
+    });
+    
+    $("#next-btn").on("click", function() {
+        var grid = $("#calendar-grid");
+        var left = parseInt(grid.css("margin-left"));
+        console.log("next, left", left);
+        grid.animate({
+            "margin-left": (left - 300) + "px",
+        });
+    });
+
+    $("#prev-btn").on("click", function() {
+    	var grid = $("#calendar-grid");
+    	var left = parseInt(grid.css("margin-left"));
+        console.log("prev, left", left);
+        grid.animate({
+            "margin-left": (left + 300) + "px",
+        });
     });
 
 });
