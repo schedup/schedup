@@ -143,7 +143,7 @@ class ChooseTimeslotsPage(BaseHandler):
                     "duration" : (end - start).total_seconds() / (60*60.0),
                 })
         
-        self.render_response("calendar2.html", days = days, hours = hours, 
+        self.render_response("calendar.html", days = days, hours = hours, 
             events_json = json.dumps(events), min_hour = min(hours),
             suggested_json = json.dumps(suggested),
             title = the_event.title,

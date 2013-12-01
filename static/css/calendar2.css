@@ -1,0 +1,128 @@
+.calendar-container
+{
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    cursor: default;
+    background: white;
+}
+
+#calendar-grid {
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.cal-hours-column {
+    margin: 0;
+    padding: 0;
+    width: 28px;
+    min-width: 28px;
+    border-right: 1px solid rgba(0,0,0,0.06);
+}
+
+.cal-hour-x {
+    height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.cal-hour-cell {
+    width: 28px;
+    min-width: 28px;
+    height: 25px;
+    border-bottom: 1px dotted rgba(0,0,0,0.06);
+}
+
+.cal-hour-text {
+    font-size: 80%;
+    font-weight: bold;
+    text-align: right;
+    padding: 2px 4px 0 0;
+}
+
+.cal-hour-cell-30 {
+    height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-size: 50%;
+    text-align: right;
+}
+
+.cal-day-column {
+    margin: 0;
+    padding: 0;
+    width: 70px;
+    min-width: 70px;
+    border-right: 1px solid rgba(0,0,0,0.06);
+}
+
+.cal-day-title {
+    width: 70px;
+    min-width: 70px;
+    height: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background-color: rgb(216, 229, 255);
+    text-align: center;
+}
+
+.cal-day-title .weekday {
+    font-size: 80%;
+    font-weight: bold;
+}
+
+.cal-day-title .date {
+    font-size: 70%;
+}
+
+.cal-day-cell {
+    width: 70px;
+    min-width: 70px;
+    height: 25px;
+    border-bottom: 1px dotted rgba(0,0,0,0.06);
+}
+
+.cal-day-cell-30 {
+    border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+.cal-day-cell-selected {
+    background-color: rgba(131, 214, 99, 0.9);
+}
+
+.cal-day-cell-sel-start {
+    background-color: rgba(122, 229, 80, 0.9);
+    
+    animation-name: blinker;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+
+    -webkit-animation-name: blinker;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-moz-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+
+
+
