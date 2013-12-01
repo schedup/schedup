@@ -4,6 +4,7 @@ import schedup.views.guest
 import schedup.views.event_list
 import schedup.views.new_event
 import schedup.views.profile
+import schedup.views.calendar
 
 
 class MainPage(BaseHandler):

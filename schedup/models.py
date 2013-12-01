@@ -24,10 +24,10 @@ class UserProfile(ndb.Model):
 
                
 class EventGuest(ndb.Model):
-    # extactly one of these must be set {{
-    user = ndb.KeyProperty(UserProfile)
+    # always expected to be set
     email = ndb.StringProperty()
-    # }}
+    # may be set if the guest is a user
+    user = ndb.KeyProperty(UserProfile)
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
@@ -60,6 +60,16 @@ class EventInfo(ndb.Model):
                 if guest.token == token:
                     return evt, guest
         return None, None
+    
+    @classmethod
+    def get_by_token(cls, user_token):
+        evt = cls.get_by_owner_token(user_token)
+        if evt:
+            return True, evt, evt.owner.get()
+        evt, gst = cls.get_by_guest_token(user_token)
+        if evt:
+            return False, evt, gst
+        return None, None, None
     
     def get_token_for(self, user):
         for guest in self.guests:
