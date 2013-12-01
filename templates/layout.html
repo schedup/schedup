@@ -64,6 +64,7 @@
 	</script>	
 	{% endif %}
 	
+	{% block topbar %}
 	{% if not hide_header %}
     <div data-theme="b" data-role="header" data-position="fixed">
     	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false></a>
@@ -71,6 +72,7 @@
     	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false></a>
     </div>
 	{% endif %}
+	{%endblock %}
 
     <div data-role="content" class="content-width-limit">
         {% block flashmsg %}

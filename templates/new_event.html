@@ -85,6 +85,15 @@
 			}
 		});
 		
+		$("#fromdate").on("change", function(){
+			var todate = $("#todate");
+			var fromtime = $("#fromdate").datebox("getTheDate");
+			var defDate = [fromtime.getFullYear(), fromtime.getMonth(), fromtime.getDate()];
+			console.log(fromtime, defDate);
+			todate.datebox({"defaultValue" : defDate});
+			//todate.datebox("refresh");
+		});
+		
 		$("#newevtform").submit(function(event){
 			var succ = true;
 			var first = null;

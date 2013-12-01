@@ -1,8 +1,19 @@
 {% extends "layout.html" %}
 
-{% block header %}
-{{title}}
-{% endblock %}
+<!-- {% block header %} -->
+<!-- {{title}} -->
+<!-- {% endblock %} -->
+{% block topbar %}
+<div class="ui-bar ui-bar-b">
+	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+	<a href="info#" data-role="button" class="ui-icon-nodisc" data-icon="info" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+	<a href="#" data-role="button" class="ui-icon-nodisc" data-icon="plus" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
+	<div style="float:right;">
+		 <a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+    </div>
+</div>
+{% endblock %} 
 
 {% block content %}
 
