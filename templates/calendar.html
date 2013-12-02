@@ -1,17 +1,60 @@
 {% extends "layout.html" %}
 
-<!-- {% block header %} -->
-<!-- {{title}} -->
-<!-- {% endblock %} -->
+
 {% block topbar %}
 <div class="ui-bar ui-bar-b">
 	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 	<a href="info#" data-role="button" class="ui-icon-nodisc" data-icon="info" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
-	<a href="#" data-role="button" class="ui-icon-nodisc" data-icon="plus" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+	<a href="#popupMenu" data-rel="popup" data-role="button" data-inline="true" data-corners="true" data-shadow="true" data-iconshadow="true" data-wrapperels="span" data-theme="b" aria-haspopup="true" aria-owns="#popupMenu" class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b">
+		<span class="ui-btn-inner ui-btn-corner-all">
+			<span class="ui-btn-text">Select Guests</span>
+		</span>
+	</a>
 	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
 	<div style="float:right;">
 		 <a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
     </div>
+</div>
+<div class="ui-popup-container ui-popup-active" id="popupMenu-popup" style="max-width: 1336px; top: 592px; left: 577px;" tabindex="0"><div data-role="popup" id="popupMenu" data-theme="a" class="ui-popup ui-body-a ui-overlay-shadow ui-corner-all" aria-disabled="false" data-disabled="false" data-shadow="true" data-corners="true" data-transition="none" data-position-to="origin">
+				<div class="ui-controlgroup-controls">
+					<div class="ui-checkbox">
+						<input type="checkbox" name="checkbox-1a" id="checkbox-1a" class="custom">
+							<label for="checkbox-1a" data-theme="c" class="ui-btn ui-btn-icon-left ui-corner-top ui-btn-up-c">
+								<span class="ui-btn-inner ui-corner-top">
+									<span class="ui-btn-text">Shir</span>
+									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
+								</span>
+							</label>
+					</div>
+					<div class="ui-checkbox">
+						<input type="checkbox" name="checkbox-2a" id="checkbox-2a" class="custom">
+							<label for="checkbox-2a" data-theme="c" class="ui-btn ui-btn-icon-left ui-btn-up-c">
+								<span class="ui-btn-inner">
+									<span class="ui-btn-text">Tomer</span>
+									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
+								</span>
+							</label>
+					</div>
+					<div class="ui-checkbox">
+						<input type="checkbox" name="checkbox-3a" id="checkbox-3a" class="custom">
+							<label for="checkbox-3a" data-theme="c" class="ui-btn ui-btn-icon-left ui-btn-up-c">
+								<span class="ui-btn-inner">
+									<span class="ui-btn-text">Ofir</span>
+									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
+								</span>
+							</label>
+					</div>
+					<div class="ui-checkbox">
+						<input type="checkbox" name="checkbox-4a" id="checkbox-4a" class="custom">
+							<label for="checkbox-4a" data-theme="c" class="ui-btn ui-btn-icon-left ui-corner-bottom ui-controlgroup-last ui-btn-up-c">
+								<span class="ui-btn-inner ui-corner-bottom ui-controlgroup-last">
+									<span class="ui-btn-text">Yana</span>
+									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
+								</span>
+							</label>
+					</div>
+			    </div>
+		</div>
 </div>
 {% endblock %} 
 
