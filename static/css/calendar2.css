@@ -9,6 +9,13 @@
     background: white;
 }
 
+#calendar-grid-container {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    /*position: absolute;*/
+}
+
 #calendar-grid {
     margin: 0;
     padding: 0;
@@ -91,38 +98,13 @@
     background-color: rgba(131, 214, 99, 0.9);
 }
 
-.cal-day-cell-sel-start {
-    background-color: rgba(122, 229, 80, 0.9);
-    
-    animation-name: blinker;
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-
-    -webkit-animation-name: blinker;
-    -webkit-animation-duration: 1s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
+.cal-day-cell-selected-add {
+	background-color: rgba(131, 214, 99, 0.6);
 }
 
-@-moz-keyframes blinker {  
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
+.cal-day-cell-selected-del {
+	background-color: rgba(240, 180, 160, 0.6);
 }
-
-@-webkit-keyframes blinker {  
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
-}
-
-@keyframes blinker {  
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
-}
-
 
 
 

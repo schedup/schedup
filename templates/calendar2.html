@@ -22,25 +22,37 @@
 </div>
 
 <div class="calendar-container disable-select">
-<table id="calendar-grid" cellpadding="0" cellspacing="0"><tr>
+<table cellpadding="0" cellspacing="0" style="width:100%;"><tr>
 	<td class="cal-hours-column">
-    <div class="cal-hour-x"></div>
-	{% for hour in hours %}
-	   <div class="cal-hour-cell" data-cell-row="{{hour*2}}"><div class="cal-hour-text">{{hour}}</div></div>
-       <div class="cal-hour-cell-30" data-cell-row="{{hour*2+1}}"></div>
-	{% endfor %}
+	<div style="z-index:5; background:white;">
+	    <div class="cal-hour-x"></div>
+		{% for hour in hours %}
+		   <div class="cal-hour-cell" data-cell-row="{{hour*2}}"><div class="cal-hour-text">{{hour}}</div></div>
+	       <div class="cal-hour-cell-30" data-cell-row="{{hour*2+1}}"></div>
+		{% endfor %}
+	</div>
 	</td>
-{% for day in days %}
-    <td class="cal-day-column" id="column-{{day.index}}">
-    <div class="cal-day-title" data-cell-col="{{day.index}}">
-        <span class="weekday">{{day.weekday}}</span> <span class="date">{{day.date}}</span>
-    </div>
-    {% for hour in hours %}
-       <div class="cal-day-cell" id="cell-{{day.index}}-{{hour}}" data-cell-row="{{hour*2}}" data-cell-col="{{day.index}}"></div>
-       <div class="cal-day-cell cal-day-cell-30" id="cell-{{day.index}}-{{hour}}-30" data-cell-row="{{hour*2+1}}" data-cell-col="{{day.index}}"></div>
-    {% endfor %}
-    </td>
-{% endfor %}
+	<td>
+		<div id="calendar-grid-container">
+		<div id="calendar-grid">
+		<table cellpadding="0" cellspacing="0"><tr>
+		{% for day in days %}
+	    <td class="cal-day-column" id="column-{{day.index}}">
+		    <div class="cal-day-title" data-cell-col="{{day.index}}">
+		        <span class="weekday">{{day.weekday}}</span> <span class="date">{{day.date}}</span>
+		    </div>
+		    {% for hour in hours %}
+		       <div class="cal-day-cell" id="cell-{{day.index*48+hour*2}}" 
+		       		data-cell-row="{{hour*2}}" data-cell-col="{{day.index}}"></div>
+		       <div class="cal-day-cell cal-day-cell-30" id="cell-{{day.index*48+hour*2+1}}" 
+		       		data-cell-row="{{hour*2+1}}" data-cell-col="{{day.index}}"></div>
+		    {% endfor %}
+	    </td>
+		{% endfor %}
+		</tr></table>
+		</div>
+		</div>
+	</td>
 </tr>
 </table>
 </div>
@@ -53,40 +65,45 @@ Send</button>
 <script type="text/javascript">
 $(document).ready(function(){
     
-    var taphold_target = null;
-    var first = null;
-	$(".cal-day-cell").on("taphold", function(e){
-		console.log("taphold", this);
-		taphold_target = $(this);
-		taphold_target.toggleClass("cal-day-cell-selected");
-		first = null;
-		$(".cal-day-cell-sel-start").each(function(){$(this).removeClass("cal-day-cell-sel-start");});
+    function setContainerWidth(){
+		var totWidth = $(".calendar-container").innerWidth();
+		var hourColWidth = $(".cal-hours-column").outerWidth();
+		console.log("totWidth", totWidth, "hours", hourColWidth);
+		$("#calendar-grid-container").width(totWidth - hourColWidth);
+	}
+    
+    $(window).on("resize", setContainerWidth);
+    setContainerWidth();
+    
+    var first_elem = null;
+    $(".cal-day-cell").on("touchstart mousedown", function(e){
+		console.log("touchstart");
+		first_elem = $(this);
+		selectRect(first_elem, first_elem);
+    });
+
+    $(".cal-day-cell").on("touchend mouseup", function(e){
+		first_elem = null;
+		console.log("touchend");
+		$(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
+		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected");
+		$(".cal-day-cell-selected-add").removeClass("cal-day-cell-selected-add");
+		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
 	});
-	
-	$(".cal-day-cell").on("tap", function(){
-		var elem = $(this);
-		if (elem.is(taphold_target)) {
-	        taphold_target = null;
-	        first = null;
-			return false;
+
+    $(".cal-day-cell").on("touchmove mousemove", function(e){
+		if (first_elem == null) {
+		    return;
 		}
-		
-        console.log("tap", this);
-
-		if (first == null) {
-	        first = elem;
-	        elem.toggleClass("cal-day-cell-sel-start");
-	        return false;
-		}
-
-        first.removeClass("cal-day-cell-sel-start");
-        elem.removeClass("cal-day-cell-sel-start");
-
-        var r1 = parseInt(first.data("cell-row"));
-        var c1 = parseInt(first.data("cell-col"));
-        var r2 = parseInt(elem.data("cell-row"));
-        var c2 = parseInt(elem.data("cell-col"));
-
+		selectRect(first_elem, $(this));
+	});
+    
+    function selectRect(fromelem, toelem) {
+        var r1 = parseInt(fromelem.data("cell-row"));
+        var c1 = parseInt(fromelem.data("cell-col"));
+        var r2 = parseInt(toelem.data("cell-row"));
+        var c2 = parseInt(toelem.data("cell-col"));
+        
         if (r2 < r1) {
             var tmp = r2;
             r2 = r1;
@@ -98,32 +115,17 @@ $(document).ready(function(){
             c1 = tmp;
         }
 
-        var all_have = true;
-        for (var r = r1; all_have && r <= r2; r++) {
-            for (var c = c1; all_have && c <= c2; c++) {
-                var cell = $(".cal-day-cell[data-cell-row='"+r+"'][data-cell-col='"+c+"']");
-                if (!cell.hasClass("cal-day-cell-selected")){
-                	all_have = false;
-                }
-            }
-        }
+        $(".cal-day-cell-selected-add").removeClass("cal-day-cell-selected-add");
+        $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
+        var cls = fromelem.hasClass("cal-day-cell-selected") ? "cal-day-cell-selected-del" : "cal-day-cell-selected-add";
         
         for (var r = r1; r <= r2; r++) {
             for (var c = c1; c <= c2; c++) {
-                var cell = $(".cal-day-cell[data-cell-row='"+r+"'][data-cell-col='"+c+"']");
-                if (all_have) {
-                    cell.removeClass("cal-day-cell-selected");
-                }
-                else {
-                    cell.addClass("cal-day-cell-selected");
-                }
+                $(".cal-day-cell[data-cell-row='"+r+"'][data-cell-col='"+c+"']").addClass(cls);
             }
         }
-		
-		first = null;
-		return false;
-	});
-	
+    }
+    
 	$(".cal-day-title").on("taphold dblclick", function() {
 		var col = $(this).data("cell-col");
 		var c1 = $(".cal-day-cell[data-cell-col='" + col + "']");
@@ -170,18 +172,30 @@ $(document).ready(function(){
     $("#next-btn").on("click", function() {
         var grid = $("#calendar-grid");
         var left = parseInt(grid.css("margin-left"));
-        console.log("next, left", left);
+        var width = grid.outerWidth();
+        var portWidth = $("#calendar-grid-container").innerWidth();
+        
+        console.log("port", portWidth, "width", width, "left", left);
+        
+        if (left + width <= portWidth) {
+            return;
+        }
         grid.animate({
-            "margin-left": (left - 300) + "px",
+            "margin-left": (left - _.min([width - portWidth, portWidth])) + "px",
         });
     });
 
     $("#prev-btn").on("click", function() {
-    	var grid = $("#calendar-grid");
-    	var left = parseInt(grid.css("margin-left"));
-        console.log("prev, left", left);
+        var grid = $("#calendar-grid");
+        var left = parseInt(grid.css("margin-left"));
+        var width = grid.outerWidth();
+        var portWidth = $("#calendar-grid-container").innerWidth();
+        if (left >= 0) {
+            return;
+        }
+        var delta = portWidth;
         grid.animate({
-            "margin-left": (left + 300) + "px",
+            "margin-left": /*_.max([left + delta, 0])*/ "0px",
         });
     });
 

@@ -178,7 +178,7 @@ class CalendarTest(BaseHandler):
     def get(self):
         days = []
         today = date.today()
-        for d in range(7):
+        for d in range(30):
             d = today + timedelta(days = d)
             days.append({"date" : d.strftime("%d %b"), "index" : d.toordinal(),
                 "weekday":["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.weekday()]})
