@@ -13,10 +13,17 @@
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
 <td>
-<a href="#" id="prev-btn" data-role="button" data-theme="a" data-inline="true" data-icon="arrow-l" data-iconpos="notext"></a>
+<a href="#" id="prev-btn" data-role="button" data-theme="b" data-inline="true" 
+	data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext"></a>
+</td>
+<td style="text-align:center;">
+<a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" 
+	data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext"
+	class="ui-disabled"></a>
 </td>
 <td style="text-align:right;">
-<a href="#" id="next-btn" data-role="button" data-theme="a" data-inline="true" data-icon="arrow-r" data-iconpos="notext"></a>
+<a href="#" id="next-btn" data-role="button" data-theme="b" data-inline="true" 
+	data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext"></a>
 </td>
 </tr></table>
 </div>
@@ -68,8 +75,23 @@ $(document).ready(function(){
     function setContainerWidth(){
 		var totWidth = $(".calendar-container").innerWidth();
 		var hourColWidth = $(".cal-hours-column").outerWidth();
-		console.log("totWidth", totWidth, "hours", hourColWidth);
 		$("#calendar-grid-container").width(totWidth - hourColWidth);
+		
+        var grid = $("#calendar-grid");
+        var left = parseInt(grid.css("margin-left").replace("px", ""));
+        
+        if (left < 0) {
+            $("#prev-btn").removeClass("ui-disabled");
+        }
+        else {
+            $("#prev-btn").addClass("ui-disabled");
+        } 
+        if (left + grid.outerWidth() > $("#calendar-grid-container").innerWidth()) {
+            $("#next-btn").removeClass("ui-disabled");
+        }
+        else {
+            $("#next-btn").addClass("ui-disabled");
+        }
 	}
     
     $(window).on("resize", setContainerWidth);
@@ -77,25 +99,35 @@ $(document).ready(function(){
     
     var first_elem = null;
     $(".cal-day-cell").on("touchstart mousedown", function(e){
-		console.log("touchstart");
 		first_elem = $(this);
 		selectRect(first_elem, first_elem);
+		e.preventDefault();
     });
 
     $(".cal-day-cell").on("touchend mouseup", function(e){
+		if (first_elem == null) {
+		    return;
+		}
 		first_elem = null;
-		console.log("touchend");
 		$(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
 		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected");
 		$(".cal-day-cell-selected-add").removeClass("cal-day-cell-selected-add");
 		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
-	});
+		
+	    if ($(".cal-day-cell-selected").length) {
+	    	$("#clear-btn").removeClass("ui-disabled");
+	    }
+	    else {
+			$("#clear-btn").addClass("ui-disabled");
+	    }
+    });
 
     $(".cal-day-cell").on("touchmove mousemove", function(e){
 		if (first_elem == null) {
 		    return;
 		}
 		selectRect(first_elem, $(this));
+		e.preventDefault();
 	});
     
     function selectRect(fromelem, toelem) {
@@ -171,34 +203,56 @@ $(document).ready(function(){
     
     $("#next-btn").on("click", function() {
         var grid = $("#calendar-grid");
-        var left = parseInt(grid.css("margin-left"));
+        var left = parseInt(grid.css("margin-left").replace("px", ""));
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
         
-        console.log("port", portWidth, "width", width, "left", left);
+        console.log("width", width, "portWidth", portWidth);
         
-        if (left + width <= portWidth) {
-            return;
+        left -= portWidth * 0.8;
+        if (left + width < portWidth) {
+            left = portWidth - width;
+            $("#next-btn").addClass("ui-disabled");
+            $("#prev-btn").removeClass("ui-disabled");
         }
+        else if (left < 0) {
+            $("#prev-btn").removeClass("ui-disabled");
+        }
+        
         grid.animate({
-            "margin-left": (left - _.min([width - portWidth, portWidth])) + "px",
+            "margin-left": left + "px",
         });
     });
 
     $("#prev-btn").on("click", function() {
         var grid = $("#calendar-grid");
-        var left = parseInt(grid.css("margin-left"));
+        var left = parseInt(grid.css("margin-left").replace("px", ""));
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
+        
+        left += portWidth * 0.8;
         if (left >= 0) {
-            return;
+            left = 0;
+            $("#next-btn").removeClass("ui-disabled");
+            $("#prev-btn").addClass("ui-disabled");
         }
-        var delta = portWidth;
+        else if (left + width > portWidth) {
+            $("#next-btn").removeClass("ui-disabled");
+        }
+        
         grid.animate({
-            "margin-left": /*_.max([left + delta, 0])*/ "0px",
+            "margin-left": left + "px",
         });
     });
-
+    
+    $("#clear-btn").on("click", function(){
+		$(".cal-day-cell-selected").addClass("cal-day-cell-selected-del");
+		$(".cal-day-cell-selected").removeClass("cal-day-cell-selected");
+		setTimeout(function(){
+		    $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
+		}, 200);
+    });
+    
 });
 </script>
 
