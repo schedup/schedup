@@ -65,8 +65,7 @@
 </div>
 
 <p>
-<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">
-Send</button>
+<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
 </p>
 
 <script type="text/javascript">
@@ -104,7 +103,6 @@ $(document).ready(function(){
         		return;
         	}
         	if (fingerCount >= 2) {
-        		/* scroll */
         		if (phase == "move") {
         			if (direction == "left") {
         				
@@ -113,33 +111,40 @@ $(document).ready(function(){
         				
         			}
         		}
+        		return false;
         	}
-        	else {
-	        	if (phase == "start") {
-	                clearTemp();
-	                first_elem = $(event.toElement);
-	                selectRect(first_elem, first_elem);
-	        	}
-	        	else if (phase == "move") {
-	                if (first_elem != null) {
-	                    selectRect(first_elem, $(event.toElement));
-	                }
-	        	}
-	        	else if (phase == "end") {
-	                if (first_elem == null) {
-	                    return;
-	                }
-	                first_elem = null;
-	                $(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
-	                clearTemp();
-	                
-	                if ($(".cal-day-cell-selected").length) {
-	                    $("#clear-btn").removeClass("ui-disabled");
-	                }
-	                else {
-	                    $("#clear-btn").addClass("ui-disabled");
-	                }
-	        	}
+        	
+        	var elem = null;
+        	if (event.type.indexOf("mouse") == 0) {
+        		elem = $(event.toElement);
+        	}
+        	else if (event.type.indexOf("touch") == 0) {
+        		elem = $(document.elementFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY));
+        	}
+
+        	if (phase == "start") {
+                clearTemp();
+                first_elem = elem;
+                selectRect(first_elem, first_elem);
+        	}
+        	else if (phase == "cancel") {
+     		    clearTemp();
+	            first_elem = null;
+	       	}
+        	else if (phase == "move" && first_elem != null) {
+                selectRect(first_elem, elem);
+        	}
+        	else if (phase == "end" && first_elem != null) {
+                first_elem = null;
+                $(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
+                clearTemp();
+                
+                if ($(".cal-day-cell-selected").length) {
+                    $("#clear-btn").removeClass("ui-disabled");
+                }
+                else {
+                    $("#clear-btn").addClass("ui-disabled");
+                }
         	}
    		},
    		threshold: 40,
