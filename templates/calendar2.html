@@ -98,37 +98,59 @@ $(document).ready(function(){
     setContainerWidth();
     
     var first_elem = null;
-    $(".cal-day-cell").on("touchstart mousedown", function(e){
-		first_elem = $(this);
-		selectRect(first_elem, first_elem);
-		e.preventDefault();
+    $("#calendar-grid").swipe({
+        swipeStatus : function(event, phase, direction, distance, duration, fingerCount) {
+        	if (event.type == "mousedown" && event.button == 2) {
+        		return;
+        	}
+        	if (fingerCount >= 2) {
+        		/* scroll */
+        		if (phase == "move") {
+        			if (direction == "left") {
+        				
+        			}
+        			else if (direction == "right") {
+        				
+        			}
+        		}
+        	}
+        	else {
+	        	if (phase == "start") {
+	                clearTemp();
+	                first_elem = $(event.toElement);
+	                selectRect(first_elem, first_elem);
+	        	}
+	        	else if (phase == "move") {
+	                if (first_elem != null) {
+	                    selectRect(first_elem, $(event.toElement));
+	                }
+	        	}
+	        	else if (phase == "end") {
+	                if (first_elem == null) {
+	                    return;
+	                }
+	                first_elem = null;
+	                $(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
+	                clearTemp();
+	                
+	                if ($(".cal-day-cell-selected").length) {
+	                    $("#clear-btn").removeClass("ui-disabled");
+	                }
+	                else {
+	                    $("#clear-btn").addClass("ui-disabled");
+	                }
+	        	}
+        	}
+   		},
+   		threshold: 40,
+   		fingers: "all",
     });
-
-    $(".cal-day-cell").on("touchend mouseup", function(e){
-		if (first_elem == null) {
-		    return;
-		}
-		first_elem = null;
-		$(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
-		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected");
-		$(".cal-day-cell-selected-add").removeClass("cal-day-cell-selected-add");
-		$(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
-		
-	    if ($(".cal-day-cell-selected").length) {
-	    	$("#clear-btn").removeClass("ui-disabled");
-	    }
-	    else {
-			$("#clear-btn").addClass("ui-disabled");
-	    }
-    });
-
-    $(".cal-day-cell").on("touchmove mousemove", function(e){
-		if (first_elem == null) {
-		    return;
-		}
-		selectRect(first_elem, $(this));
-		e.preventDefault();
-	});
+    
+    function clearTemp() {
+        $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected");
+        $(".cal-day-cell-selected-add").removeClass("cal-day-cell-selected-add");
+        $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
+    }
     
     function selectRect(fromelem, toelem) {
         var r1 = parseInt(fromelem.data("cell-row"));
