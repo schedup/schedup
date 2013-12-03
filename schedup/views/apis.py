@@ -6,6 +6,7 @@ APIs for the client-side:
 """
 import re
 from schedup.base import BaseHandler, logged_in, json_handler
+from datetime import datetime, timedelta
 
 EMAIL_PATTERN = re.compile(r".+?@.+?\..+")
 
@@ -27,6 +28,15 @@ class AutocompleteContacts(BaseHandler):
             results.append({"id" : res["email"], "name" : name})
         return results
 
+
+class GetCalendarEvents(BaseHandler):
+    URL = "/api/get-calendar"
+
+    @logged_in
+    @json_handler
+    def get(self):
+        now = datetime.now()
+        return self.gconn.get_events("primary", now, now + timedelta(days=7))
 
 
 

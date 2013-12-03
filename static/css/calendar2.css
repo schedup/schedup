@@ -13,7 +13,7 @@
     overflow: hidden;
     margin: 0;
     padding: 0;
-    /*position: absolute;*/
+    position: relative;
 }
 
 #calendar-grid {
@@ -105,6 +105,41 @@
 .cal-day-cell-selected-del {
 	background-color: rgba(214, 99, 99, 0.4);
 }
+
+.cal-user-event {
+	background: rgba(0,0,0,0.2);
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
+	overflow: hidden;
+	/*border-radius: 5px;*/
+}
+
+.cal-user-event-title {
+	font-size: 80%;
+	text-align: center;
+	font-weight: normal;
+	color: rgba(0,0,0,0.8);
+	padding: 3px;
+}
+
+.cal-user-vote {
+	background: rgba(0, 255, 245, 0.3);
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
+	overflow: hidden;
+	/*border-radius: 5px;*/
+}
+
+
+
+
+
+
+
+
+
 
 
 

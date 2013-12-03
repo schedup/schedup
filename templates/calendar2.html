@@ -14,52 +14,52 @@
 <table style="width:100%;"><tr>
 <td>
 <a href="#" id="prev-btn" data-role="button" data-theme="b" data-inline="true" 
-	data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext"></a>
+    data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext"></a>
 </td>
 <td style="text-align:center;">
 <a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" 
-	data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext"
-	class="ui-disabled"></a>
+    data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext"
+    class="ui-disabled"></a>
 </td>
 <td style="text-align:right;">
 <a href="#" id="next-btn" data-role="button" data-theme="b" data-inline="true" 
-	data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext"></a>
+    data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext"></a>
 </td>
 </tr></table>
 </div>
 
 <div class="calendar-container disable-select">
 <table cellpadding="0" cellspacing="0" style="width:100%;"><tr>
-	<td class="cal-hours-column">
-	<div style="z-index:5; background:white;">
-	    <div class="cal-hour-x"></div>
-		{% for hour in hours %}
-		   <div class="cal-hour-cell" data-cell-row="{{hour*2}}"><div class="cal-hour-text">{{hour}}</div></div>
-	       <div class="cal-hour-cell-30" data-cell-row="{{hour*2+1}}"></div>
-		{% endfor %}
-	</div>
-	</td>
-	<td>
-		<div id="calendar-grid-container">
-		<div id="calendar-grid">
-		<table cellpadding="0" cellspacing="0"><tr>
-		{% for day in days %}
-	    <td class="cal-day-column" id="column-{{day.index}}">
-		    <div class="cal-day-title" data-cell-col="{{day.index}}">
-		        <span class="weekday">{{day.weekday}}</span> <span class="date">{{day.date}}</span>
-		    </div>
-		    {% for hour in hours %}
-		       <div class="cal-day-cell" id="cell-{{day.index*48+hour*2}}" 
-		       		data-cell-row="{{hour*2}}" data-cell-col="{{day.index}}"></div>
-		       <div class="cal-day-cell cal-day-cell-30" id="cell-{{day.index*48+hour*2+1}}" 
-		       		data-cell-row="{{hour*2+1}}" data-cell-col="{{day.index}}"></div>
-		    {% endfor %}
-	    </td>
-		{% endfor %}
-		</tr></table>
-		</div>
-		</div>
-	</td>
+    <td class="cal-hours-column">
+    <div style="z-index:5; background:white;">
+        <div class="cal-hour-x"></div>
+        {% for hour in hours %}
+           <div class="cal-hour-cell" data-cell-row="{{hour*2}}"><div class="cal-hour-text">{{hour}}</div></div>
+           <div class="cal-hour-cell-30" data-cell-row="{{hour*2+1}}"></div>
+        {% endfor %}
+    </div>
+    </td>
+    <td>
+        <div id="calendar-grid-container">
+        <div id="calendar-grid">
+        <table cellpadding="0" cellspacing="0"><tr>
+        {% for day in days %}
+        <td class="cal-day-column" id="column-{{day.index}}">
+            <div class="cal-day-title" data-cell-col="{{day.index}}">
+                <span class="weekday">{{day.weekday}}</span> <span class="date">{{day.date}}</span>
+            </div>
+            {% for hour in hours %}
+               <div class="cal-day-cell" id="cell-{{day.index*48+hour*2}}" 
+                       data-cell-row="{{hour*2}}" data-cell-col="{{day.index}}"></div>
+               <div class="cal-day-cell cal-day-cell-30" id="cell-{{day.index*48+hour*2+1}}" 
+                       data-cell-row="{{hour*2+1}}" data-cell-col="{{day.index}}"></div>
+            {% endfor %}
+        </td>
+        {% endfor %}
+        </tr></table>
+        </div>
+        </div>
+    </td>
 </tr>
 </table>
 </div>
@@ -72,10 +72,10 @@
 $(document).ready(function(){
     
     function setContainerWidth(){
-		var totWidth = $(".calendar-container").innerWidth();
-		var hourColWidth = $(".cal-hours-column").outerWidth();
-		$("#calendar-grid-container").width(totWidth - hourColWidth);
-		
+        var totWidth = $(".calendar-container").innerWidth();
+        var hourColWidth = $(".cal-hours-column").outerWidth();
+        $("#calendar-grid-container").width(totWidth - hourColWidth);
+        
         var grid = $("#calendar-grid");
         var left = parseInt(grid.css("margin-left").replace("px", ""));
         
@@ -91,65 +91,115 @@ $(document).ready(function(){
         else {
             $("#next-btn").addClass("ui-disabled");
         }
-	}
+    }
     
     $(window).on("resize", setContainerWidth);
     setContainerWidth();
     
-    var first_elem = null;
     $("#calendar-grid").swipe({
         swipeStatus : function(event, phase, direction, distance, duration, fingerCount) {
-        	if (event.type == "mousedown" && event.button == 2) {
-        		return;
-        	}
-        	if (fingerCount >= 2) {
-        		if (phase == "move") {
-        			if (direction == "left") {
-        				
-        			}
-        			else if (direction == "right") {
-        				
-        			}
-        		}
-        		return false;
-        	}
-        	
-        	var elem = null;
-        	if (event.type.indexOf("mouse") == 0) {
-        		elem = $(event.toElement);
-        	}
-        	else if (event.type.indexOf("touch") == 0) {
-        		elem = $(document.elementFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY));
-        	}
-
-        	if (phase == "start") {
-                clearTemp();
-                first_elem = elem;
-                selectRect(first_elem, first_elem);
-        	}
-        	else if (phase == "cancel") {
-     		    clearTemp();
-	            first_elem = null;
-	       	}
-        	else if (phase == "move" && first_elem != null) {
-                selectRect(first_elem, elem);
-        	}
-        	else if (phase == "end" && first_elem != null) {
-                first_elem = null;
-                $(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
-                clearTemp();
-                
-                if ($(".cal-day-cell-selected").length) {
-                    $("#clear-btn").removeClass("ui-disabled");
-                }
-                else {
-                    $("#clear-btn").addClass("ui-disabled");
-                }
-        	}
-   		},
-   		threshold: 40,
-   		fingers: "all",
+            if (event.type == "mousedown" && event.button == 2) {
+                /* don't catch right-click */
+                return;
+            }
+            
+            if (fingerCount >= 2) {
+                /* two finger - scroll */
+                scrollCalendarGrid(event, phase, direction, distance);
+                return;
+            }
+            
+            calendarGridSelect(event, phase);
+        },
+        threshold: 40,
+        fingers: "all",
     });
+    
+    var grid_margin = null;
+    function scrollCalendarGrid(event, phase, direction, distance) {
+        var grid = $("#calendar-grid");
+        if (phase == "start") {
+            grid_margin = parseInt(grid.css("margin-left").replace("px", ""));
+        }
+        else if (phase == "move" && grid_margin != null) {
+            var delta = 0;
+            if (direction == "left") {
+                delta = -distance;
+            }
+            else if (direction == "right") {
+                delta = distance;
+            }
+            
+            var new_left = grid_margin + delta;
+            if (new_left > 0) {
+                new_left = 0;
+            }
+            grid.css({"margin-left": new_left + "px"});
+            var portWidth = $("#calendar-grid-container").innerWidth();
+            var width = grid.outerWidth();
+            
+            if (new_left >= 0) {
+                $("#prev-btn").addClass("ui-disabled");
+            }
+            else {
+                $("#prev-btn").removeClass("ui-disabled");
+            }
+            if (new_left + width < portWidth) {
+                $("#next-btn").addClass("ui-disabled");
+            }
+            else {
+                $("#next-btn").removeClass("ui-disabled");
+            }
+        }
+        else if (phase == "cancel" && grid_margin !=null) {
+            grid.css({"margin-left": left + "px"});
+            grid.css({"margin-left": grid_margin + "px"});
+        }
+        else if (phase == "end") {
+            grid_margin = null;
+        }
+    }
+    
+    var first_elem = null;
+    function calendarGridSelect(event, phase) {
+        var elem = null;
+        if (event.type.indexOf("mouse") == 0) {
+            elem = $(event.toElement);
+        }
+        else if (event.type.indexOf("touch") == 0) {
+            elem = $(document.elementFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY));
+        }
+        else {
+            return;
+        }
+        
+        console.log("phase", phase);
+    
+        if (phase == "start") {
+            clearTemp();
+            first_elem = elem;
+            selectRect(first_elem, first_elem);
+        }
+        else if (phase == "cancel") {
+            clearTemp();
+            first_elem = null;
+        }
+        else if (phase == "move" && first_elem != null) {
+            selectRect(first_elem, elem);
+        }
+        else if (phase == "end" && first_elem != null) {
+            first_elem = null;
+            $(".cal-day-cell-selected-add").addClass("cal-day-cell-selected");
+            clearTemp();
+            
+            if ($(".cal-day-cell-selected").length) {
+                $("#clear-btn").removeClass("ui-disabled");
+            }
+            else {
+                $("#clear-btn").addClass("ui-disabled");
+            }
+        }
+    }
     
     function clearTemp() {
         $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected");
@@ -185,35 +235,35 @@ $(document).ready(function(){
         }
     }
     
-	$(".cal-day-title").on("taphold dblclick", function() {
-		var col = $(this).data("cell-col");
-		var c1 = $(".cal-day-cell[data-cell-col='" + col + "']");
-		var c1_has = _.every(c1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
-		
-		if (c1_has) {
-			c1.removeClass("cal-day-cell-selected");
-		}
-		else {
-			c1.addClass("cal-day-cell-selected");
-		}
-	});
+    $(".cal-day-title").on("taphold dblclick", function() {
+        var col = $(this).data("cell-col");
+        var c1 = $(".cal-day-cell[data-cell-col='" + col + "']");
+        var c1_has = _.every(c1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+        
+        if (c1_has) {
+            c1.removeClass("cal-day-cell-selected");
+        }
+        else {
+            c1.addClass("cal-day-cell-selected");
+        }
+    });
 
-	$(".cal-hour-cell").on("taphold dblclick", function() {
-	     var row = $(this).data("cell-row");
-	     var r1 = $(".cal-day-cell[data-cell-row='" + row + "']");
+    $(".cal-hour-cell").on("taphold dblclick", function() {
+         var row = $(this).data("cell-row");
+         var r1 = $(".cal-day-cell[data-cell-row='" + row + "']");
          var r2 = $(".cal-day-cell[data-cell-row='" + (row + 1)+ "']");
-	     var r1_has = _.every(r1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
+         var r1_has = _.every(r1.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
          var r2_has = _.every(r2.map(function(){return $(this).hasClass("cal-day-cell-selected");}));
-	     
-	     if (r1_has && r2_has) {
-	    	 r1.removeClass("cal-day-cell-selected");
+         
+         if (r1_has && r2_has) {
+             r1.removeClass("cal-day-cell-selected");
              r2.removeClass("cal-day-cell-selected");
-	     }
-	     else {
+         }
+         else {
              r1.addClass("cal-day-cell-selected");
              r2.addClass("cal-day-cell-selected");
-	     }
-	});
+         }
+    });
 
     $(".cal-hour-cell-30").on("taphold dblclick", function() {
         var row = $(this).data("cell-row");
@@ -273,12 +323,49 @@ $(document).ready(function(){
     });
     
     $("#clear-btn").on("click", function(){
-		$(".cal-day-cell-selected").addClass("cal-day-cell-selected-del");
-		$(".cal-day-cell-selected").removeClass("cal-day-cell-selected");
-		setTimeout(function(){
-		    $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
-		}, 200);
+        $(".cal-day-cell-selected").addClass("cal-day-cell-selected-del");
+        $(".cal-day-cell-selected").removeClass("cal-day-cell-selected");
+        $("#clear-btn").addClass("ui-disabled");
+        setTimeout(function(){
+            $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
+        }, 200);
     });
+
+    function insertEvents(eventlist, evtclass) {
+        var hour_height = $(".cal-day-cell").outerHeight() + $(".cal-day-cell-30").outerHeight();
+        var grid = $("#calendar-grid");
+        for (var i = 0; i < eventlist.length; i++) {
+            var evt = eventlist[i];
+            var elem = $("<div class='" + evtclass + "'>");
+            var col = $(".cal-day-title[data-cell-col='" + evt.start_day + "']");
+            if (col.length == 0) {
+                continue;
+            }
+            elem.css({
+                left : col.position().left, 
+                top: col.height() + evt.hour_offset * hour_height,
+                width: col.width(), 
+                height: evt.duration * hour_height,
+            });
+            elem.appendTo(grid);
+            if (evt.users) {
+                for (var j = 0; j < evt.users.length; j++) {
+                    elem.addClass("user-" + evt.users[j]);
+                }
+            }
+            if (evt.title) {
+                var title = $("<div class='cal-user-event-title'>")
+                title.text(evt.title);
+                title.appendTo(elem);
+            }
+        }
+    }
+
+    var user_calendar_events = {{user_calendar_events|safe}};
+    var user_calendar_votes = {{user_calendar_votes|safe}};
+
+    insertEvents(user_calendar_events, "cal-user-event");
+    insertEvents(user_calendar_votes, "cal-user-vote");
     
 });
 </script>

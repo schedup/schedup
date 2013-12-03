@@ -4,7 +4,7 @@ Create new event flow
 import string
 import random
 from dateutil.parser import parse as parse_datetime, parse
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from schedup.base import BaseHandler, logged_in, maybe_logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
@@ -182,11 +182,63 @@ class CalendarTest(BaseHandler):
             d = today + timedelta(days = d)
             days.append({"date" : d.strftime("%d %b"), "index" : d.toordinal(),
                 "weekday":["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.weekday()]})
+        hours = [8, 9, 10, 11, 12]
+        
+        user_calendar_events = [{
+            "title" : "lunch", 
+            "start" : datetime.now().replace(hour = 10, minute = 0, second = 0, microsecond = 0) + timedelta(days=1),
+            "end" : datetime.now().replace(hour = 11, minute = 30, second = 0, microsecond = 0) + timedelta(days=1),
+        }]
+
+        user_calendar_votes = [
+            {
+                "start" : datetime.now().replace(hour = 10, minute = 30, second = 0, microsecond = 0) + timedelta(days=2),
+                "end" : datetime.now().replace(hour = 11, minute = 30, second = 0, microsecond = 0) + timedelta(days=2),
+            },
+            {
+                "start" : datetime.now().replace(hour = 9, minute = 30, second = 0, microsecond = 0) + timedelta(days=1),
+                "end" : datetime.now().replace(hour = 10, minute = 30, second = 0, microsecond = 0) + timedelta(days=1),
+            },
+        ]
+        
+        processed_user_calendar_events = self._process_events(user_calendar_events, min(hours))
+        processed_user_calendar_votes = self._process_events(user_calendar_votes, min(hours))
         
         self.render_response("calendar2.html", 
             days = days,
-            hours=[8,9,10,11,12])
+            hours = hours,
+            user_calendar_events = json.dumps(processed_user_calendar_events),
+            user_calendar_votes = json.dumps(processed_user_calendar_votes),
+        )
     
+    def _process_events(self, eventlist, min_hour):
+        processed = []
+        for evt in eventlist:
+            s = evt["start"]
+            e = evt["end"]
+            if s.date() != e.date():
+                continue
+            evt2 = {
+                "title" : evt.get("title"), 
+                "start_day" : s.toordinal(), 
+                "hour_offset" : (s - s.replace(hour = min_hour, minute=0, second=0, microsecond=0)).total_seconds() / 3600.0,
+                "duration" : (e - s).total_seconds() / 3600.0,
+                "users" : evt.get("users", ()),
+            }
+            processed.append(evt2)
+        return processed
+    
+
+
+
+
+
+
+
+
+
+
+
 
 
 
