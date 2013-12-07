@@ -24,10 +24,10 @@ class UserProfile(ndb.Model):
 
                
 class EventGuest(ndb.Model):
-    # extactly one of these must be set {{
-    user = ndb.KeyProperty(UserProfile)
+    # always expected to be set
     email = ndb.StringProperty()
-    # }}
+    # may be set if the guest is a user
+    user = ndb.KeyProperty(UserProfile)
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")

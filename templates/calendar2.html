@@ -64,9 +64,11 @@
 </table>
 </div>
 
-<p>
-<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
-</p>
+<div>
+	<div class="input-error" id="errbox"></div>
+	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
+	<a href="/decline/{{event.token}}" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">Decline</a>
+</div>
 
 <script type="text/javascript">
 $(document).ready(function(){
@@ -103,16 +105,16 @@ $(document).ready(function(){
                 return;
             }
             
-            if (fingerCount >= 2) {
-                /* two finger - scroll */
+            /*if (fingerCount >= 2) {
+                // two finger - scroll
                 scrollCalendarGrid(event, phase, direction, distance);
                 return;
-            }
+            }*/
             
             calendarGridSelect(event, phase);
         },
-        threshold: 40,
-        fingers: "all",
+        threshold: 20,
+        /*fingers: "all",*/
     });
     
     var grid_margin = null;
@@ -329,6 +331,48 @@ $(document).ready(function(){
         setTimeout(function(){
             $(".cal-day-cell-selected-del").removeClass("cal-day-cell-selected-del");
         }, 200);
+    });
+    
+    $("#savebtn").on("click", function(){
+    	data-cell-row="{{hour*2}}" data-cell-col
+    	var selected = $(".cal-day-cell-selected").map(function(){
+    		return $(this).data("data-cell-col") ","+ $(this).data("data-cell-row");
+    	});
+    	
+    	console.log("selected", selected);
+    	if (!selected.length) {
+    		$("#errbox").text("No time slots selected");
+    		$("#errbox").show();
+    		setTimeout(function(){
+                $("#errbox").fadeOut();
+    		}, 5000);
+    		return;
+    	}
+    	
+    	$("#errbox").hide();
+    	
+        $.ajax("{{post_url}}", {
+            cache : false,
+            type: "POST",
+            dataType : "json",
+            data: JSON.stringify(selected),
+            traditional: true,
+            success : function(){
+                console.log("hurra");
+                window.location.href = "/my";
+            },
+            error : function(x){
+                console.log("error", x);
+                $("#errbox").text("Error: " + x);
+                $("#errbox").show();
+                setTimeout(function(){
+                    $("#errbox").fadeOut();
+                }, 5000);
+
+            }
+
+        });
+    	
     });
 
     function insertEvents(eventlist, evtclass) {
