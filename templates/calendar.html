@@ -7,8 +7,12 @@
 <div class="ui-bar ui-bar-b">
 	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 	<a href="#transitionExample" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
-	<a href="#popupMenu" data-rel="popup" data-role="button" data-inline="true" data-corners="true" data-shadow="true" data-iconshadow="true" data-wrapperels="span" data-theme="b" aria-haspopup="true" aria-owns="#popupMenu" class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b">
-	<div data-role="popup" id="transitionExample" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+	<a href="#friendsFilter" data-transition="pop" data-icon="plus" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
+	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
+	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+</div>
+
+<div data-role="popup" id="transitionExample" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
 	<style>
 	h2 { color:DodgerBlue ; width:200px; font-size:24px; }
   	</style>
@@ -19,59 +23,49 @@
 	<h4>Description</h4>
 	<p>{{event.description}}</p>
 	{% endif %}
+</div>
+
+<div data-role="popup" id="friendsFilter" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+	<style>
+	h2 { color:DodgerBlue ; width:200px; font-size:24px; }
+  	</style>
+  	<div data-role="fieldcontain">
+	<div class="ui-controlgroup-controls">
+		{% set i = 1 %}
+		{% for guest in event.guests %}
+			{% if guest.status == "accept" %}
+        		{% set checkbox_name = "myCheckBox" %}
+        	{% elif guest.status == "decline" %}
+        		{% set checkbox_name = "declineCheckBox" %}
+        	{% else %}
+        		{% set checkbox_name = "pendingCheckBox" %}
+        	{% endif %}
+			{% set user = guest.user %}
+        	{% if user %}
+        		{% set display_name = user.get().fullname or user.get().email %}
+        	{% else %}
+        		{% set display_name = guest.email %}
+        	{% endif %}
+        {% set checkbox_id = "checkbox-"+i.__str__()+"a" %}
+        {% set i = i+1 %}
+        	<div class="ui-checkbox">
+ 				<input type="checkbox" name={{checkbox_name}} id={{checkbox_id}} class="custom">
+ 					<label for={{checkbox_id}} data-theme="c" class="ui-btn ui-btn-icon-left ui-corner-top ui-btn-up-c">
+ 						<span class="ui-btn-inner ui-corner-top">
+ 						<span class="ui-btn-text">{{display_name}}</span>
+ 						<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
+ 						</span>
+ 					</label>
+ 			</div>
+        {% endfor %}
 	</div>
-		<span class="ui-btn-inner ui-btn-corner-all">
-			<span class="ui-btn-text">Select Guests</span>
-		</span>
-	</a>
-	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
-	<div style="float:right;">
-		 <a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
-    </div>
+	</div>
 </div>
-<div class="ui-popup-container ui-popup-active" id="popupMenu-popup" style="max-width: 1336px; top: 592px; left: 577px;" tabindex="0"><div data-role="popup" id="popupMenu" data-theme="a" class="ui-popup ui-body-a ui-overlay-shadow ui-corner-all" aria-disabled="false" data-disabled="false" data-shadow="true" data-corners="true" data-transition="none" data-position-to="origin">
-				<div class="ui-controlgroup-controls">
-					<div class="ui-checkbox">
-						<input type="checkbox" name="checkbox-1a" id="checkbox-1a" class="custom">
-							<label for="checkbox-1a" data-theme="c" class="ui-btn ui-btn-icon-left ui-corner-top ui-btn-up-c">
-								<span class="ui-btn-inner ui-corner-top">
-									<span class="ui-btn-text">Shir</span>
-									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
-								</span>
-							</label>
-					</div>
-					<div class="ui-checkbox">
-						<input type="checkbox" name="checkbox-2a" id="checkbox-2a" class="custom">
-							<label for="checkbox-2a" data-theme="c" class="ui-btn ui-btn-icon-left ui-btn-up-c">
-								<span class="ui-btn-inner">
-									<span class="ui-btn-text">Tomer</span>
-									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
-								</span>
-							</label>
-					</div>
-					<div class="ui-checkbox">
-						<input type="checkbox" name="checkbox-3a" id="checkbox-3a" class="custom">
-							<label for="checkbox-3a" data-theme="c" class="ui-btn ui-btn-icon-left ui-btn-up-c">
-								<span class="ui-btn-inner">
-									<span class="ui-btn-text">Ofir</span>
-									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
-								</span>
-							</label>
-					</div>
-					<div class="ui-checkbox">
-						<input type="checkbox" name="checkbox-4a" id="checkbox-4a" class="custom">
-							<label for="checkbox-4a" data-theme="c" class="ui-btn ui-btn-icon-left ui-corner-bottom ui-controlgroup-last ui-btn-up-c">
-								<span class="ui-btn-inner ui-corner-bottom ui-controlgroup-last">
-									<span class="ui-btn-text">Yana</span>
-									<span class="ui-icon ui-icon-ui-icon-checkbox-off ui-icon-checkbox-off"></span>
-								</span>
-							</label>
-					</div>
-			    </div>
-		</div>
-</div>
+
 {% endblock %} 
 
+	
+ 		
 {% block content %}
 
 <div class="calendar-container">
@@ -105,10 +99,13 @@
 <button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
 </p>
 
+
 <script type="text/javascript">
+
 $(document).ready(function(){
     
     var last_cell = null;
+
     
 	/*$("#calendar-grid").on("vmousemove", function(e){
 	    var elem = $(this);
@@ -123,6 +120,19 @@ $(document).ready(function(){
 			e.preventDefault();
 		}
 	});*/
+	
+	$("input:checkbox[name=pendingCheckBox]").checkboxradio('disable');
+	$("input:checkbox[name=declinedCheckBox]").checkboxradio('disable');
+	$("#friendsFilter").on({
+		   popupafterclose: function() {
+ 			   var selected = new Array();
+ 				$("input:checkbox[name=myCheckBox]:checked").each(function() {
+ 			       selected.push($(this));
+ 			  });
+			  console.log(selected);
+			  //highlight the votes of the friends requested by chekbox
+		   }
+	});
 	
 	$(".calendar-cell").on("click", function(e) {
 	    $(this).toggleClass("calendar-cell-selected");
