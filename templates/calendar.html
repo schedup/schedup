@@ -4,6 +4,7 @@
 {% block topbar %}
 <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
 
+<!-- TOP BAR -->
 <div class="ui-bar ui-bar-b">
 	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 	<a href="#transitionExample" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
@@ -121,6 +122,7 @@ $(document).ready(function(){
 		}
 	});*/
 	
+// 	HANDLERS FOR FRIENDS FILTER
 	$("input:checkbox[name=pendingCheckBox]").checkboxradio('disable');
 	$("input:checkbox[name=declinedCheckBox]").checkboxradio('disable');
 	$("#friendsFilter").on({
