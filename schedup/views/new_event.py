@@ -148,6 +148,7 @@ class ChooseTimeslotsPage(BaseHandler):
             suggested_json = json.dumps(suggested),
             title = the_event.title,
             post_url = "/choose/%s" % (owner_token,),
+            event = the_event,
         )
     
     def post(self, owner_token):
