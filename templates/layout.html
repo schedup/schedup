@@ -46,6 +46,7 @@
 	{% if not hide_header %}
 	<div data-role="panel" id="sidepanel" data-position="left" data-theme="b" data-display="overlay">
 	    <ul data-role="listview">
+            <li data-icon="delete" data-theme="a"><a href="#" data-rel="close"></a></li>
 		    <li data-role="list-divider">Me</li>
 		    <li data-icon="plus"><a href="/new" data-ajax=false>New Event</a></li>
 		    <li data-icon="edit"><a href="/my" data-ajax=false>My Events</a></li>
@@ -56,25 +57,6 @@
 		</ul>
 	</div>
 	
-	<script type="text/javascript">
-	$(document).ready(function(){
-	    $(document).bind('keydown', function(event) {
-	      if (event.keyCode == 27 && $("#sidepanel").hasClass("ui-panel-open")) {
-	        event.preventDefault();
-	        $('#sidepanel').panel('close');
-	      }
-	    });
-	    
-	    //$(window).on("navigate", function(event, data){
-		$(document).bind( "pagebeforechange", function( event, data ) {
-		  console.log(event, data);
-		  /*if( data.state.direction == "back" && $("#sidepanel").hasClass("ui-panel-open")) {
-		        event.preventDefault();
-		        $('#sidepanel').panel('close');
-		  }*/
-	    });
-	});
-	</script>	
 	{% endif %}
 	
 	{% block topbar %}

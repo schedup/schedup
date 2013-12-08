@@ -6,7 +6,6 @@
     padding: 0;
     overflow-x: hidden;
     cursor: default;
-    background: white;
 }
 
 #calendar-grid-container {
@@ -20,6 +19,7 @@
     margin: 0;
     padding: 0;
     position: relative;
+    background: white;
 }
 
 .cal-hours-column {
@@ -132,10 +132,23 @@
 	/*border-radius: 5px;*/
 }
 
+.color-legend {
+	width: 20px;
+	height: 20px;
+	margin: 6px 6px 0 0;
+	display: inline-block;
+}
 
+#legend-popup ul {
+	list-style-type: none;
+	padding: 0;
+}
 
-
-
+#legend-btn .ui-btn-inner {
+	padding: 4px 8px 4px 7px;
+	font-weight: bold;
+	font-size: 14px;
+}
 
 
 

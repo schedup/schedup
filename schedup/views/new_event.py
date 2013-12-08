@@ -1,27 +1,26 @@
 """
 Create new event flow
 """
-import string
-import random
-from dateutil.parser import parse as parse_datetime, parse
-from datetime import timedelta, date, datetime
-from schedup.base import BaseHandler, logged_in, maybe_logged_in
+import logging
+from dateutil.parser import parse as parse_datetime
+from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from google.appengine.ext import ndb
-import logging
-import json
-from schedup.views.calendar import generate_calendar, handle_calendar_response
+try:
+    from Crypto.Random import random
+except ImportError:
+    import random
+
+def generate_random_token(length):
+    return "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-") 
+        for _ in range(length))
 
 
 class NewEventPage(BaseHandler):
     URL = "/new"
-    TOKEN_SIZE = 20
+    TOKEN_SIZE = 25
     
-    @classmethod
-    def generate_token(cls, chars=string.ascii_letters + string.digits):
-        return ''.join(random.choice(chars) for _ in range(cls.TOKEN_SIZE))
-
     @logged_in
     def get(self):
         return self.render_response("new_event.html", post_url=self.URL)
@@ -33,9 +32,9 @@ class NewEventPage(BaseHandler):
         for email in self.request.params["guests"].split(";"):
             user = UserProfile.query(UserProfile.email == email).get()
             if user:
-                gst = EventGuest(user = user.key, email = email, token = self.generate_token())
+                gst = EventGuest(user = user.key, email = email, token = generate_random_token(self.TOKEN_SIZE))
             else:
-                gst = EventGuest(email=email, token=self.generate_token())
+                gst = EventGuest(email=email, token = generate_random_token(self.TOKEN_SIZE))
             guests.append(gst)
         if not guests:
             return self.redirect_with_flashmsg("/new", "No emails given", "error")
@@ -46,7 +45,7 @@ class NewEventPage(BaseHandler):
         if fromtime > totime:
             return self.redirect_with_flashmsg("/new", "Start time is later than end time", "error")
         
-        owner_token = self.generate_token()
+        owner_token = generate_random_token(self.TOKEN_SIZE)
         evt = EventInfo(owner = self.user.key, 
             owner_token = owner_token,
             title = title,
@@ -70,41 +69,15 @@ class NewEventPage(BaseHandler):
                         fullname = self.user.fullname, title = title, token = guest.token),
             )
         
-        logging.info("Guests: %r", guests)
-        
-        self.redirect_with_context("/choose/" + owner_token, 
-            flashmsg = "Invites for voting sent, Please Vote",
-            flashclass = "ok", 
-            token = owner_token)
+        logging.info("Guests: %r", guests)       
+        self.redirect_with_flashmsg("/cal/%s" % (owner_token,), 
+            msg = "Invites were sent to guests, please vote", style = "ok")
 
 
-class ChooseTimeslotsPage(BaseHandler):
-    URL = "/choose/(.+)"
-    
-    @maybe_logged_in
-    def get(self, owner_token):
-        generate_calendar(self, owner_token, "/choose/%s" % (owner_token,))
-    
-    @maybe_logged_in
-    def post(self, owner_token):
-        handle_calendar_response(self, owner_token, "/my")
-
-
-    
-    
 
     
 
 
-
-
-
-
-
-
-
-
-
-
+    
 
 

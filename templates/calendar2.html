@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block header %}
-{{title}}
+{{the_event.title or "Select time slots"}}
 {% endblock %}
 
 {% block extracss %}
@@ -13,19 +13,34 @@
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
 <td>
-<a href="#" id="prev-btn" data-role="button" data-theme="b" data-inline="true" 
-    data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext"></a>
+<a href="#" id="prev-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
+    data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext">Scroll left</a>
 </td>
 <td style="text-align:center;">
-<a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" 
-    data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext"
-    class="ui-disabled"></a>
+<a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
+    data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext">Clear selection</a>
+</td>
+<td style="text-align:center;">
+<a href="#legend-popup" id="legend-btn" data-rel="popup" data-role="button" 
+    data-position-to="window" data-mini="true" class="ui-icon-nodisc"
+	data-inline="true" data-transition="pop" data-theme="b">?</a>
 </td>
 <td style="text-align:right;">
-<a href="#" id="next-btn" data-role="button" data-theme="b" data-inline="true" 
-    data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext"></a>
+<a href="#" id="next-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
+    data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext">Scroll right</a>
 </td>
 </tr></table>
+</div>
+
+
+<div data-role="popup" id="legend-popup" class="ui-content" data-theme="c" data-overlay-theme="a">
+<a href="#" data-rel="back" data-role="button" data-theme="c" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<p>Color legend</p>
+<ul>
+    <li><div class="color-legend" style="background: rgba(131, 214, 99, 0.9);"></div>Your preferred times</li>
+    <li><div class="color-legend" style="background: rgba(0,0,0,0.2);"></div>Your existing events</li>
+    <li><div class="color-legend" style="background: rgba(0, 255, 245, 0.3);"></div>Guests' preferred times</li>
+</ul>
 </div>
 
 <div class="calendar-container disable-select">
@@ -66,8 +81,10 @@
 
 <div>
 	<div class="input-error" id="errbox"></div>
-	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
-	<a href="/decline/{{user_token}}" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">Decline</a>
+	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Preferences</button>
+	<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
+	{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
+	</a>
 </div>
 
 <script type="text/javascript">
@@ -96,7 +113,6 @@ $(document).ready(function(){
     }
     
     $(window).on("resize", setContainerWidth);
-    setContainerWidth();
     
     $("#calendar-grid").swipe({
         swipeStatus : function(event, phase, direction, distance, duration, fingerCount) {
@@ -333,7 +349,8 @@ $(document).ready(function(){
     
     $("#savebtn").on("click", function(){
     	var selected = $(".cal-day-cell-selected").map(function(){
-    		return $(this).data("cell-col") + "," + (parseInt($(this).data("cell-row"))/2.0);
+    		return {day: parseInt($(this).data("cell-col")), 
+    			halfhour: parseInt($(this).data("cell-row"))};
     	});
     	
     	console.log("selected", selected);
@@ -354,9 +371,9 @@ $(document).ready(function(){
             dataType : "json",
             data: JSON.stringify(_.toArray(selected)),
             traditional: true,
-            success : function(a, b, c) {
-                console.log("hurra", a, b, c);
-                //window.location.href = """;
+            success : function(data) {
+                console.log("hurra", data);
+                window.location.href = data;
             },
             error : function(x){
                 console.log("error", x);
@@ -393,7 +410,7 @@ $(document).ready(function(){
                 }
             }
             if (evt.title) {
-                var title = $("<div class='cal-user-event-title'>")
+                var title = $("<div class='cal-user-event-title'>");
                 title.text(evt.title);
                 title.appendTo(elem);
             }
@@ -402,9 +419,37 @@ $(document).ready(function(){
 
     var user_calendar_events = {{user_calendar_events|safe}};
     var user_calendar_votes = {{user_calendar_votes|safe}};
+    var user_selected_slots = {{user_selected_slots|safe}};
 
-    insertEvents(user_calendar_events, "cal-user-event");
-    insertEvents(user_calendar_votes, "cal-user-vote");
+    function prepare() {
+    	setContainerWidth();
+        insertEvents(user_calendar_events, "cal-user-event");
+        insertEvents(user_calendar_votes, "cal-user-vote");
+    }
+    
+    setTimeout(prepare, 10);
+    
+    for (var i = 0; i < user_selected_slots.length; i++) {
+    	var slot = user_selected_slots[i];
+    	var cell = $(".cal-day-cell[data-cell-col='" + slot.day + "'][data-cell-row='" + slot.halfhour + "']");
+    	cell.addClass("cal-day-cell-selected");
+    }
+    
+    if ($(".cal-day-cell-selected").length) {
+        $("#clear-btn").removeClass("ui-disabled");
+    }
+    else {
+        $("#clear-btn").addClass("ui-disabled");
+    }
+    
+    $('#decline-btn').on("click", function(event) {
+        event.preventDefault();
+        if (confirm("Are you sure you want to {% if is_owner %}cancel{% else %}decline{% endif %} the event?")) {  
+           window.location = $(this).attr('href');
+           return true;
+        }
+        return false;
+    });
     
 });
 </script>
