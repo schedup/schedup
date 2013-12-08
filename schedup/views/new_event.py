@@ -11,6 +11,7 @@ from schedup.utils import send_email
 from google.appengine.ext import ndb
 import logging
 import json
+from schedup.views.calendar import generate_calendar, handle_calendar_response
 
 
 class NewEventPage(BaseHandler):
@@ -82,84 +83,13 @@ class ChooseTimeslotsPage(BaseHandler):
     
     @maybe_logged_in
     def get(self, owner_token):
-        the_event = EventInfo.get_by_owner_token(owner_token)
-        if not the_event:
-            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
-        
-        days = []
-        s = the_event.start_window
-        while s <= the_event.end_window:
-            days.append((s.day, ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][s.weekday()]))
-            s += timedelta(days=1)
-
-        hours = set()
-        if "morning" in the_event.daytime:
-            hours.update(range(8,13))
-        if "noon" in the_event.daytime:
-            hours.update(range(12,17))
-        if "evening" in the_event.daytime:
-            hours.update(range(17,24))
-        hours = range(min(hours), max(hours)+1)
-        
-        logging.info("hours = %r", hours)
-        
-        timemap = {}
-        for gst in the_event.guests:
-            for ts, duration in (gst.selected_times if gst.selected_times else ()):
-                for halfhour in range(duration // 30):
-                    k = ts + timedelta(minutes=halfhour * 30)
-                    if k not in timemap:
-                        timemap[k] = 0
-                    timemap[k] += 1
-        
-        suggested = []
-        #count = len(the_event.guests)+1
-        #for slot, count in timemap.items():
-        #    suggested.append({"going" : slot,
-        #        "count" : count,
-        #        "day":5,
-        #        "hour":6,
-        #        "duration":1.5,
-        #        })
-        
-        events = []
-        if self.user:
-            for evt in self.gconn.get_events("primary", the_event.start_window, the_event.end_window):
-                start = parse(evt["start"]["dateTime"])
-                end = parse(evt["end"]["dateTime"])
-                events.append({
-                    "title" : evt["summary"], 
-                    "day" : (start.date() - the_event.start_window).days,
-                    "hour" : start.hour + start.minute / 60.0, 
-                    "duration" : (end - start).total_seconds() / (60*60.0),
-                })
-        
-        self.render_response("calendar.html", days = days, hours = hours, 
-            events_json = json.dumps(events), min_hour = min(hours),
-            suggested_json = json.dumps(suggested),
-            title = the_event.title,
-            post_url = "/choose/%s" % (owner_token,),
-        )
+        generate_calendar(self, owner_token, "/choose/%s" % (owner_token,))
     
+    @maybe_logged_in
     def post(self, owner_token):
-        selected = json.loads(self.request.body)
-        logging.info("selected=%r", selected)
-
-        the_event = EventInfo.get_by_owner_token(owner_token)
-        the_event.owner_selected_times = selected
-        the_event.put()
-        
-        res = ""
-        json_data = json.dumps(res)
-        self.response.content_type = "application/json"
-        self.response.write(json_data)
+        handle_calendar_response(self, owner_token, "/my")
 
 
-class ChooseTimeslotsPageForGuest(BaseHandler):
-    URL = "/guestChoose/(.+)"
-    
-    def get(self, token):
-        pass
     
     
 

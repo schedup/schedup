@@ -67,7 +67,7 @@
 <div>
 	<div class="input-error" id="errbox"></div>
 	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Send</button>
-	<a href="/decline/{{event.token}}" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">Decline</a>
+	<a href="/decline/{{user_token}}" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">Decline</a>
 </div>
 
 <script type="text/javascript">
@@ -175,8 +175,6 @@ $(document).ready(function(){
             return;
         }
         
-        console.log("phase", phase);
-    
         if (phase == "start") {
             clearTemp();
             first_elem = elem;
@@ -334,9 +332,8 @@ $(document).ready(function(){
     });
     
     $("#savebtn").on("click", function(){
-    	data-cell-row="{{hour*2}}" data-cell-col
     	var selected = $(".cal-day-cell-selected").map(function(){
-    		return $(this).data("data-cell-col") ","+ $(this).data("data-cell-row");
+    		return $(this).data("cell-col") + "," + (parseInt($(this).data("cell-row"))/2.0);
     	});
     	
     	console.log("selected", selected);
@@ -355,22 +352,20 @@ $(document).ready(function(){
             cache : false,
             type: "POST",
             dataType : "json",
-            data: JSON.stringify(selected),
+            data: JSON.stringify(_.toArray(selected)),
             traditional: true,
-            success : function(){
-                console.log("hurra");
-                window.location.href = "/my";
+            success : function(a, b, c) {
+                console.log("hurra", a, b, c);
+                //window.location.href = """;
             },
             error : function(x){
                 console.log("error", x);
-                $("#errbox").text("Error: " + x);
+                $("#errbox").text("Error: " + x.statusText);
                 $("#errbox").show();
                 setTimeout(function(){
                     $("#errbox").fadeOut();
-                }, 5000);
-
+                }, 7000);
             }
-
         });
     	
     });

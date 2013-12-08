@@ -21,7 +21,11 @@ class AutocompleteContacts(BaseHandler):
         results = []
         if EMAIL_PATTERN.match(q):
             results.append({"id" : q, "name" : q})
-        for res in self.gconn.get_contacts(q, 10):
+        try:
+            goog_results = self.gconn.get_contacts(q, 10)
+        except Exception:
+            goog_results = ()
+        for res in goog_results:
             name = res["name"]
             if not EMAIL_PATTERN.match(name):
                 name += " &lt;%s&gt;" % (res["email"],)
