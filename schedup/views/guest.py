@@ -41,6 +41,9 @@ class EditEventPage(BaseHandler):
         evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+        evt.voting_count = 0
+        evt.decline_count = 0
+        evt.put()
         self.render_response("edit.html",event = evt)
 
 class SendEventPage(BaseHandler):
@@ -105,6 +108,7 @@ class GuestDeclined(BaseHandler):
     def get(self, token):
         evt, guest = EventInfo.get_by_guest_token(token)
         guest.status = "decline"
+        evt.decline_count += 1
         evt.put()
         self.redirect_with_context("/my")
 
