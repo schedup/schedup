@@ -159,6 +159,7 @@ class ChooseTimeslotsPage(BaseHandler):
 
         the_event = EventInfo.get_by_owner_token(owner_token)
         the_event.owner_selected_times = selected
+        the_event.voting_count += 1
         the_event.put()
         
         res = ""
