@@ -124,7 +124,8 @@
 }
 
 .cal-user-vote {
-	background: rgba(0, 255, 245, 0.3);
+	/*background: rgba(0, 255, 245, 0.3);*/
+	background: url('/static/img/diagbg2.png') repeat;
 	pointer-events: none;
 	position: absolute;
 	z-index: 1;

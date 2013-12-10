@@ -5,6 +5,7 @@ from email.utils import parseaddr
 from dateutil.parser import parse
 from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in
+from google.appengine.ext import ndb
 
 
 class CalendarPage(BaseHandler):
@@ -14,7 +15,12 @@ class CalendarPage(BaseHandler):
     def get(self, user_token):
         is_owner, the_event, user = EventInfo.get_by_token(user_token)
         if not the_event:
-            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+            if "eventkey" in self.session:
+                the_event = ndb.Key(urlsafe = self.session.pop("eventkey")).get()
+                is_owner = True
+                user = the_event.owner.get()
+            if not the_event:
+                return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
         days = []
         s = the_event.start_window
@@ -56,6 +62,8 @@ class CalendarPage(BaseHandler):
             if gst.email == user.email:
                 continue
             if not gst.selected_times:
+                continue
+            if gst.status != "accept":
                 continue
             for start_time, end_time in gst.selected_times:
                 user_calendar_votes.append({
@@ -155,6 +163,7 @@ class CalendarPage(BaseHandler):
             the_event.owner_selected_times = ranges
         else:
             user.selected_times = ranges
+            user.status = "accept"
         the_event.put()
     
         self.session["flashmsg"] = "Thanks for voting"

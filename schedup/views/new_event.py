@@ -13,7 +13,7 @@ except ImportError:
     import random
 
 def generate_random_token(length):
-    return "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-") 
+    return "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-") 
         for _ in range(length))
 
 
@@ -37,13 +37,13 @@ class NewEventPage(BaseHandler):
                 gst = EventGuest(email=email, token = generate_random_token(self.TOKEN_SIZE))
             guests.append(gst)
         if not guests:
-            return self.redirect_with_flashmsg("/new", "No emails given", "error")
+            return self.redirect_with_flashmsg(self.URL, "No emails given", "error")
         
         title = self.request.params["title"]
         fromtime = parse_datetime(self.request.params["fromdate"])
         totime = parse_datetime(self.request.params["todate"])
         if fromtime > totime:
-            return self.redirect_with_flashmsg("/new", "Start time is later than end time", "error")
+            return self.redirect_with_flashmsg(self.URL, "Start time is later than end time", "error")
         
         owner_token = generate_random_token(self.TOKEN_SIZE)
         evt = EventInfo(owner = self.user.key, 
@@ -57,10 +57,8 @@ class NewEventPage(BaseHandler):
             description=self.request.params["description"],
             duration=int(float(self.request.params["slider-step"])*60),
         )
-
         evt.put()
-        # clear the cache so /my will show this event
-        ndb.get_context().clear_cache()
+        self.session["eventkey"] = evt.key.urlsafe()
         
         for guest in guests:
             send_email("%s invited you to %s" % (self.user.fullname, title),
@@ -71,7 +69,7 @@ class NewEventPage(BaseHandler):
         
         logging.info("Guests: %r", guests)       
         self.redirect_with_flashmsg("/cal/%s" % (owner_token,), 
-            msg = "Invites were sent to guests, please vote", style = "ok")
+            msg = "Invites were sent to guests. Please vote", style = "ok")
 
 
 
