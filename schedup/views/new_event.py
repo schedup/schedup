@@ -133,16 +133,18 @@ class ChooseTimeslotsPage(BaseHandler):
         
         events = []
         if self.user:
-            for evt in self.gconn.get_events("primary", the_event.start_window, the_event.end_window):
-                start = parse(evt["start"]["dateTime"])
-                end = parse(evt["end"]["dateTime"])
-                events.append({
-                    "title" : evt["summary"], 
-                    "day" : (start.date() - the_event.start_window).days,
-                    "hour" : start.hour + start.minute / 60.0, 
-                    "duration" : (end - start).total_seconds() / (60*60.0),
-                })
-        
+            try:
+                for evt in self.gconn.get_events("primary", the_event.start_window, the_event.end_window):
+                    start = parse(evt["start"]["dateTime"])
+                    end = parse(evt["end"]["dateTime"])
+                    events.append({
+                        "title" : evt["summary"], 
+                        "day" : (start.date() - the_event.start_window).days,
+                        "hour" : start.hour + start.minute / 60.0, 
+                        "duration" : (end - start).total_seconds() / (60*60.0),
+                    })
+            except:
+                pass        
         self.render_response("calendar.html", days = days, hours = hours, 
             events_json = json.dumps(events), min_hour = min(hours),
             suggested_json = json.dumps(suggested),
@@ -157,6 +159,7 @@ class ChooseTimeslotsPage(BaseHandler):
 
         the_event = EventInfo.get_by_owner_token(owner_token)
         the_event.owner_selected_times = selected
+        the_event.voting_count += 1
         the_event.put()
         
         res = ""

@@ -41,6 +41,8 @@ class EventInfo(ndb.Model):
     status = ndb.StringProperty(choices=["sent","canceled","pending"], default="pending")
     evtid = ndb.StringProperty()
     owner_selected_times= ndb.PickleProperty()
+    voting_count = ndb.IntegerProperty(default = 0)
+    decline_count = ndb.IntegerProperty(default = 0)
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()

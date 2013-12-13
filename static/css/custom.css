@@ -156,7 +156,9 @@ label.error {
     border-bottom: 3px solid white;
 }
 
-
+#friendsButton .ui-btn-inner {
+ 	padding: 4px;
+}
 
 
 

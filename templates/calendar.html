@@ -2,17 +2,15 @@
 
 
 {% block topbar %}
-<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
 
 <!-- TOP BAR -->
 <div class="ui-bar ui-bar-b">
 	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 	<a href="#transitionExample" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
-	<a href="#friendsFilter" data-transition="pop" data-icon="plus" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
-	<h1 class="ui-title">SchedUp</h1>
+	<a href="#friendsFilter" id="friendsButton" data-transition="pop" data-role="button" data-inline="true" data-rel="popup" data-mini="true" class="ui-icon-nodisc"><i class="icon-users" title="Guest List"></i></a>
+	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
 	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 </div>
-
 <div data-role="popup" id="transitionExample" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
 	<style>
 	h2 { color:DodgerBlue ; width:200px; font-size:24px; }
