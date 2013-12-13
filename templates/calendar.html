@@ -9,7 +9,7 @@
 	<a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 	<a href="#transitionExample" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
 	<a href="#friendsFilter" data-transition="pop" data-icon="plus" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
-	<h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
+	<h1 class="ui-title">SchedUp</h1>
 	<a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
 </div>
 
@@ -27,9 +27,7 @@
 </div>
 
 <div data-role="popup" id="friendsFilter" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
-	<style>
-	h2 { color:DodgerBlue ; width:200px; font-size:24px; }
-  	</style>
+  	<h4>choose other guests to see how they voted</h4>
   	<div data-role="fieldcontain">
 	<div class="ui-controlgroup-controls">
 		{% set i = 1 %}
@@ -39,7 +37,7 @@
         	{% elif guest.status == "decline" %}
         		{% set checkbox_name = "declineCheckBox" %}
         	{% else %}
-        		{% set checkbox_name = "pendingCheckBox" %}
+        		{% set checkbox_name = "myCheckBox" %}
         	{% endif %}
 			{% set user = guest.user %}
         	{% if user %}
@@ -123,13 +121,13 @@ $(document).ready(function(){
 	});*/
 	
 // 	HANDLERS FOR FRIENDS FILTER
-	$("input:checkbox[name=pendingCheckBox]").checkboxradio('disable');
-	$("input:checkbox[name=declinedCheckBox]").checkboxradio('disable');
+ 	$("input:checkbox[name=pendingCheckBox]").checkboxradio('disable');
+ 	$("input:checkbox[name=declinedCheckBox]").checkboxradio('disable');
 	$("#friendsFilter").on({
 		   popupafterclose: function() {
  			   var selected = new Array();
  				$("input:checkbox[name=myCheckBox]:checked").each(function() {
- 			       selected.push($(this));
+ 			       selected.push($(this).find('.ui-btn-text'));
  			  });
 			  console.log(selected);
 			  //highlight the votes of the friends requested by chekbox
