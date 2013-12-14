@@ -9,7 +9,54 @@
 <link rel="stylesheet" href="/static/css/calendar2.css" />
 {% endblock %}
 
+{# block topbar #}
+
+<!-- TOP BAR -->
+<!-- div class="ui-bar ui-bar-b">
+    <a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+    <a href="#infobox" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
+    <a href="#friendsFilter" id="friendsButton" data-transition="pop" data-role="button" data-inline="true" data-rel="popup" data-mini="true" class="ui-icon-nodisc"><i class="icon-users" title="Guest List"></i></a>
+    <h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
+    <a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
+</div-->
+
+{# endblock #} 
+
+
 {% block content %}
+
+<div data-role="popup" id="infobox" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+    <h2 style="color:DodgerBlue; width:200px; font-size:24px;">{{the_event.title}}</h2>
+    <!-- h4>{{the_event.type}} Event</h4-->
+    <h4>By {{the_event.owner_fullname}} </h4>
+    {% if the_event.description %} 
+    <h4>Description</h4>
+    <p>{{the_event.description}}</p>
+    {% endif %}
+</div>
+
+<div data-role="popup" id="friendsFilter" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+    <fieldset data-role="controlgroup">
+        <legend>Guests to show</legend>
+        {% if not is_owner %}
+            {% set sanitized = the_event.owner.get().sanitized_email() %}
+            <input type="checkbox" id="guest-checkbox-{{sanitized}}" checked 
+               class="guestFilterCheckbox" data-email="{{sanitized}}">
+            <label for="guest-checkbox-{{sanitized}}">{{the_event.owner_fullname}}</label>
+        {% endif %}
+        
+        {% for guest in the_event.guests %}
+            {% if guest.token != user_token %}
+                {% set sanitized = guest.sanitized_email() %}
+                <input type="checkbox" id="guest-checkbox-{{sanitized}}" checked 
+                   class="guestFilterCheckbox {{guest.status}}" data-email="{{sanitized}}">
+                <label for="guest-checkbox-{{sanitized}}">{{guest.fullname}}</label>
+            {% endif %}
+        {% endfor %}
+    </fieldset>
+</div>
 
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
@@ -18,13 +65,23 @@
     data-iconshadow="false" data-shadow="false" data-icon="arrow-l" data-iconpos="notext">Scroll left</a>
 </td>
 <td style="text-align:center;">
-<a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
-    data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext">Clear selection</a>
+<a href="#infobox" id="info-btn" data-rel="popup" data-role="button" data-icon="info" data-iconshadow="false"
+    data-position-to="window" data-mini="true" class="ui-icon-nodisc" data-iconpos="notext"
+	data-inline="true" data-transition="pop" data-theme="b">Info</a>
+</td>
+<td style="text-align:center;">
+<a href="#friendsFilter" id="guests-btn" data-rel="popup" data-role="button" 
+    data-position-to="window" data-mini="true" class="ui-icon-nodisc"
+    data-inline="true" data-transition="pop" data-theme="b"><i class="icon-users" title="Guest List"></i></a>
 </td>
 <td style="text-align:center;">
 <a href="#legend-popup" id="legend-btn" data-rel="popup" data-role="button" 
     data-position-to="window" data-mini="true" class="ui-icon-nodisc"
-	data-inline="true" data-transition="pop" data-theme="b">?</a>
+    data-inline="true" data-transition="pop" data-theme="b">?</a>
+</td>
+<td style="text-align:center;">
+<a href="#" id="clear-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
+    data-iconshadow="false" data-shadow="false" data-icon="delete" data-iconpos="notext">Clear selection</a>
 </td>
 <td style="text-align:right;">
 <a href="#" id="next-btn" data-role="button" data-theme="b" data-inline="true" class="ui-icon-nodisc"
@@ -32,7 +89,6 @@
 </td>
 </tr></table>
 </div>
-
 
 <div data-role="popup" id="legend-popup" class="ui-content" data-theme="c" data-overlay-theme="a">
 <a href="#" data-rel="back" data-role="button" data-theme="c" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
@@ -405,10 +461,10 @@ $(document).ready(function(){
                 height: evt.duration * hour_height,
             });
             elem.appendTo(grid);
-            if (evt.users) {
-                for (var j = 0; j < evt.users.length; j++) {
-                    elem.addClass("user-" + evt.users[j]);
-                }
+            console.log("event.user = ", evt.user);
+            if (evt.user) {
+                /*for (var j = 0; j < evt.users.length; j++) {*/
+                elem.addClass("email-" + evt.user);
             }
             if (evt.title) {
                 var title = $("<div class='cal-user-event-title'>");
@@ -451,7 +507,22 @@ $(document).ready(function(){
         }
         return false;
     });
-    
+
+    $(".guestFilterCheckbox.pending").checkboxradio('disable');
+    $(".guestFilterCheckbox.decline").checkboxradio('disable');
+
+    $(".guestFilterCheckbox").on("change", function() {
+    	var slots = $(".cal-user-vote.email-" + $(this).data("email"));
+        console.log("CHECKBOX CLICKED", $(this).data("email"), slots.length);
+        
+        if ($(this).is(":checked")) {
+        	slots.fadeIn();
+        }
+        else {
+        	slots.fadeOut();
+        }
+    });
+
 });
 </script>
 

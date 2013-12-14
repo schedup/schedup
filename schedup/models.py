@@ -23,6 +23,9 @@ class UserProfile(ndb.Model):
                     count += 1
         return count
 
+    def sanitized_email(self):
+        return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
+    
 
 class EventGuest(ndb.Model):
     # always expected to be set
@@ -32,6 +35,13 @@ class EventGuest(ndb.Model):
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
+    
+    @property
+    def fullname(self):
+        return self.user.get().fullname if self.user else self.email
+    
+    def sanitized_email(self):
+        return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
 
 
 class EventInfo(ndb.Model):
@@ -42,8 +52,7 @@ class EventInfo(ndb.Model):
     status = ndb.StringProperty(choices=["sent","canceled","pending"], default="pending")
     evtid = ndb.StringProperty()
     owner_selected_times= ndb.PickleProperty()
-    voting_count = ndb.IntegerProperty(default = 0)
-    decline_count = ndb.IntegerProperty(default = 0)
+    new_notifications = ndb.IntegerProperty(default = 0)
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()
@@ -54,6 +63,11 @@ class EventInfo(ndb.Model):
     duration = ndb.IntegerProperty(required = True)
     start_time = ndb.DateTimeProperty()
     end_time = ndb.DateTimeProperty()
+    
+    @property
+    def owner_fullname(self):
+        owner = self.owner.get()
+        return owner.fullname or owner.email
     
     @classmethod
     def get_by_guest_token(cls, token):

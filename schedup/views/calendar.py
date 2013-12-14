@@ -57,7 +57,7 @@ class CalendarPage(BaseHandler):
         else:
             user_calendar_events = ()
         
-        user_calendar_votes= []
+        user_calendar_votes = []
         for gst in the_event.guests:
             if gst.email == user.email:
                 continue
@@ -77,12 +77,13 @@ class CalendarPage(BaseHandler):
             ranges = the_event.owner_selected_times
         else:
             ranges = user.selected_times
+            owner_email = the_event.owner.get().email
             if the_event.owner_selected_times:
                 for start_time, end_time in the_event.owner_selected_times:
                     user_calendar_votes.append({
                         "start" : start_time, 
                         "end" : end_time, 
-                        "user" : self.canonize_email(gst.email)
+                        "user" : self.canonize_email(owner_email)
                     })
         
         if ranges:
@@ -164,6 +165,7 @@ class CalendarPage(BaseHandler):
         else:
             user.selected_times = ranges
             user.status = "accept"
+            the_event.new_notifications += 1
         the_event.put()
     
         self.session["flashmsg"] = "Thanks for voting"
@@ -188,15 +190,17 @@ class DeclinePage(BaseHandler):
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
         if is_owner:
-            the_event.status = "canceled" 
+            the_event.status = "canceled"
             msg = "Event '%s' canceled" % (the_event.title,)
         else:
             user.status = "decline"
             user.selected_times = []
+            the_event.new_notifications += 1
             msg = "You've declined '%s'" % (the_event.title,)
-        the_event.put()
         if the_event.evtid:
             self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+            the_event.evtid = None
+        the_event.put()
 
         return self.redirect_with_flashmsg("/", msg, "note")
 

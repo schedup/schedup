@@ -6,7 +6,6 @@ from dateutil.parser import parse as parse_datetime
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
-from google.appengine.ext import ndb
 try:
     from Crypto.Random import random
 except ImportError:
