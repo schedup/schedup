@@ -1,4 +1,6 @@
+import time
 from google.appengine.ext import ndb
+from datetime import timedelta
 
 
 class UserProfile(ndb.Model):
@@ -22,7 +24,6 @@ class UserProfile(ndb.Model):
         return count
 
 
-               
 class EventGuest(ndb.Model):
     # always expected to be set
     email = ndb.StringProperty()
@@ -88,6 +89,55 @@ class EventInfo(ndb.Model):
         for guest in self.guests:
             if guest.user==user.key:
                 return guest.status!="pending"
+    
+    def suggest_times(self, max_results = 3):
+        time_table = {}
+        halfhour = timedelta(minutes = 30)
+        # add the owner's votes
+        for start_time, end_time in self.owner_selected_times:
+            t = start_time
+            while t < end_time:
+                if t not in time_table:
+                    time_table = 0
+                time_table[t] += 1
+                t += halfhour
+        
+        # add guest votes (but only if owner votes intersect with them)
+        for guest in self.guests:
+            if not guest.selected_times:
+                continue
+            for start_time, end_time in guest.selected_times:
+                t = start_time
+                while t < end_time:
+                    if t not in time_table:
+                        continue
+                    time_table[t] += 1
+                    t += halfhour
+        
+        # sort time slots first by num of votes (more is better), then by date (sooner is better)
+        sorted_times = sorted(time_table, key = lambda k: (time_table[k], -time.mktime(k.timetuple())), reverse = True)
+        
+        # merge time slots into ranges (up to max_results)
+        ranges = []
+        for slot in sorted_times:
+            if len(ranges) >= max_results:
+                break
+            elif not ranges:
+                ranges.append((slot, slot + halfhour))
+                continue
+            s, e = ranges[-1]
+            if e == slot:
+                ranges[-1] = (s, slot + halfhour)
+            elif s == slot + halfhour:
+                ranges[-1] = (slot, e)
+            else:
+                ranges.append((slot, slot + halfhour))
+        return ranges
+
+
+
+
+
 
 
 
