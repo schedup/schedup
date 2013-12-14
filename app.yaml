@@ -19,6 +19,9 @@ handlers:
 - url: /.*
   script: schedup.main.app
 
+inbound_services:
+- mail
+
 libraries:
 - name: webob
   version: latest
@@ -28,4 +31,6 @@ libraries:
   version: latest
 - name: endpoints
   version: latest
+- name: pycrypto
+  version: "latest"
 

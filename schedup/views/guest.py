@@ -108,7 +108,6 @@ class GuestDeclined(BaseHandler):
     def get(self, token):
         evt, guest = EventInfo.get_by_guest_token(token)
         guest.status = "decline"
-        evt.decline_count += 1
         evt.put()
         self.redirect_with_context("/my")
 
