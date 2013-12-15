@@ -137,6 +137,9 @@
 <div>
 	<div class="input-error" id="errbox"></div>
 	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Preferences</button>
+	<a href="#" id="pickdate-btn" data-role="button" data-theme="e" data-icon="grid" data-iconpos="right">
+	Pick Time
+	</a>
 	<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
 	{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
 	</a>
@@ -515,6 +518,17 @@ $(document).ready(function(){
         else {
         	slots.fadeOut();
         }
+    });
+    
+    $("#pickdate-btn").on("click", function() {
+        var weight = 1.0 / ({{the_event.guests.num_accepted}} + 0.01);
+        
+        console.log("weight", weight);
+        
+        $("#savebtn").prop("disable", true);
+        $(".cal-user-event").hide();
+        $(".cal-user-vote").css("background", "rgba(0,255,0," + weight + ")");
+        $(".cal-day-cell-selected").css("background", "rgba(0,255,0,0.1)");
     });
 
 });

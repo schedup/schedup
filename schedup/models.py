@@ -68,6 +68,9 @@ class EventInfo(ndb.Model):
     def owner_fullname(self):
         owner = self.owner.get()
         return owner.fullname or owner.email
+
+    def num_accepted(self):
+        return len([gst for gst in self.guests if gst.status == "accept"])
     
     @classmethod
     def get_by_guest_token(cls, token):
