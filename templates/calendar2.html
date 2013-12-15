@@ -42,17 +42,17 @@
         <legend>Guests to show</legend>
         {% if not is_owner %}
             {% set sanitized = the_event.owner.get().sanitized_email() %}
-            <input type="checkbox" id="guest-checkbox-{{sanitized}}" checked 
+            <input type="checkbox" id="guest-checkbox-owner" checked 
                class="guestFilterCheckbox" data-email="{{sanitized}}">
-            <label for="guest-checkbox-{{sanitized}}">{{the_event.owner_fullname}}</label>
+            <label for="guest-checkbox-owner">{{the_event.owner_fullname}}</label>
         {% endif %}
         
         {% for guest in the_event.guests %}
             {% if guest.token != user_token %}
                 {% set sanitized = guest.sanitized_email() %}
-                <input type="checkbox" id="guest-checkbox-{{sanitized}}" checked 
+                <input type="checkbox" id="guest-checkbox-{{loop.index}}" {% if guest.status == "accept" %}checked{%endif%} 
                    class="guestFilterCheckbox {{guest.status}}" data-email="{{sanitized}}">
-                <label for="guest-checkbox-{{sanitized}}">{{guest.fullname}}</label>
+                <label for="guest-checkbox-{{loop.index}}">{{guest.fullname}}</label>
             {% endif %}
         {% endfor %}
     </fieldset>
@@ -113,8 +113,7 @@
     </td>
     <td>
         <div id="calendar-grid-container">
-        <div id="calendar-grid">
-        <table cellpadding="0" cellspacing="0"><tr>
+        <table id="calendar-grid" cellpadding="0" cellspacing="0"><tr>
         {% for day in days %}
         <td class="cal-day-column" id="column-{{day.index}}">
             <div class="cal-day-title" data-cell-col="{{day.index}}">
@@ -129,7 +128,6 @@
         </td>
         {% endfor %}
         </tr></table>
-        </div>
         </div>
     </td>
 </tr>
@@ -435,7 +433,6 @@ $(document).ready(function(){
             data: JSON.stringify(_.toArray(selected)),
             traditional: true,
             success : function(data) {
-                console.log("hurra", data);
                 window.location.href = data;
             },
             error : function(x){
@@ -467,9 +464,7 @@ $(document).ready(function(){
                 height: evt.duration * hour_height,
             });
             elem.appendTo(grid);
-            console.log("event.user = ", evt.user);
             if (evt.user) {
-                /*for (var j = 0; j < evt.users.length; j++) {*/
                 elem.addClass("email-" + evt.user);
             }
             if (evt.title) {
@@ -519,7 +514,6 @@ $(document).ready(function(){
 
     $(".guestFilterCheckbox").on("change", function() {
     	var slots = $(".cal-user-vote.email-" + $(this).data("email"));
-        console.log("CHECKBOX CLICKED", $(this).data("email"), slots.length);
         
         if ($(this).is(":checked")) {
         	slots.fadeIn();

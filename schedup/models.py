@@ -114,7 +114,7 @@ class EventInfo(ndb.Model):
             t = start_time
             while t < end_time:
                 if t not in time_table:
-                    time_table = 0
+                    time_table[t] = 0
                 time_table[t] += 1
                 t += halfhour
         

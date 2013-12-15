@@ -47,13 +47,17 @@ class CalendarPage(BaseHandler):
             except Exception:
                 goog_events = ()
             for evt in goog_events:
-                start = parse(evt["start"]["dateTime"])
-                end = parse(evt["end"]["dateTime"])
-                user_calendar_events.append({
-                    "title" : evt["summary"], 
-                    "start" : start,
-                    "end" : end,
-                })
+                try:
+                    start = parse(evt["start"]["dateTime"])
+                    end = parse(evt["end"]["dateTime"])
+                except Exception:
+                    logging.error("bad event: %r", evt)
+                else:
+                    user_calendar_events.append({
+                        "title" : evt["summary"], 
+                        "start" : start,
+                        "end" : end,
+                    })
         else:
             user_calendar_events = ()
         
