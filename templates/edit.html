@@ -6,23 +6,10 @@ Edit Your Event
 
 {% block content %}
 
-{% if event.voting_count != 0 %}
-	{% set temp = "people" %}
-	{% if event.voting_count  == 1 %}
-		{% set temp = "person" %}
-	{% endif %}
-	<button disabled="">{{event.voting_count}} {{temp}} have voted for this event!</button>
-{% endif %}
-{% if event.decline_count != 0 %}
-	{% set temp = "people" %}
-	{% if event.decline_count  == 1 %}
-		{% set temp = "person" %}
-	{% endif %}
-	<button disabled="" data-theme="b">{{event.decline_count}} {{temp}} said they are not going to this event :(</button>
-{% endif %}
 
 <h1>{{event.title}}<a href="#editTitle" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit Title"></a></h1>
 <!-- h4>By {{user.fullname or user.email}} </h4-->
+
 <h4>From: {{event.start_time}}<a href="#editStartTime" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit Start Time"></a></h4>
 <h4>To: {{event.end_time}}<a href="#editEndTime" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit End Time"></a></h4>
 <!-- <h4> Event Type: {{event.type}}</h4> -->
@@ -38,6 +25,7 @@ Edit Your Event
 	{% endfor %}<a href="#editTimeOfDay" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit Time Of Day"></a></h4>
 <h4>Duration: {{event.duration/60}} Hours<a href="#editDuration" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit Duration"></a></h4>
 
+
 {% if event.description %} 
 <h4>Description<a href="#editDescription" data-transition="pop" data-icon="edit" data-role="button" data-inline="true" data-rel="popup" data-theme="b" class="ui-icon-nodisc" data-iconpos="notext" title="Edit Description"></a></h4>
 <p style="padding-left: 50px;">{{event.description}}</p>
@@ -47,7 +35,8 @@ Edit Your Event
     <div data-role="collapsible" data-collapsed="false">
         <h4>Guest List</h4>
         <!-- a href="#" data-role="button" data-icon="edit" data-iconpos="notext" title="Add guests"></a-->
-        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search guest..." data-inset="true">
+        <ul data-role="listview" data-inset="true"
+            {% if event.guests.__len__() > 10 %} data-filter="true" data-filter-placeholder="Search guest..." {%endif %}>
         {% for guest in event.guests %}
         	{% if guest.status == "accept" %}
         		{% set ic = "check" %}
@@ -67,9 +56,9 @@ Edit Your Event
     </div>
 </div>
 
-<a href="/choose/{{event.owner_token}}" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Check Votes</a>
+<a href="/cal/{{event.owner_token}}" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right" data-ajax="false">Check Votes</a>
 <a href="/send/{{event.owner_token}}" data-theme="b" data-role="button" data-icon="check" data-iconpos="right" data-ajax="false">Send Invites</a>
-<a href="/cancel/{{event.owner_token}}" data-theme="c" data-role="button" data-icon="delete" data-iconpos="right" data-ajax="false">Cancel Event</a>
+<a href="/decline/{{event.owner_token}}" data-theme="c" data-role="button" data-icon="delete" data-iconpos="right" data-ajax="false">Cancel Event</a>
 
 <div data-role="popup" id="editTitle" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
 	<form action="{{post_url}}" method="post" data-ajax="false" id="titleform">

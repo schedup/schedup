@@ -109,22 +109,30 @@ def logged_in(method):
     return method2
 
 def maybe_logged_in(method):
-    @oauth.oauth_aware
     @functools.wraps(method)
     def method2(self, *args):
-        from schedup.connector import GoogleConnector
-        from schedup.models import UserProfile
-        if oauth.has_credentials():
-            self.gconn = GoogleConnector(oauth)
-            self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
-            if not self.user:
-                prof = self.gconn.get_profile()
-                self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
-                self.user.put()
+        # only start the dance if we have the cookies
+        if "ACSID" in self.request.cookies or "dev_appserver_login" in self.request.cookies:
+            @oauth.oauth_aware
+            def aware(self, *args):
+                from schedup.connector import GoogleConnector
+                from schedup.models import UserProfile
+                if oauth.has_credentials():
+                    self.gconn = GoogleConnector(oauth)
+                    self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
+                    if not self.user:
+                        prof = self.gconn.get_profile()
+                        self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
+                        self.user.put()
+                else:
+                    self.gconn = None
+                    self.user = None
+                return method(self, *args)
+            return aware(self, *args)
         else:
             self.gconn = None
             self.user = None
-        return method(self, *args)
+            return method(self, *args)
     return method2
 
 def json_handler(method):
