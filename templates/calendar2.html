@@ -138,10 +138,16 @@
 
 <div>
 	<div class="input-error" id="errbox"></div>
+	<div>
 	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Preferences</button>
 	<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
 	{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
-	</a>
+	</a></div>
+	{% if is_owner %}
+		
+		<a href="#finalize" data-transition="pop" data-role="button" data-icon="star" data-iconpos="right" data-rel="popup" data-theme="b" class="ui-icon-nodisc" title="finalize">Finalize</a>
+	{% endif %}
+		
 </div>
 
 <script type="text/javascript">
