@@ -47,6 +47,7 @@ class CalendarPage(BaseHandler):
             except Exception:
                 goog_events = ()
             for evt in goog_events:
+                logging.info("!!! %r", evt)
                 start = parse(evt["start"]["dateTime"])
                 end = parse(evt["end"]["dateTime"])
                 user_calendar_events.append({
