@@ -29,7 +29,7 @@
 		</fieldset>
         <div class="input-error" id="when-error">At least one time of day is required</div>
 	</div>
-	<div data-role="fieldcontain">
+	<div data-role="fieldcontain" style="display:none;">
 		<fieldset data-role="controlgroup" data-type="horizontal"
 			data-mini="true">
 			<legend> Type </legend>
@@ -50,23 +50,27 @@
         <div class="input-error" id="fromdate-error">Required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="todate">  </label> <input name="todate" data-mini="true"
+		<label for="todate"> End Time Span </label> <input name="todate" data-mini="true"
 			id="todate" type="date" placeholder="Last applicable date"
 			data-role="datebox"
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
         <div class="input-error" id="todate-error">Required</div>
         <div class="input-error" id="todate-error2">End date must be later than start date</div>
 	</div>
-	<div data-role="fieldcontain">
+	<div data-role="fieldcontain" style="display:none;">
 		<label for="slider-step">Duration (Hours)</label>
 		<input type="range" name="slider-step" id="slider-step" value="2" min="0" max="5" step="0.5" />
 	</div>
 	<div data-role="fieldcontain">
 		<label for="textarea-a">Details</label>
-		<textarea name="description" id="textarea-a" placeholder="Description"></textarea>
+		<textarea name="description" id="textarea-a" placeholder="Description, location, and any extra notes"></textarea>
 	</div>
 
-	<input type="submit" value="Send" data-theme="b">
+    <div id="helpmsg" style="display:none; background: rgba(255,255,0,0.2);">
+    Send invites to guests and move on to picking your preferred time slots.<br/>
+    Don't worry, you can cancel or edit the event any time.
+    </div>
+	<input type="submit" value="Send Invites" data-theme="b">
 </form>
 
 <script type="text/javascript">
@@ -85,13 +89,23 @@
 			}
 		});
 		
+		var disable_auto_todate = false;
+		
 		$("#fromdate").on("change", function(){
+			if (disable_auto_todate) {
+				return;
+			}
 			var todate = $("#todate");
-			var fromtime = $("#fromdate").datebox("getTheDate");
-			var defDate = [fromtime.getFullYear(), fromtime.getMonth(), fromtime.getDate()];
-			console.log(fromtime, defDate);
-			todate.datebox({"defaultValue" : defDate});
-			//todate.datebox("refresh");
+			var from_ts = $("#fromdate").datebox("getTheDate");
+			from_ts.setDate(from_ts.getDate() + 4);
+			console.log(from_ts);
+			
+			todate.datebox('setTheDate', from_ts);
+			todate.trigger('datebox', {'method': 'doset'});
+		});
+		
+		$("#todate").on("click", function(){
+			disable_auto_todate = true;
 		});
 		
 		$("#newevtform").submit(function(event){

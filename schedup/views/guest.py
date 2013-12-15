@@ -25,6 +25,7 @@ class GuestPage(BaseHandler):
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         guest.status = self.request.params.get("status")
+        evt.new_notifications += 1
         evt.put()
         if guest.user:
             url="/invited"
@@ -38,13 +39,12 @@ class EditEventPage(BaseHandler):
     
     @logged_in
     def get(self, owner_token):
-        evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
+        evt = EventInfo.query(EventInfo.owner_token==owner_token).get()
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
-        evt.voting_count = 0
-        evt.decline_count = 0
+        evt.new_notifications = 0
         evt.put()
-        self.render_response("edit.html",event = evt)
+        self.render_response("edit.html", event = evt)
 
 class SendEventPage(BaseHandler):
     URL = "/send/(.+)"
@@ -88,28 +88,5 @@ class SendEventPage(BaseHandler):
             resp = self.gconn.update_event("primary",evt.evtid, event_details, send_notifications = True)
             return self.redirect_with_flashmsg("/my", "Updates sent", "ok")
 
-class CancelEventPage(BaseHandler):
-    URL = "/cancel/(.+)"
-    
-    @logged_in
-    def get(self, owner_token):
-        evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
-        if not evt:
-            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
-        evt.status = "canceled"
-        evt.put()
-        if evt.evtid:
-            self.gconn.remove_event("primary", evt.evtid, send_notifications = True)
-        self.redirect_with_flashmsg("/my", "Event '%s' canceled" % (evt.title,), "note")
-
-class GuestDeclined(BaseHandler):
-    URL = "/decline/(.+)"
-    
-    def get(self, token):
-        evt, guest = EventInfo.get_by_guest_token(token)
-        guest.status = "decline"
-        evt.decline_count += 1
-        evt.put()
-        self.redirect_with_context("/my")
 
 
