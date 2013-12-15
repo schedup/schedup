@@ -6,27 +6,28 @@
 	{% for evt in events %}
     <!-- li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li-->
 	    {% if owner %}
-	    {% if evt.status != "canceled" %}
-	    <li {% if evt.new_notifications > 0 %} data-theme="e" {% endif %}>
-		    <a href="/edit/{{evt.owner_token}}">
-		        <h2>{{ evt.title }}</h2>
-		        <p>{{evt.type}}</p>
-		        <p class="ui-li-aside"><strong>{{evt.start_window}} - {{evt.end_window}}</strong></p>
-		        <span class="ui-li-count">{{evt.new_notifications}}</span>
-		    </a>
-		  </li>
-		{% endif %}
-	    {% else %}
-	    {% if evt.status != "canceled" %}
-	    <li {% if not evt.has_responded(user) %} data-theme="e" {% endif %}>
-		    <a href="/guest/{{evt.get_token_for(user)}}">
-		        <h2>{{ evt.title }}</h2>
-		        <p>{{evt.type}}</p>
-		        <p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
-		    </a>
-		  </li>
-		{% endif %}
-		{% endif %}
+	    	{% if evt.status != "canceled" %}
+	    		<li data-theme="c">
+		  			<a href="/edit/{{evt.owner_token}}">
+		      		<h2>{{ evt.title }}</h2>
+		        	<p>{{evt.type}}</p>
+		        	<p class="ui-li-aside"><strong>{{evt.start_window}} - {{evt.end_window}}</strong></p>
+		        	<span class="ui-li-count">{{evt.new_notifications}}</span>
+		   		 	</a>
+		  		</li>
+			{% endif %}
+	    	{% else %}
+	    		{% if evt.status != "canceled" %}
+	    			<li {% if not evt.has_responded(user) %} data-theme="e" {% endif %}>
+		    			<a href="/guest/{{evt.get_token_for(user)}}">
+		        		<h2>{{ evt.title }}</h2>
+		        		<p>{{evt.type}}</p>
+		        		<p class="ui-li-aside"><strong>{{evt.start_window}}</strong></p>
+		    			</a>
+		  			</li>
+				{% endif %}
+			{% endif %}
+		
     {% endfor %}
 </ul>
 
