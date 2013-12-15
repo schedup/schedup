@@ -13,8 +13,8 @@ handlers:
   static_dir: static
 
 - url: /favicon.ico
-	static_files: static/img/favicon.ico
-	upload: static/img/favicon.ico
+  static_files: static/img/favicon.ico
+  upload: static/img/favicon.ico
 
 - url: /.*
   script: schedup.main.app
