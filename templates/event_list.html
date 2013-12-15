@@ -11,7 +11,7 @@
     <!-- li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li-->
 	    {% if owner %}
 	    {% if evt.status != "canceled" %}
-	    <li {% if (evt.voting_count + evt.decline_count > 0)%} data-theme="e" {% endif %}>
+	    <li data-theme="c">
 		    <a href="/edit/{{evt.owner_token}}">
 		        <h2>{{ evt.title }}</h2>
 		        <p>{{evt.type}}</p>
