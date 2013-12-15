@@ -57,6 +57,24 @@
         {% endfor %}
     </fieldset>
 </div>
+<div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+    <fieldset data-role="controlgroup" data-type="horizontal" class="ui-corner-all ui-controlgroup ui-controlgroup-horizontal">
+       <legend>select final time</legend>
+       <div class="ui-controlgroup-controls"> 	
+        {% for best_time in the_event.suggest_times() %}
+       	 <div class="ui-radio">
+       	 	<input type="radio" name="radio-view" id="radio-view-{{loop.index}}" value="list">
+       	 	<label for="radio-view-{{loop.index}}" data-corners="true" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-theme="c" class="ui-btn ui-radio-off ui-corner-left ui-btn-up-c">
+       	 	<span class="ui-btn-inner ui-corner-left">
+       	 	<span class="ui-btn-text">{{best_time[0].date().__str__()}}<BR/>{{best_time[0].date().strftime('%A')}}<BR/>{{best_time[0].time().__str__()}}</span>
+       	 	</span>
+       	 	</label>
+       	 </div>
+        {% endfor %}
+        </fieldset>
+        <button type="submit" data-theme="b" name="sendInvitations" value="submit-value" class="ui-btn-hidden" aria-disabled="false">Send Invitations</button>
+</div>
 
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
@@ -143,7 +161,9 @@
 	</a></div>
 	{% if is_owner %}
 		
-		<a href="#finalize" data-transition="pop" data-role="button" data-icon="star" data-iconpos="right" data-rel="popup" data-theme="b" class="ui-icon-nodisc" title="finalize">Finalize</a>
+	<a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
+    data-position-to="window" data-iconpos="right"
+	data-transition="pop" data-theme="b" title="finalize">Finalize</a>
 	{% endif %}
 		
 </div>
