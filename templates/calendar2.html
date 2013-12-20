@@ -59,22 +59,28 @@
 </div>
 <div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-    <fieldset data-role="controlgroup" data-type="horizontal" class="ui-corner-all ui-controlgroup ui-controlgroup-horizontal">
-       <legend>select final time</legend>
-       <div class="ui-controlgroup-controls"> 	
-        {% for best_time in the_event.suggest_times() %}
-       	 <div class="ui-radio">
-       	 	<input type="radio" name="radio-view" id="radio-view-{{loop.index}}" value="list">
-       	 	<label for="radio-view-{{loop.index}}" data-corners="true" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-theme="c" class="ui-btn ui-radio-off ui-corner-left ui-btn-up-c">
-       	 	<span class="ui-btn-inner ui-corner-left">
-       	 	<span class="ui-btn-text">{{best_time[0].date().__str__()}}<BR/>{{best_time[0].date().strftime('%A')}}<BR/>{{best_time[0].time().__str__()}}</span>
-       	 	</span>
-       	 	</label>
-       	 </div>
-        {% endfor %}
+    <form id="sendInvites" action="/send/{{user_token}}" method="get" data-ajax="false">
+		<h2>Select final time</h2>
+   		<fieldset data-role="controlgroup" data-type="horizontal" class="ui-corner-all ui-controlgroup ui-controlgroup-horizontal">
+       		<div class="ui-controlgroup-controls"> 	
+        	{% for best_time in the_event.suggest_times() %}
+       	 		<div class="ui-radio">
+       	 			<input type="radio" name="radio-view" id="radio-view-{{loop.index}}" value="{{best_time[0]}}">
+       	 			<label for="radio-view-{{loop.index}}" data-corners="true" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-theme="c" class="ui-btn ui-radio-off ui-corner-left ui-btn-up-c">
+       	 			<span class="ui-btn-inner ui-corner-left">
+       	 				<span class="ui-btn-text">{{best_time[0].date().__str__()}}<BR/>{{best_time[0].date().strftime('%A')}}<BR/>{{best_time[0].time().__str__()}}</span>
+       	 			</span>
+       	 			</label>
+       	 		</div>
+        	{% endfor %}
+        	</div>
         </fieldset>
-        <button type="submit" data-theme="b" name="sendInvitations" value="submit-value" class="ui-btn-hidden" aria-disabled="false">Send Invitations</button>
+        <button type="submit" data-theme="b" class="ui-btn-hidden" aria-disabled="false">Send Invitations</button>
+        </form>
 </div>
+
+
+<!-- <div class="input-error" id="when-error">You must pick a final date before sending invitations</div> -->
 
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
@@ -542,6 +548,21 @@ $(document).ready(function(){
         	slots.fadeOut();
         }
     });
+    
+    $("#sendInvites").submit(function(event){
+    	
+    	var selected = $('input:radio[name=radio-view]:checked');
+    		if (selected.size()==0) {
+//                 var msg = $("#when-error");
+//                 msg.show();
+//                 function onchg(){
+//                     msg.fadeOut();
+//                 }
+    			event.preventDefault();
+			}
+    		console.log(selected[0].value);
+    		//event.preventDefault();
+    	});
 
 });
 </script>

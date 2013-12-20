@@ -3,7 +3,7 @@ Guest flow (either logged in or not)
 """
 import logging
 from dateutil.parser import parse as parse_datetime, parse
-from datetime import timedelta, date
+from datetime import timedelta, datetime
 from schedup.utils import send_email
 from google.appengine.ext import ndb
 from schedup.base import BaseHandler, logged_in
@@ -164,6 +164,9 @@ class SendEventPage(BaseHandler):
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
+        final_time = self.request.params.get("radio-view");
+        evt.start_time=datetime.strptime(str(final_time),'%Y-%m-%d %H:%M:%S');
+        evt.end_time=evt.start_time+timedelta(hours=2);
         event_details = {
             'summary': evt.title,
             'description': evt.description,
