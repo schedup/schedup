@@ -2,9 +2,9 @@ import json
 import logging
 from datetime import timedelta, datetime
 from email.utils import parseaddr
-from dateutil.parser import parse
+from dateutil.parser import parse as parse_datetime
 from schedup.models import EventInfo
-from schedup.base import BaseHandler, maybe_logged_in
+from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
 
 
@@ -22,6 +22,8 @@ class CalendarPage(BaseHandler):
                 user = the_event.owner.get()
             if not the_event:
                 return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+        
+        logging.info("the_event = %r", the_event)
         
         days = []
         s = the_event.start_window
@@ -51,8 +53,8 @@ class CalendarPage(BaseHandler):
                 goog_events = ()
             for evt in goog_events:
                 try:
-                    start = parse(evt["start"]["dateTime"])
-                    end = parse(evt["end"]["dateTime"])
+                    start = parse_datetime(evt["start"]["dateTime"])
+                    end = parse_datetime(evt["end"]["dateTime"])
                 except Exception:
                     logging.error("bad event: %r", evt)
                 else:
@@ -101,6 +103,11 @@ class CalendarPage(BaseHandler):
                         "day" : start_time.toordinal(), 
                         "halfhour" : first + hh, 
                     })
+        
+        if is_owner:
+            the_event.new_notifications = 0
+            the_event.put()
+                    
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
@@ -112,8 +119,9 @@ class CalendarPage(BaseHandler):
             post_url = "/cal/%s" % (user_token,),
             the_event = the_event,
             is_owner = is_owner,
+            is_logged_in = self.user is not None,
         )
-
+        
     @staticmethod
     def canonize_email(email):
         _, addr = parseaddr(email)
@@ -175,8 +183,12 @@ class CalendarPage(BaseHandler):
             the_event.new_notifications += 1
         the_event.put()
     
-        self.session["flashmsg"] = "Thanks for voting"
         self.session["flashclass"] = "ok"
+        if is_owner:
+            self.session["flashmsg"] = "Preferences saved. Now wait for your guests to respond and pick the final time"
+        else:
+            self.session["flashmsg"] = "Thanks for selecting times. The organizer will notify you of the final time"
+        self.session["flashtimeout"] = 12
     
         self.response.content_type = "application/json"
         if is_owner:
@@ -186,7 +198,41 @@ class CalendarPage(BaseHandler):
         else:
             url = "/"
         self.response.write(json.dumps(url))
+
+
+class SendEventPage(BaseHandler):
+    URL = "/send/(.+)"
     
+    @logged_in
+    def post(self, owner_token):
+        evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
+        if not evt:
+            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+        
+        final_time = self.request.get("final_time");
+        evt.start_time = parse_datetime(final_time);
+        evt.end_time = evt.start_time + timedelta(minutes=evt.duration)
+        event_details = {
+            'summary': evt.title,
+            'description': evt.description,
+            'location': '',
+            'status':'confirmed',
+            'start': {'dateTime': evt.start_time.isoformat() + "+02:00",},
+            'end': {'dateTime': evt.end_time.isoformat() + "+02:00"},
+            'attendees': [{'email': guest.email, 'responseStatus':'accepted'}
+                for guest in evt.guests if guest.status == "accept"],
+        }
+        logging.info("log: event status = %r", evt.status)
+        if evt.status == "pending":    
+            evt.status="sent"
+            resp = self.gconn.create_event("primary", event_details, send_notifications = True)
+            evt.evtid = resp["id"]
+            evt.put()
+            return self.redirect_with_flashmsg("/my", "The event was added to your calendar", "ok")
+        elif evt.status == "sent":
+            resp = self.gconn.update_event("primary", evt.evtid, event_details, send_notifications = True)
+            return self.redirect_with_flashmsg("/my", "The event was updated in your calendar", "ok")
+
 
 class DeclinePage(BaseHandler):
     URL = "/decline/(.+)"

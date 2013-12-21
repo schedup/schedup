@@ -101,22 +101,23 @@ class EventInfo(ndb.Model):
     def get_by_owner_token(cls, owner_token):
         return cls.query(cls.owner_token == owner_token).get()
     
-    def has_responded(self,user):
+    def get_response(self,user):
         for guest in self.guests:
             if guest.user==user.key:
-                return guest.status!="pending"
+                return guest.status
     
     def suggest_times(self, max_results = 3):
         time_table = {}
         halfhour = timedelta(minutes = 30)
         # add the owner's votes
-        for start_time, end_time in self.owner_selected_times:
-            t = start_time
-            while t < end_time:
-                if t not in time_table:
-                    time_table[t] = 0
-                time_table[t] += 1
-                t += halfhour
+        if self.owner_selected_times:
+            for start_time, end_time in self.owner_selected_times:
+                t = start_time
+                while t < end_time:
+                    if t not in time_table:
+                        time_table[t] = 0
+                    time_table[t] += 1
+                    t += halfhour
         
         # add guest votes (but only if owner votes intersect with them)
         for guest in self.guests:
@@ -126,7 +127,7 @@ class EventInfo(ndb.Model):
                 t = start_time
                 while t < end_time:
                     if t not in time_table:
-                        continue
+                        time_table[t] = 0
                     time_table[t] += 1
                     t += halfhour
         

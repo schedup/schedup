@@ -1,30 +1,39 @@
-{% extends "layout.html" %} {% block header %} New Event {% endblock %}
+{% extends "layout.html" %} 
+
+{% block header %} 
+{% if edit_event %}Edit{% else %}New{% endif %} Event
+{% endblock %}
 
 {% block content %}
+<div data-role="popup" id="helpMsgPopup" data-overlay-theme="a" data-theme="c" style="max-width:350px; margin-right:10px;" class="ui-corner-all">
+    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+    <p id="helpMsgPopupText" style="padding: 20px 10px;">Placeholder</p>
+</div>
+
 <form action="{{post_url}}" method="post" data-ajax="false" id="newevtform">
 	<div data-role="fieldcontain">
-		<label for="titleinput"> Title </label> 
+		<label for="titleinput" data-help-message="The event's title, e.g., <em>study session</em>, <em>My Birthday Beer</em>, etc."> Title </label> 
 		<input name="title"
-			id="titleinput" data-mini="true" placeholder="Event Title" value=""
+			id="titleinput" data-mini="true" placeholder="E.g., Study Session" value="{{the_event.title}}"
 			type="text" autocomplete="off">
 		<div class="input-error" id="titleinput-error">This field is required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="guestinput"> Guests </label> 
+		<label for="guestinput" data-help-message="Enter the guests' emails. You can either write the full email or the person's name (auto-completed from your Google contacts)"> Guests </label> 
 		<input name="guests"
-			id="guestinput" data-mini="true" placeholder="Guest emails" value=""
+			id="guestinput" data-mini="true" placeholder="Guests' emails"
 			type="search" data-clear-btn="false">
         <div class="input-error" id="guestinput-error">At least one email address is required</div>
 	</div>
-	<div id="checkboxes1" data-role="fieldcontain">
+	<div data-role="fieldcontain">
 		<fieldset data-role="controlgroup" data-type="horizontal" id="fieldtype"
 			data-mini="true">
-			<legend> When </legend>
-			<input id="checkbox1" name="when" type="checkbox" value="morning" >
+			<legend data-help-message="The time of day for the event (morning/noon/evening). Multiple choices are allowed" style="width:100%;"> When </legend>
+			<input id="checkbox1" name="when" type="checkbox" value="morning" {% if "morning" in the_event.daytime%}checked{%endif%}>
 			<label for="checkbox1">	Morning </label> 
-			<input id="checkbox2" name="when"	type="checkbox" value="noon"> 
+			<input id="checkbox2" name="when"	type="checkbox" value="noon" {% if "noon" in the_event.daytime%}checked{%endif%}> 
 			<label for="checkbox2">	Noon </label> 
-			<input id="checkbox3" name="when" type="checkbox" value="evening" checked> 
+			<input id="checkbox3" name="when" type="checkbox" value="evening" {% if "evening" in the_event.daytime%}checked{%endif%}> 
 			<label for="checkbox3">	Evening </label>
 		</fieldset>
         <div class="input-error" id="when-error">At least one time of day is required</div>
@@ -33,44 +42,48 @@
 		<fieldset data-role="controlgroup" data-type="horizontal"
 			data-mini="true">
 			<legend> Type </legend>
-			<input id="radio1" name="type" value="Business" type="radio">
+			<input id="radio1" name="type" value="Business" type="radio" {% if the_event.type == "Business" %}checked{%endif%}>
 			<label for="radio1"> Business </label> 
-			<input id="radio2" name="type" value="Friends" type="radio" checked> 
+			<input id="radio2" name="type" value="Friends" type="radio" {% if the_event.type == "Friends" %}checked{%endif%}> 
 			<label for="radio2"> Friends </label> 
-			<input id="radio3" name="type" value="Family" type="radio">
+			<input id="radio3" name="type" value="Family" type="radio" {% if the_event.type == "Family" %}checked{%endif%}>
 			<label for="radio3"> Family </label>
 		</fieldset>
         <div class="input-error" id="type-error">Please choose one</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="fromdate"> Start Time Span </label> <input name="fromdate"
-			data-mini="true" id="fromdate" type="date"
-			placeholder="First applicable date" data-role="datebox"
+		<label for="fromdate" data-help-message="The first date on which the event <em>may</em> take place, e.g., the beginning of the event's <em>time window</em>.<br>You and your guests will be able to choose time slots starting from this date."> First Applicable Date </label>
+		<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="Click to choose" data-role="datebox"
+		    {%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
         <div class="input-error" id="fromdate-error">Required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="todate"> End Time Span </label> <input name="todate" data-mini="true"
-			id="todate" type="date" placeholder="Last applicable date"
-			data-role="datebox"
+		<label for="todate" data-help-message="The last date on which the event <em>may</em> take place, e.g., the end of the event's <em>time window</em>.<br>You and your guests will be able to choose time slots up to this date."> Last Applicable Date </label>
+		<input name="todate" data-mini="true" id="todate" type="date" placeholder="Click to choose"	data-role="datebox"
+		    {%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
 			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
         <div class="input-error" id="todate-error">Required</div>
         <div class="input-error" id="todate-error2">End date must be later than start date</div>
 	</div>
 	<div data-role="fieldcontain" style="display:none;">
 		<label for="slider-step">Duration (Hours)</label>
-		<input type="range" name="slider-step" id="slider-step" value="2" min="0" max="5" step="0.5" />
+		<input type="range" name="slider-step" id="slider-step" value="{{the_event.duration / 60.0}}" min="0" max="5" step="0.5" />
 	</div>
 	<div data-role="fieldcontain">
-		<label for="textarea-a">Details</label>
-		<textarea name="description" id="textarea-a" placeholder="Description, location, and any extra notes"></textarea>
+		<label for="textarea-a" data-help-message="Use this field for any extra details you might want to add, like <em>at the Red Lobster's</em> or <em>don't forget a towel</em>">Details</label>
+		<textarea name="description" id="textarea-a" placeholder="Location, description, extra notes" rows="3">{{the_event.description}}</textarea>
 	</div>
 
-    <div id="helpmsg" style="display:none; background: rgba(255,255,0,0.2);">
-    Send invites to guests and move on to picking your preferred time slots.<br/>
-    Don't worry, you can cancel or edit the event any time.
-    </div>
-	<input type="submit" value="Send Invites" data-theme="b">
+	<a href="#" id="send-btn" data-theme="b" data-role="button" data-theme="c" data-icon="arrow-r" data-iconpos="right">
+	   {% if edit_event %}
+	   Update Event<br>
+	   <small>guests will be notified</small>
+	   {% else %}
+	   Invite Guests<br>
+	   <small>and pick your time slots</small>
+	   {% endif %}
+	</a>
 </form>
 
 <script type="text/javascript">
@@ -81,6 +94,7 @@
 			hintText : "Email address or contact name",
 			tokenDelimiter : ";",
 			preventDuplicates : true,
+			prePopulate : {{the_event_guests|safe}},
 		});
 		
 		$("#guestinput").change(function(){
@@ -108,7 +122,23 @@
 			disable_auto_todate = true;
 		});
 		
-		$("#newevtform").submit(function(event){
+		$("#send-btn").on("click", function(){
+			$("#newevtform").submit();
+		});
+		
+		$("*[data-help-message]").each(function() {
+			$(this).append("<div class='helpbtn'>");
+		});
+		
+		$("*[data-help-message]").on("click", function(e){
+			var msg = $(this).data("help-message");
+			$("#helpMsgPopupText").html(msg);
+			$("#helpMsgPopup").popup("open");
+			e.preventDefault();
+			return false;
+		});
+		
+		$("#newevtform").on("submit", function(event){
 			var succ = true;
 			var first = null;
 			

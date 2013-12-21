@@ -11,9 +11,10 @@ class MyEventsPage(BaseHandler):
     @logged_in
     def get(self):
         token = self.session.pop("token", None)
-        self.render_response("event_list.html", title= "My Events",
+        self.render_response("event_list.html", 
+            title = "My Events",
             owner = True,
-            events = self.user.get_owner_events().order(-EventInfo.created_at),
+            events = [evt for evt in self.user.get_owner_events().order(-EventInfo.created_at) if evt.status != "canceled"],
             token = token, 
         )
 
@@ -22,7 +23,11 @@ class InvitedToPage(BaseHandler):
     
     @logged_in
     def get(self):
-        self.render_response("event_list.html", title= "Invited To", events = self.user.get_participating_events(), owner = False)
+        self.render_response("event_list.html", 
+            title = "Invited To", 
+            events = [evt for evt in self.user.get_participating_events() if evt.status != "canceled"], 
+            owner = False,
+        )
 
 
 

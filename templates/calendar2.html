@@ -25,7 +25,8 @@
 
 {% block content %}
 
-<div data-role="popup" id="infobox" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+<div data-role="popup" id="infobox" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window" 
+    style="max-width:350px; min-width:250px; margin-right: 10px;">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
     <h2 style="color:DodgerBlue; width:200px; font-size:24px;">{{the_event.title}}</h2>
     <!-- h4>{{the_event.type}} Event</h4-->
@@ -34,12 +35,12 @@
     <h4>Description</h4>
     <p>{{the_event.description}}</p>
     {% endif %}
-    <br>
+    <hr>
     <h2 style="color:DodgerBlue; width:200px; font-size:24px;">Color legend</h2>
 	<ul>
 	   	<li><div class="color-legend" style="background: rgba(131, 214, 99, 0.9);"></div>Your preferred times</li>
    		<li><div class="color-legend" style="background: rgba(0,0,0,0.2);"></div>Your existing events</li>
-   		<li><div class="color-legend" style="background: rgba(0, 255, 245, 0.3);"></div>Guests' preferred times</li>
+   		<li><div class="color-legend" style="background: url('/static/img/diagbg2.png') repeat;"></div>Guests' preferred times</li>
 	</ul>
 </div>
 
@@ -57,54 +58,54 @@
         {% for guest in the_event.guests %}
             {% if guest.token != user_token %}
                 {% set sanitized = guest.sanitized_email() %}
-                <input type="checkbox" id="guest-checkbox-{{loop.index}}" {% if guest.status == "accept" %}checked{%endif%} 
+                <input type="checkbox" id="guest-checkbox-{{loop.index}}" {% if guest.status == "accept" %}checked{%else%}disabled{%endif%} 
                    class="guestFilterCheckbox {{guest.status}}" data-email="{{sanitized}}">
                 <label for="guest-checkbox-{{loop.index}}">
                 	{% if guest.status == "decline" %}
                 		<del>{{guest.fullname}}</del>
                 	{% else %}
                 		{{guest.fullname}}
-                	{% endif %}		
+                	{% endif %}
                 </label>
             {% endif %}
-            
         {% endfor %}
-        <ul data-role="listview" data-inset="true" data-divider-theme="d">
-    			<li data-role="list-divider">Declined:</li>
-    				{% for guest in the_event.guests %}
-            			{% if guest.token != user_token %}
-                			{% if guest.status == "decline" %}
-                				<li>{{guest.fullname}}</li>
-                			{% endif %}	
-            			{% endif %}
-            		{% endfor %}
-        
     </fieldset>
 </div>
+
 <div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-    <form id="sendInvites" action="/send/{{user_token}}" method="get" data-ajax="false">
-		<h2>Select final time</h2>
-   		<fieldset data-role="controlgroup" data-type="horizontal" class="ui-corner-all ui-controlgroup ui-controlgroup-horizontal">
-       		<div class="ui-controlgroup-controls"> 	
-        	{% for best_time in the_event.suggest_times() %}
-       	 		<div class="ui-radio">
-       	 			<input type="radio" name="radio-view" id="radio-view-{{loop.index}}" value="{{best_time[0]}}">
-       	 			<label for="radio-view-{{loop.index}}" data-corners="true" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-theme="c" class="ui-btn ui-radio-off ui-corner-left ui-btn-up-c">
-       	 			<span class="ui-btn-inner ui-corner-left">
-       	 				<span class="ui-btn-text">{{best_time[0].date().__str__()}}<BR/>{{best_time[0].date().strftime('%A')}}<BR/>{{best_time[0].time().__str__()}}</span>
-       	 			</span>
-       	 			</label>
-       	 		</div>
-        	{% endfor %}
-        	</div>
-        </fieldset>
-        <button type="submit" data-theme="b" class="ui-btn-hidden" aria-disabled="false">Send Invitations</button>
-        </form>
+    <div data-role="header" data-theme="a" class="ui-corner-top">
+        <h1>Select Final TIme</h1>
+    </div>
+    <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="min-width:300px;">
+	    <form id="sendInvites" action="/send/{{user_token}}" method="post" data-ajax="false">
+	   		{% set times = the_event.suggest_times() %}
+	   		{% if not times %}
+	   		    <div>No times to suggest!</div>
+	   		{% else %} 	
+	            <fieldset data-role="controlgroup" data-type="vertical" data-mini="false">
+	       	    {% for best_time, _ in times %}
+		           <input type="radio" name="final_time" value="{{best_time}}" id="final_time-{{loop.index}}">
+		           <label for="final_time-{{loop.index}}">
+		           {{best_time.strftime("%H:%M")}}<br><small>{{best_time.strftime("%a, %d %b %Y")}}</small>
+		           </label>
+	       	    {% endfor %}
+	            </fieldset>
+	            <div class="input-error" id="final_time-error">You must pick a final time</div>
+	            <input type="submit" data-theme="b" value="Send Event">
+	       	{% endif %}
+	    </form>
+	</div>
 </div>
 
-
-<!-- <div class="input-error" id="when-error">You must pick a final date before sending invitations</div> -->
+{% if not is_logged_in %}
+<div>
+<a href="/signup?redirect=/cal/{{user_token}}" id="sync-btn" data-role="button" data-theme="e" data-iconpos="right"
+    data-iconshadow="false" data-shadow="false" data-icon="refresh" data-ajax="false">
+    Sync your Calendar<br><small>with Google Calendar</small>
+</a>
+</div>
+{% endif %}
 
 <div id="prevnext-bar">
 <table style="width:100%;"><tr>
@@ -125,7 +126,8 @@
 {% if is_owner %}
 	<td style="text-align:center;">
 	<a href="/edit/{{the_event.owner_token}}" id="edit-btn" data-role="button" data-icon="edit"
-    	data-position-to="window" class="ui-icon-nodisc" data-inline="true" data-theme="b" data-iconpos="notext"></a>
+    	class="ui-icon-nodisc" data-iconshadow="false" data-shadow="false" data-inline="true" 
+    	data-theme="b" data-iconpos="notext"></a>
 	</td>
 {% endif %}
 <td style="text-align:center;">
@@ -177,18 +179,25 @@
 
 <div>
 	<div class="input-error" id="errbox"></div>
-	<div>
+	
 	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Preferences</button>
+	
 	<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
 	{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
-	</a></div>
-	{% if is_owner %}
-		
-	<a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
+	</a>
+
+    {% if is_owner and the_event.owner_selected_times %}
+    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
     data-position-to="window" data-iconpos="right"
-	data-transition="pop" data-theme="b" title="finalize">Finalize</a>
-	{% endif %}
-		
+    data-transition="pop" data-theme="b" title="finalize">
+    {% if the_event.status == "pending" %}
+    Send Event
+    {% else %}
+    Update Event
+    {% endif %}
+    </a>
+    {% endif %}
+
 </div>
 
 <script type="text/javascript">
@@ -565,22 +574,24 @@ $(document).ready(function(){
         	slots.fadeOut();
         }
     });
-    
-    $("#sendInvites").submit(function(event){
-    	
-    	var selected = $('input:radio[name=radio-view]:checked');
-    		if (selected.size()==0) {
-//                 var msg = $("#when-error");
-//                 msg.show();
-//                 function onchg(){
-//                     msg.fadeOut();
-//                 }
-    			event.preventDefault();
-			}
-    		console.log(selected[0].value);
-    		//event.preventDefault();
-    	});
 
+    $("#sendInvites").on("submit", function(event){
+    	if (!$("input[name='final_time']:checked").val()) {
+    		$("#final_time-error").show();
+    		$("input[name='final_time']").on("click", function(){
+    			$("#final_time-error").hide();
+    		});
+            event.preventDefault();
+            return false;
+    	}
+    });
+
+    if ("{{is_owner}}" == "False" && user_selected_slots.length == 0) {
+        setTimeout(function(){
+            $("#infobox").popup("open");
+        }, 300);
+    }
+    
 });
 </script>
 

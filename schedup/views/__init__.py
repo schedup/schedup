@@ -1,6 +1,5 @@
-from schedup.base import BaseHandler, maybe_logged_in
+from schedup.base import BaseHandler, maybe_logged_in, logged_in
 import schedup.views.apis
-import schedup.views.guest
 import schedup.views.event_list
 import schedup.views.new_event
 import schedup.views.profile
@@ -15,6 +14,15 @@ class MainPage(BaseHandler):
             self.redirect("/my")
         else:
             self.render_response('landing.html', hide_header = True)
+
+
+class SignUpRedirect(BaseHandler):
+    URL = "/signup"
+    
+    @logged_in
+    def get(self):
+        return self.redirect(self.request.get("redirect"))
+
 
 class AboutPage(BaseHandler):
     URL = "/about"

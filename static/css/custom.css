@@ -8,20 +8,28 @@ label.error {
 	float: none;
 }
 
-@media screen and (min-width: 900px) {
-	.content-width-limit {
-		max-width: 800px;
-		margin-right: auto;
-		margin-left: auto;
-	}
+.content-width-limit {
+    max-width: 960px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
-@media screen and (min-width: 1200px) {
-	.content-width-limit {
-		max-width: 1200px;
-		margin-right: auto;
-		margin-left: auto;
-	}
+.helpbtn {
+    width: 20px;
+    height: 100%;
+    display: block;
+    float: right;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 800;
+    font-size: 80%;
+    background: rgba(0,0,0,0.05);
+    border-radius: 12px;
+    text-align: center;
+    text-shadow: none;
+    color: rgba(0,0,0,0.4);
+}
+.helpbtn:before {
+    content: "?";
 }
 
 #flashmsg {
