@@ -40,7 +40,7 @@ class GetCalendarEvents(BaseHandler):
     @json_handler
     def get(self):
         now = datetime.now()
-        return self.gconn.get_events("primary", now, now + timedelta(days=7))
+        return self.gconn.get_events("primary", now, now + timedelta(days=14))
 
 
 

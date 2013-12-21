@@ -72,12 +72,13 @@
     </fieldset>
 </div>
 
-<div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window">
+<div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window"
+    style="min-width:250px; max-width:350px;">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
     <div data-role="header" data-theme="a" class="ui-corner-top">
         <h1>Select Final TIme</h1>
     </div>
-    <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="min-width:300px;">
+    <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
 	    <form id="sendInvites" action="/send/{{user_token}}" method="post" data-ajax="false">
 	   		{% set times = the_event.suggest_times() %}
 	   		{% if not times %}
@@ -179,29 +180,32 @@
 
 <div>
 	<div class="input-error" id="errbox"></div>
-	
-	<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Preferences</button>
-	
-	<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
-	{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
-	</a>
 
-    {% if is_owner and the_event.owner_selected_times %}
-    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
-    data-position-to="window" data-iconpos="right"
-    data-transition="pop" data-theme="b" title="finalize">
-    {% if the_event.status == "pending" %}
-    Send Event
+    {% if the_event.status == "canceled" %}
+        <div class="input-error" style="display:block;">Event Canceled</div>
     {% else %}
-    Update Event
+		<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Selection</button>
+		
+		<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
+		{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
+		</a>
+	
+	    {% if is_owner and the_event.owner_selected_times %}
+	    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
+	    data-position-to="window" data-iconpos="right"
+	    data-transition="pop" data-theme="b" title="finalize">
+	    {% if the_event.status == "pending" %}
+	    Send Event
+	    {% else %}
+	    Update Event
+	    {% endif %}
+	    </a>
+	    {% endif %}
     {% endif %}
-    </a>
-    {% endif %}
-
 </div>
 
 <script type="text/javascript">
-$(document).ready(function(){
+function initpage() {
     
     function setContainerWidth(){
         var totWidth = $(".calendar-container").innerWidth();
@@ -234,11 +238,11 @@ $(document).ready(function(){
                 return;
             }
             
-            /*if (fingerCount >= 2) {
-                // two finger - scroll
-                scrollCalendarGrid(event, phase, direction, distance);
+            if (fingerCount >= 2) {
+                /* two finger - scroll
+                scrollCalendarGrid(event, phase, direction, distance);*/
                 return;
-            }*/
+            }
             
             calendarGridSelect(event, phase);
         },
@@ -298,7 +302,8 @@ $(document).ready(function(){
             elem = $(event.toElement);
         }
         else if (event.type.indexOf("touch") == 0) {
-            elem = $(document.elementFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY));
+            elem = $(document.elementFromPoint(event.changedTouches[0].screenX, event.changedTouches[0].screenY));
+            /*elem = $(event.relatedTarget);*/
         }
         else {
             return;
@@ -412,10 +417,9 @@ $(document).ready(function(){
         var left = parseInt(grid.css("margin-left").replace("px", ""));
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
-        
-        console.log("width", width, "portWidth", portWidth);
-        
-        left -= portWidth * 0.8;
+        var colWidth = $(".cal-day-column").outerWidth()
+                
+        left -= Math.floor(portWidth / colWidth) * colWidth;
         if (left + width < portWidth) {
             left = portWidth - width;
             $("#next-btn").addClass("ui-disabled");
@@ -436,7 +440,7 @@ $(document).ready(function(){
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
         
-        left += portWidth * 0.8;
+        left += Math.floor(portWidth / colWidth) * colWidth;
         if (left >= 0) {
             left = 0;
             $("#next-btn").removeClass("ui-disabled");
@@ -591,7 +595,10 @@ $(document).ready(function(){
             $("#infobox").popup("open");
         }, 300);
     }
-    
+}
+
+$(document).ready(function() {
+	setTimeout(initpage, 100);
 });
 </script>
 

@@ -88,20 +88,23 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#guestinput").tokenInput("/api/autocomplete-contacts", {
-			minChars : 3,
-			theme : "facebook",
-			hintText : "Email address or contact name",
-			tokenDelimiter : ";",
-			preventDuplicates : true,
-			prePopulate : {{the_event_guests|safe}},
-		});
 		
-		$("#guestinput").change(function(){
-			if ($(this).val() == "") {
-				$(this).tokenInput("clear");
-			}
-		});
+		setTimeout(function(){
+	        $("#guestinput").tokenInput("/api/autocomplete-contacts", {
+	            minChars : 3,
+	            theme : "facebook",
+	            hintText : "Email address or contact name",
+	            tokenDelimiter : ";",
+	            preventDuplicates : true,
+	            prePopulate : {{the_event_guests|safe}},
+	        });
+	        
+	        $("#guestinput").change(function(){
+	            if ($(this).val() == "") {
+	                $(this).tokenInput("clear");
+	            }
+	        });
+		}, 100);
 		
 		var disable_auto_todate = false;
 		

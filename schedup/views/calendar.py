@@ -2,11 +2,15 @@ import json
 import logging
 from datetime import timedelta, datetime
 from email.utils import parseaddr
+from dateutil.rrule import rrulestr
 from dateutil.parser import parse as parse_datetime
+from dateutil.tz import tzutc
 from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
 
+
+UTC = tzutc()
 
 class CalendarPage(BaseHandler):
     URL = "/cal/(.+)"
@@ -44,8 +48,11 @@ class CalendarPage(BaseHandler):
         if "evening" in the_event.daytime:
             hours.update(range(17,23))
         hours = range(min(hours), max(hours)+1)
-        
+
         if self.gconn:
+            dt_start = datetime(the_event.start_window.year, the_event.start_window.month, the_event.start_window.day, tzinfo = UTC)
+            dt_end = dt_start + timedelta(days = (the_event.end_window - the_event.start_window).days + 1)
+
             user_calendar_events = []
             try:
                 goog_events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
@@ -57,6 +64,21 @@ class CalendarPage(BaseHandler):
                     end = parse_datetime(evt["end"]["dateTime"])
                 except Exception:
                     logging.error("bad event: %r", evt)
+                    continue
+                
+                if "recurrence" in evt:
+                    the_event.end_window
+                    for rectext in evt["recurrence"]:
+                        diff = end - start
+                        rrule = rrulestr(rectext, dtstart = start)
+                        logging.info("RECURRENCE: %r", rrule)
+                        
+                        for rec in rrule.between(dt_start, dt_end):
+                            user_calendar_events.append({
+                                "title" : evt["summary"], 
+                                "start" : rec,
+                                "end" : rec + diff,
+                            })
                 else:
                     user_calendar_events.append({
                         "title" : evt["summary"], 
@@ -185,9 +207,9 @@ class CalendarPage(BaseHandler):
     
         self.session["flashclass"] = "ok"
         if is_owner:
-            self.session["flashmsg"] = "Preferences saved. Now wait for your guests to respond and pick the final time"
+            self.session["flashmsg"] = "Preferences saved.<br>Please wait for your guests to respond and pick the final time"
         else:
-            self.session["flashmsg"] = "Thanks for selecting times. The organizer will notify you of the final time"
+            self.session["flashmsg"] = "Thanks for selecting times.<br>The organizer will notify you of the final time"
         self.session["flashtimeout"] = 12
     
         self.response.content_type = "application/json"
@@ -237,6 +259,7 @@ class SendEventPage(BaseHandler):
 class DeclinePage(BaseHandler):
     URL = "/decline/(.+)"
     
+    @maybe_logged_in
     def get(self, user_token):
         is_owner, the_event, user = EventInfo.get_by_token(user_token)
         if not the_event:
@@ -245,14 +268,14 @@ class DeclinePage(BaseHandler):
         if is_owner:
             the_event.status = "canceled"
             msg = "Event '%s' canceled" % (the_event.title,)
+            if the_event.evtid:
+                self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+                the_event.evtid = None
         else:
             user.status = "decline"
             user.selected_times = []
             the_event.new_notifications += 1
             msg = "You've declined '%s'" % (the_event.title,)
-        if the_event.evtid:
-            self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
-            the_event.evtid = None
         the_event.put()
 
         return self.redirect_with_flashmsg("/", msg, "note")

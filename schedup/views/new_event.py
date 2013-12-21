@@ -63,7 +63,7 @@ def create_or_update_event(self, evt):
     evt.owner_selected_times = None
     evt.title = title
     evt.daytime = daytime
-    evt.type = self.request.params["type"]
+    evt.type = self.request.params.get("type")
     evt.start_window = fromtime
     evt.end_window = totime
     evt.guests = guests
@@ -77,7 +77,6 @@ def create_or_update_event(self, evt):
 
 class NewEventPage(BaseHandler):
     URL = "/new"
-    TOKEN_SIZE = 25
     
     @logged_in
     def get(self):

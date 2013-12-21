@@ -5,7 +5,6 @@ import functools
 import json
 import sys
 import traceback
-import inspect
 from webapp2_extras import sessions
 from oauth2client.appengine import OAuth2Decorator
 from schedup import settings

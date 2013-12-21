@@ -33,9 +33,10 @@
 
 {% if not events %}
     {% if owner %}
-    <h1>You haven't created any events<br>;-(</h1>
+    <h1>You don't have any events <div style="display:inline-block;">;-(</div></h1>
+    <h2><a href="/new">Create one now</a></h2>
     {% else %}
-    <h1>You weren't invited to any events<br>;-(</h1>
+    <h1>You weren't invited to any events<div style="display:inline-block;">;-(</div></h1>
     {% endif %}
 {% endif %}
 
