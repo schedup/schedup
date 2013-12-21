@@ -418,7 +418,7 @@ function initpage() {
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
         var colWidth = $(".cal-day-column").outerWidth()
-                
+
         left -= Math.floor(portWidth / colWidth) * colWidth;
         if (left + width < portWidth) {
             left = portWidth - width;
@@ -439,8 +439,9 @@ function initpage() {
         var left = parseInt(grid.css("margin-left").replace("px", ""));
         var width = grid.outerWidth();
         var portWidth = $("#calendar-grid-container").innerWidth();
+        var colWidth = $(".cal-day-column").outerWidth()
         
-        left += Math.floor(portWidth / colWidth) * colWidth;
+        left += portWidth;
         if (left >= 0) {
             left = 0;
             $("#next-btn").removeClass("ui-disabled");
@@ -451,7 +452,7 @@ function initpage() {
         }
         
         grid.animate({
-            "margin-left": left + "px",
+            "margin-left": (Math.floor(left / colWidth) * colWidth) + "px",
         });
     });
     
