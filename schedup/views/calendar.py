@@ -14,6 +14,7 @@ class CalendarPage(BaseHandler):
     @maybe_logged_in
     def get(self, user_token):
         is_owner, the_event, user = EventInfo.get_by_token(user_token)
+        
         if not the_event:
             if "eventkey" in self.session:
                 the_event = ndb.Key(urlsafe = self.session.pop("eventkey")).get()
@@ -24,12 +25,14 @@ class CalendarPage(BaseHandler):
         
         days = []
         s = the_event.start_window
+        
         while s <= the_event.end_window:
             days.append({"date" : s.strftime("%d %b"), "index" : s.toordinal(),
                 "weekday":["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][s.weekday()]})
             s += timedelta(days = 1)
         
         hours = set()
+        
         if "morning" in the_event.daytime:
             hours.update(range(7,12))
         if "noon" in the_event.daytime:
@@ -75,7 +78,7 @@ class CalendarPage(BaseHandler):
                     "end" : end_time, 
                     "user" : self.canonize_email(gst.email)
                 })
-        
+               
         user_selected_slots = []
         if is_owner:
             ranges = the_event.owner_selected_times
@@ -98,7 +101,7 @@ class CalendarPage(BaseHandler):
                         "day" : start_time.toordinal(), 
                         "halfhour" : first + hh, 
                     })
-        
+        logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
             hours = hours,
