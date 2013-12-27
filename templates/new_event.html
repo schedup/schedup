@@ -52,19 +52,18 @@
         <div class="input-error" id="type-error">Please choose one</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="fromdate" data-help-message="The first date on which the event <em>may</em> take place, e.g., the beginning of the event's <em>time window</em>.<br>You and your guests will be able to choose time slots starting from this date."> First Applicable Date </label>
-		<input name="fromdate" data-mini="true" id="fromdate" type="date" placeholder="Click to choose" data-role="datebox"
-		    {%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
-			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
-        <div class="input-error" id="fromdate-error">Required</div>
-	</div>
-	<div data-role="fieldcontain">
-		<label for="todate" data-help-message="The last date on which the event <em>may</em> take place, e.g., the end of the event's <em>time window</em>.<br>You and your guests will be able to choose time slots up to this date."> Last Applicable Date </label>
-		<input name="todate" data-mini="true" id="todate" type="date" placeholder="Click to choose"	data-role="datebox"
-		    {%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
-			data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
-        <div class="input-error" id="todate-error">Required</div>
-        <div class="input-error" id="todate-error2">End date must be later than start date</div>
+		<label for="fromdate" data-help-message="Select time window.<br>Your guests will choose what time slots are most convenient for them.">Time Window</label>
+		<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" style="display: inline-block;">
+			<input name="fromdate" data-inlin="true" data-mini="true" style="display: inline;" id="fromdate" type="date" placeholder="Start Window" data-role="datebox"
+				{%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
+				data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+			<div class="input-error" id="fromdate-error">Required</div>
+			<input name="todate" data-inlin="true" data-mini="true" style="display: inline;" id="todate" type="date" placeholder="End Window"	data-role="datebox"
+				{%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
+				data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+			<div class="input-error" id="todate-error">Required</div>
+			<div class="input-error" id="todate-error2">End date must be later than start date</div>
+		</fieldset>
 	</div>
 	<div data-role="fieldcontain" style="display:none;">
 		<label for="slider-step">Duration (Hours)</label>
@@ -84,6 +83,11 @@
 	   <small>and pick your time slots</small>
 	   {% endif %}
 	</a>
+	{% if edit_event %}
+		<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
+		{% if is_owner %}Cancel Event{% else %}Cancel Event{% endif %}
+		</a>
+	{% endif %}
 </form>
 
 <script type="text/javascript">

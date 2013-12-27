@@ -123,6 +123,7 @@ class EditEventPage(BaseHandler):
         
         self.render_response("new_event.html", 
             post_url = "/edit/%s" % (owner_token,),
+            user_token = owner_token,
             the_event = evt,
             edit_event = True,
             the_event_guests = json.dumps([{"id":gst.email, "name":gst.fullname} for gst in evt.guests])

@@ -1,6 +1,7 @@
 import time
 from google.appengine.ext import ndb
 from datetime import timedelta
+import datetime
 
 
 class UserProfile(ndb.Model):
@@ -106,6 +107,11 @@ class EventInfo(ndb.Model):
             if guest.user==user.key:
                 return guest.status
     
+    def past_event(self):
+        if (self.end_time-datetime.datetime.now())>datetime.timedelta(days=-2):
+            return True
+        return False
+        
     def suggest_times(self, max_results = 3):
         time_table = {}
         halfhour = timedelta(minutes = 30)

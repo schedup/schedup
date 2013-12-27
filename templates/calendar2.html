@@ -185,11 +185,6 @@
         <div class="input-error" style="display:block;">Event Canceled</div>
     {% else %}
 		<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Selection</button>
-		
-		<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
-		{% if is_owner %}Cancel Event{% else %}Decline{% endif %}
-		</a>
-	
 	    {% if is_owner and the_event.owner_selected_times %}
 	    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
 	    data-position-to="window" data-iconpos="right"
