@@ -70,15 +70,18 @@ class CalendarPage(BaseHandler):
                     the_event.end_window
                     for rectext in evt["recurrence"]:
                         diff = end - start
-                        rrule = rrulestr(rectext, dtstart = start)
-                        logging.info("RECURRENCE: %r", rrule)
-                        
-                        for rec in rrule.between(dt_start, dt_end):
-                            user_calendar_events.append({
-                                "title" : evt["summary"], 
-                                "start" : rec,
-                                "end" : rec + diff,
-                            })
+                        try:
+                            rrule = rrulestr(rectext, dtstart = start)
+                            logging.info("RECURRENCE: %r", rrule)
+                            
+                            for rec in rrule.between(dt_start, dt_end):
+                                user_calendar_events.append({
+                                    "title" : evt["summary"], 
+                                    "start" : rec,
+                                    "end" : rec + diff,
+                                })
+                        except Exception:
+                            logging.error("Failed to parse RRULE: %r", rectext, exc_info = True)
                 else:
                     user_calendar_events.append({
                         "title" : evt["summary"], 
