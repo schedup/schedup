@@ -53,16 +53,23 @@
 	</div>
 	<div data-role="fieldcontain">
 		<label for="fromdate" data-help-message="Select time window.<br>Your guests will choose what time slots are most convenient for them.">Time Window</label>
-		<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" style="display: inline-block;">
-			<input name="fromdate" data-inlin="true" data-mini="true" style="display: inline;" id="fromdate" type="date" placeholder="Start Window" data-role="datebox"
-				{%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
-				data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
-			<div class="input-error" id="fromdate-error">Required</div>
-			<input name="todate" data-inlin="true" data-mini="true" style="display: inline;" id="todate" type="date" placeholder="End Window"	data-role="datebox"
-				{%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
-				data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
-			<div class="input-error" id="todate-error">Required</div>
-			<div class="input-error" id="todate-error2">End date must be later than start date</div>
+		<fieldset id="start-end-window" data-role="controlgroup" data-type="horizontal" data-mini="true" style="display: inline-block;">
+			<table style="min-width:320px; margin-right: 12px;" cellpadding="0" cellspacing="0"><tr>
+			<td style="width:45%;">
+				<input name="fromdate" data-inlin="true" data-mini="true" id="fromdate" type="date" placeholder="Start Window" data-role="datebox"
+					{%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
+					data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+				<div class="input-error" style="max-width:140px" id="fromdate-error">Required</div>
+			</td>
+			<td style="width:10px;"></td>
+			<td style="width:45%;">
+				<input name="todate" data-inlin="true" data-mini="true" id="todate" type="date" placeholder="End Window"	data-role="datebox"
+					{%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
+					data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+				<div class="input-error" style="max-width:140px" id="todate-error">Required</div>
+				<div class="input-error" style="max-width:140px" id="todate-error2">End date must be later than start date</div>
+			</td>
+			</tr></table>
 		</fieldset>
 	</div>
 	<div data-role="fieldcontain" style="display:none;">

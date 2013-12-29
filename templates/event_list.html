@@ -2,14 +2,11 @@
 
 {% block content %}
 
-<ul data-role="listview" data-ajax="false" data-inset="true" data-count-theme="b">
+<ul data-role="listview" data-inset="true" data-count-theme="b">
 	{% for evt in events %}
 	    {% if owner %}
-    		<li data-theme="c" 
-    			{% if (evt.end_time==none ) or (evt.past_event()) %}
-    				style="display:none;"
-				{% endif %}>
-	  			<a href="/cal/{{evt.owner_token}}">
+    		<li data-theme="c">
+	  			<a href="/cal/{{evt.owner_token}}" data-ajax="false">
 	      		<h2>{{ evt.title }}</h2>
 	        	<p class="ui-li-aside"><strong>{{evt.start_window}} - {{evt.end_window}}</strong></p>
 	        	<span class="ui-li-count">{{evt.new_notifications}}</span>
@@ -22,7 +19,7 @@
   			    {% elif resp == "decline" %}
   			    data-theme = "a"
   			{% endif %}>
-	   			<a href="/cal/{{evt.get_token_for(user)}}">
+	   			<a href="/cal/{{evt.get_token_for(user)}}" data-ajax="false">
 	       		<h2>{{ evt.title }}</h2>
 	       		<p class="ui-li-aside"><strong>{{evt.start_window}} - {{evt.end_window}}</strong></p>
 	       		{% if resp == "decline" %}

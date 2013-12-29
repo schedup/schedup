@@ -19,6 +19,11 @@ indexes:
 - kind: EventInfo
   properties:
   - name: owner
+  - name: end_window
+
+- kind: EventInfo
+  properties:
+  - name: owner
   - name: start_time
 
 - kind: EventInfo
