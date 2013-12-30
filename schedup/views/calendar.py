@@ -240,7 +240,7 @@ class SendEventPage(BaseHandler):
         event_details = {
             'summary': evt.title,
             'description': evt.description,
-            'location': '',
+            'location': evt.location,
             'status':'confirmed',
             'start': {'dateTime': evt.start_time.isoformat() + "+02:00",},
             'end': {'dateTime': evt.end_time.isoformat() + "+02:00"},
