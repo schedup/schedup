@@ -62,6 +62,7 @@ class EventInfo(ndb.Model):
     start_window = ndb.DateProperty(required = True)
     end_window = ndb.DateProperty(required = True)
     duration = ndb.IntegerProperty(required = True)
+    location = ndb.StringProperty()
     start_time = ndb.DateTimeProperty()
     end_time = ndb.DateTimeProperty()
     

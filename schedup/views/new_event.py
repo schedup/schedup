@@ -52,6 +52,7 @@ def create_or_update_event(self, evt):
         raise RedirectWithFlash(self.URL, "No emails given", "error")
     
     title = self.request.params["title"]
+    location = self.request.params["where"]
     fromtime = parse_datetime(self.request.params["fromdate"])
     totime = parse_datetime(self.request.params["todate"])
     if fromtime > totime:
@@ -62,6 +63,7 @@ def create_or_update_event(self, evt):
     
     evt.owner_selected_times = None
     evt.title = title
+    evt.location = location
     evt.daytime = daytime
     evt.type = self.request.params.get("type")
     evt.start_window = fromtime

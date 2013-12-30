@@ -28,7 +28,7 @@
 	<div data-role="fieldcontain">
 		<fieldset data-role="controlgroup" data-type="horizontal" id="fieldtype"
 			data-mini="true">
-			<legend data-help-message="The time of day for the event (morning/noon/evening). Multiple choices are allowed" style="width:100%;"> When </legend>
+			<legend data-help-message="The time of day for the event (morning/noon/evening). Multiple choices are allowed" style="width:100%;">When</legend>
 			<input id="checkbox1" name="when" type="checkbox" value="morning" {% if "morning" in the_event.daytime%}checked{%endif%}>
 			<label for="checkbox1">	Morning </label> 
 			<input id="checkbox2" name="when"	type="checkbox" value="noon" {% if "noon" in the_event.daytime%}checked{%endif%}> 
@@ -37,6 +37,12 @@
 			<label for="checkbox3">	Evening </label>
 		</fieldset>
         <div class="input-error" id="when-error">At least one time of day is required</div>
+	</div>
+	<div data-role="fieldcontain">
+		<label for="searchTextField" data-help-message="Add a location to your event.">Where</label> 
+		<input name="where"
+			id="searchTextField" data-mini="true" size="50" placeholder="Anything you want!" value="{{the_event.title}}"
+			type="text">
 	</div>
 	<div data-role="fieldcontain" style="display:none;">
 		<fieldset data-role="controlgroup" data-type="horizontal"
@@ -100,6 +106,17 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		
+		var defaultBounds = new google.maps.LatLngBounds(
+			new google.maps.LatLng(-33.8902, 151.1759),
+			new google.maps.LatLng(-33.8474, 151.2631));
+
+		var input = document.getElementById('searchTextField');
+		var options = {
+				  bounds: defaultBounds,
+				  types: ['establishment']
+				};
+		autocomplete = new google.maps.places.Autocomplete(input);
+				
 		setTimeout(function(){
 	        $("#guestinput").tokenInput("/api/autocomplete-contacts", {
 	            minChars : 3,

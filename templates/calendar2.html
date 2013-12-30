@@ -31,6 +31,9 @@
     <h2 style="color:DodgerBlue; width:200px; font-size:24px;">{{the_event.title}}</h2>
     <!-- h4>{{the_event.type}} Event</h4-->
     <h4>By {{the_event.owner_fullname}} </h4>
+    {% if the_event.location %} 
+    <h4>{{the_event.location}}</h4>
+    {% endif %}
     {% if the_event.description %} 
     <h4>Description</h4>
     <p>{{the_event.description}}</p>
