@@ -23,8 +23,8 @@ def create_or_update_event(self, evt):
 
     title = self.request.params["title"]
     location = self.request.params["where"]
-    fromtime = parse_datetime(self.request.params["fromdate"])
-    totime = parse_datetime(self.request.params["todate"])
+    fromtime = parse_datetime(self.request.params["fromdate"]).date()
+    totime = parse_datetime(self.request.params["todate"]).date()
     if fromtime > totime:
         raise RedirectWithFlash(self.URL, "Start time is later than end time", "error")
 
