@@ -28,7 +28,7 @@ class AboutPage(BaseHandler):
     URL = "/about"
     
     def get(self):
-        self.render_response("about.html")
+        self.render_response("about.html", section="about")
 
 
 

@@ -80,4 +80,9 @@ label.error {
 	width: 100%;
 }
 
+div[data-role="popup"] {
+    min-width:250px; 
+    max-width:350px;
+}
+
 

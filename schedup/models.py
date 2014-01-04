@@ -8,7 +8,7 @@ class UserProfile(ndb.Model):
     email = ndb.StringProperty(required=True)
     fullname = ndb.StringProperty()
     google_id = ndb.StringProperty()
-    facebook_id = ndb.StringProperty()
+    facebook_token = ndb.StringProperty()
 
     def get_owner_events(self):
         return EventInfo.query(EventInfo.owner == self.key)
@@ -54,6 +54,7 @@ class EventInfo(ndb.Model):
     evtid = ndb.StringProperty()
     owner_selected_times= ndb.PickleProperty()
     new_notifications = ndb.IntegerProperty(default = 0)
+    first_owner_save = ndb.BooleanProperty()
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()

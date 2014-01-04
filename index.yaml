@@ -12,6 +12,11 @@ indexes:
 
 - kind: EventInfo
   properties:
+  - name: guests.user
+  - name: end_window
+
+- kind: EventInfo
+  properties:
   - name: owner
   - name: created_at
     direction: desc

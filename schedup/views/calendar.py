@@ -8,6 +8,7 @@ from dateutil.tz import tzutc
 from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
+from schedup.utils import send_email
 
 
 UTC = tzutc()
@@ -60,10 +61,20 @@ class CalendarPage(BaseHandler):
                 goog_events = ()
             for evt in goog_events:
                 try:
-                    start = parse_datetime(evt["start"]["dateTime"])
-                    end = parse_datetime(evt["end"]["dateTime"])
+                    if "dateTime" in evt["start"]:
+                        start = parse_datetime(evt["start"]["dateTime"])
+                    elif "date" in evt["start"]:
+                        start = parse_datetime(evt["start"]["date"])
+                    else:
+                        raise ValueError("start: no date or dateTime")
+                    if "dateTime" in evt["end"]:
+                        end = parse_datetime(evt["end"]["dateTime"])
+                    elif "date" in evt["end"]:
+                        end = parse_datetime(evt["end"]["date"]).replace(hour=23,minute=59,second=59)
+                    else:
+                        raise ValueError("end: no date or dateTime")
                 except Exception:
-                    logging.error("bad event: %r", evt)
+                    logging.error("bad event: %r", evt, exc_info = True)
                     continue
                 
                 if "recurrence" in evt:
@@ -132,7 +143,7 @@ class CalendarPage(BaseHandler):
         if is_owner:
             the_event.new_notifications = 0
             the_event.put()
-                    
+
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
@@ -145,6 +156,7 @@ class CalendarPage(BaseHandler):
             the_event = the_event,
             is_owner = is_owner,
             is_logged_in = self.user is not None,
+            dont_overlay_header = True,
         )
         
     @staticmethod
@@ -202,6 +214,14 @@ class CalendarPage(BaseHandler):
     
         if is_owner:
             the_event.owner_selected_times = ranges
+            if the_event.first_owner_save:
+                the_event.first_owner_save = False
+                for guest in the_event.guests:
+                    send_email("%s invited you to %s" % (self.user.fullname, the_event.title),
+                        recipient = guest.email,
+                        html_body = self.render_template("emails/new.html", 
+                                fullname = self.user.fullname, title = the_event.title, token = guest.token),
+                    )
         else:
             user.selected_times = ranges
             user.status = "accept"

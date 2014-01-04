@@ -10,8 +10,10 @@ from oauth2client.appengine import OAuth2Decorator
 from schedup import settings
 
 
+ON_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+
 app = webapp2.WSGIApplication([],
-    debug = True, #os.environ['SERVER_SOFTWARE'].startswith('Dev'),
+    debug = True,
     config = {
         'webapp2_extras.sessions' : {
             'secret_key': settings.SESSION_SECRET,

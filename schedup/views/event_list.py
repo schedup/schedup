@@ -20,6 +20,7 @@ class MyEventsPage(BaseHandler):
                 self.user.get_owner_events().filter(EventInfo.end_window >= mintime).order(EventInfo.end_window) 
                 if evt.status != "canceled" and (not evt.end_time or evt.end_time >= mintime)],
             token = token,
+            section="my",
         )
 
 class InvitedToPage(BaseHandler):
@@ -34,6 +35,7 @@ class InvitedToPage(BaseHandler):
                 self.user.get_participating_events().filter(EventInfo.end_window >= mintime).order(EventInfo.end_window) 
                 if evt.status != "canceled" and (not evt.end_time or evt.end_time >= mintime)],
             owner = False,
+            section="invited",
         )
 
 
