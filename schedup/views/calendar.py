@@ -64,13 +64,13 @@ class CalendarPage(BaseHandler):
                     if "dateTime" in evt["start"]:
                         start = parse_datetime(evt["start"]["dateTime"])
                     elif "date" in evt["start"]:
-                        start = parse_datetime(evt["start"]["date"])
+                        start = parse_datetime(evt["start"]["date"]).replace(tzinfo = UTC)
                     else:
                         raise ValueError("start: no date or dateTime")
                     if "dateTime" in evt["end"]:
                         end = parse_datetime(evt["end"]["dateTime"])
                     elif "date" in evt["end"]:
-                        end = parse_datetime(evt["end"]["date"]).replace(hour=23,minute=59,second=59)
+                        end = parse_datetime(evt["end"]["date"]).replace(hour=23,minute=59,second=59,tzinfo=UTC)
                     else:
                         raise ValueError("end: no date or dateTime")
                 except Exception:
