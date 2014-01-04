@@ -212,10 +212,12 @@ class CalendarPage(BaseHandler):
             ranges.append((start_ts, end_ts))
         logging.info("ranges=%r", ranges)
     
+        emails_sent = False
         if is_owner:
             the_event.owner_selected_times = ranges
             if the_event.first_owner_save:
                 the_event.first_owner_save = False
+                emails_sent = True
                 for guest in the_event.guests:
                     send_email("%s invited you to %s" % (self.user.fullname, the_event.title),
                         recipient = guest.email,
@@ -230,7 +232,10 @@ class CalendarPage(BaseHandler):
     
         self.session["flashclass"] = "ok"
         if is_owner:
-            self.session["flashmsg"] = "Preferences saved.<br>Please wait for your guests to respond and pick the final time"
+            if emails_sent:
+                self.session["flashmsg"] = "Selection saved and invites were sent.<br>Please wait for your guests to respond and pick the final time"
+            else:
+                self.session["flashmsg"] = "Selection saved.<br>Please wait for your guests to respond and pick the final time"
         else:
             self.session["flashmsg"] = "Thanks for selecting times.<br>The organizer will notify you of the final time"
         self.session["flashtimeout"] = 12

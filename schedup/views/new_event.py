@@ -107,9 +107,8 @@ class NewEventPage(BaseHandler):
         self.session["eventkey"] = evt.key.urlsafe()
         
         logging.info("Guests: %r", evt.guests)
-        self.redirect_with_flashmsg("/cal/%s" % (evt.owner_token,), 
-            msg = "Invites were sent to guests. Please pick you time slots", style = "ok")
-    
+        self.redirect("/cal/%s" % (evt.owner_token,)) 
+
 
 class EditEventPage(BaseHandler):
     URL = "/edit/(.+)"
