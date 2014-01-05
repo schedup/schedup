@@ -1,4 +1,12 @@
 from google.appengine.api import mail
+try:
+    from Crypto.Random import random
+except ImportError:
+    import random
+
+def generate_random_token(length):
+    return "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-") 
+        for _ in range(length))
 
 
 def send_email(subject, recipient, reply_to = None, on_behalf_of = None,

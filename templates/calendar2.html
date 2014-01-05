@@ -78,9 +78,7 @@
 <div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window"
     style="min-width:250px; max-width:350px;">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-    <div data-role="header" data-theme="a" class="ui-corner-top">
-        <h1>Select Final TIme</h1>
-    </div>
+    <h2>Select Final TIme</h2>
     <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
 	    <form id="sendInvites" action="/send/{{user_token}}" method="post" data-ajax="false">
 	   		{% set times = the_event.suggest_times() %}
@@ -187,20 +185,25 @@
     {% if the_event.status == "canceled" %}
         <div class="input-error" style="display:block;">Event Canceled</div>
     {% else %}
-    <fieldset data-role="controlgroup" data-type="horizontal" style="display: inline-block;">
-		<button data-role="button" id="savebtn" data-theme="b" data-icon="check" data-iconpos="right">Save Selection</button>
+    <!-- fieldset data-role="controlgroup" data-type="horizontal" style="display: inline-block;"-->
+		<button data-role="button" id="savebtn" data-theme="{% if is_owner and not the_event.first_owner_save %}c{%else%}b{%endif%}" data-icon="check" data-iconpos="right">
+		  {% if is_owner and the_event.first_owner_save %}
+          Save and Send Invites
+		  {% else %}
+          Save Selection
+		  {% endif %}
+		</button>
 	    {% if is_owner and the_event.owner_selected_times %}
 	    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
 	    data-position-to="window" data-iconpos="right"
-	    data-transition="pop" data-theme="b" title="Pick Final Time & Send Invetations">
+	    data-transition="pop" data-theme="b" title="Pick final time and create calendar event">
 	    {% if the_event.status == "pending" %}
-	    Sched'Up
+	    Add to Calendar
 	    {% else %}
-	    Update Event
+	    Update in Calendar
 	    {% endif %}
 	    </a>
 	    {% endif %}
-	    </fieldset>
     {% endif %}
 </div>
 

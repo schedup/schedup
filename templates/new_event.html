@@ -14,7 +14,7 @@
 	<div data-role="fieldcontain">
 		<label for="titleinput" data-help-message="The event's title, e.g., <em>study session</em>, <em>My Birthday Beer</em>, etc."> Title </label> 
 		<input name="title"
-			id="titleinput" data-mini="true" placeholder="E.g., Study Session" value="{{the_event.title}}"
+			id="titleinput" data-mini="true" placeholder="Beer with the Guys" value="{{the_event.title}}"
 			type="text" autocomplete="off">
 		<div class="input-error" id="titleinput-error">This field is required</div>
 	</div>
@@ -39,9 +39,9 @@
         <div class="input-error" id="when-error">At least one time of day is required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="searchTextField" data-help-message="Add a location to your event.">Where</label> 
+		<label for="searchTextField" data-help-message="Add a location to your event">Where</label> 
 		<input name="where"
-			id="searchTextField" data-mini="true" size="50" placeholder="Anything you want!" value="{{the_event.location}}"
+			id="searchTextField" data-mini="true" size="50" placeholder="Mike's Place" value="{{the_event.location}}"
 			type="text">
 	</div>
 	<div data-role="fieldcontain" style="display:none;">
@@ -57,34 +57,46 @@
 		</fieldset>
         <div class="input-error" id="type-error">Please choose one</div>
 	</div>
+	
 	<div data-role="fieldcontain">
-		<label for="fromdate" data-help-message="Select time window.<br>Your guests will choose what time slots are most convenient for them.">Time Window</label>
+		<label for="fromdate" data-help-message="The time window of the event. Your guests will choose convenient time slots in this window">Time Window</label>
 		<fieldset id="start-end-window" data-role="controlgroup" data-type="horizontal" data-mini="true" style="display: inline-block;">
-			<table style="min-width:320px; margin-right: 12px;" cellpadding="0" cellspacing="0"><tr>
-			<td style="width:45%;">
+			<table style="min-width:280px; margin-right: 12px;" cellpadding="0" cellspacing="0"><tr>
+			<td style="width:50%">
+			    <div style="width:120px;">
 				<input name="fromdate" data-inlin="true" data-mini="true" id="fromdate" type="date" placeholder="Start Window" data-role="datebox"
 					{%if the_event.start_window %}value="{{the_event.start_window.strftime('%Y-%m-%d')}}"{%endif%}
 					data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+				</div>
 				<div class="input-error" style="max-width:140px" id="fromdate-error">Required</div>
 			</td>
-			<td style="width:10px;"></td>
-			<td style="width:45%;">
+			<td style="width:50%">
+                <div style="width:120px; margin-left:10px;">
 				<input name="todate" data-inlin="true" data-mini="true" id="todate" type="date" placeholder="End Window"	data-role="datebox"
 					{%if the_event.end_window %}value="{{the_event.end_window.strftime('%Y-%m-%d')}}"{%endif%}
 					data-options='{"mode": "calbox", "useNewStyle": true, "overrideDateFormat":"%Y-%m-%d", "theme":"c", "themeHeader":"a", "themeDate":"c", "themeDateToday":"a", "useFocus":true}'>
+				</div>
 				<div class="input-error" style="max-width:140px" id="todate-error">Required</div>
 				<div class="input-error" style="max-width:140px" id="todate-error2">End date must be later than start date</div>
 			</td>
-			</tr></table>
+			</tr>
+            {% if edit_event %}
+			<tr><td colspan="2">
+			<div style="background: rgba(255,255,0,0.2); border-radius: 8px; padding:10px; margin:5px 0;">Changing the time window will clear 
+			your guests' preferences and will require them to vote again</div>
+			</td></tr>
+			{% endif %}
+			</table>
 		</fieldset>
 	</div>
+	
 	<div data-role="fieldcontain" style="display:none;">
 		<label for="slider-step">Duration (Hours)</label>
 		<input type="range" name="slider-step" id="slider-step" value="{{the_event.duration / 60.0}}" min="0" max="5" step="0.5" />
 	</div>
 	<div data-role="fieldcontain">
-		<label for="textarea-a" data-help-message="Use this field for any extra details you might want to add, like <em>at the Red Lobster's</em> or <em>don't forget a towel</em>">Details</label>
-		<textarea name="description" id="textarea-a" placeholder="Location, description, extra notes" rows="3">{{the_event.description}}</textarea>
+		<label for="textarea-a" data-help-message="Use this field for any extra details you might want to add, like <em>don't forget a towel</em>">Details</label>
+		<textarea name="description" id="textarea-a" placeholder="Come dressed like pirates!" rows="3">{{the_event.description}}</textarea>
 	</div>
 
 	<a href="#" id="send-btn" data-theme="b" data-role="button" data-theme="c" data-icon="arrow-r" data-iconpos="right">
@@ -92,31 +104,21 @@
 	   Update Event<br>
 	   <small>guests will be notified</small>
 	   {% else %}
-	   Invite Guests<br>
-	   <small>and pick your time slots</small>
+	   Next
 	   {% endif %}
 	</a>
+	
 	{% if edit_event %}
 		<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
-		{% if is_owner %}Cancel Event{% else %}Cancel Event{% endif %}
+		Cancel Event
 		</a>
 	{% endif %}
 </form>
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		var searchTextFieldAutocomplete = new google.maps.places.Autocomplete(document.getElementById("searchTextField"));
 		
-		var defaultBounds = new google.maps.LatLngBounds(
-			new google.maps.LatLng(-33.8902, 151.1759),
-			new google.maps.LatLng(-33.8474, 151.2631));
-
-		var input = document.getElementById('searchTextField');
-		var options = {
-				  bounds: defaultBounds,
-				  types: ['establishment']
-				};
-		autocomplete = new google.maps.places.Autocomplete(input);
-				
 		setTimeout(function(){
 	        $("#guestinput").tokenInput("/api/autocomplete-contacts", {
 	            minChars : 3,

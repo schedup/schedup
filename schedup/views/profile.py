@@ -6,7 +6,7 @@ class ProfilePage(BaseHandler):
     
     @logged_in
     def get(self):
-        self.render_response('profile.html')
+        self.render_response('profile.html', section="profile")
 
 
 
