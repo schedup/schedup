@@ -109,7 +109,8 @@
 	</a>
 	
 	{% if edit_event %}
-		<a href="/decline/{{user_token}}" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right">
+		<a href="#" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right"
+		  style="color: rgb(184, 12, 12); text-shadow: 0px 0px 10px rgba(184,12,12,0.3);">
 		Cancel Event
 		</a>
 	{% endif %}
@@ -135,6 +136,14 @@
 	            }
 	        });
 		}, 100);
+		
+		$("#decline-btn").on("click", function() {
+			if (confirm("Are you sure you want to cancel the event?")) {
+			   window.location.href = '/decline/{{user_token}}';
+			   return true;
+			}
+			return false;
+		});
 		
 		var disable_auto_todate = false;
 		

@@ -83,6 +83,14 @@
     font-size: 70%;
 }
 
+.cal-day-column.weekend {
+	background-color: rgba(86, 120, 255, 0.1);
+}
+
+.cal-day-column.weekend .cal-day-title {
+    background-color: rgb(165, 196, 255);
+}
+
 .cal-day-cell {
     width: 60px;
     min-width: 60px;
