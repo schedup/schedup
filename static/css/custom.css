@@ -54,6 +54,12 @@ label.error {
     background: rgba(202, 82, 82, 0.5);
 }
 
+#owl-example .item img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .input-error {
 	display: none;
 	font-weight: bold;
