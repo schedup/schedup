@@ -50,7 +50,7 @@
 	    <ul data-role="listview">
             <li data-icon="delete" data-theme="a"><a href="#" data-rel="close"></a></li>
 		    <li data-icon="plus" {% if section=="new" %}data-theme="e" {%endif %}><a href="/new" data-ajax=false>New Event</a></li>
-            <li data-icon="plus" {% if section=="newfb" %}data-theme="e" {%endif %}><a href="/fbnew" data-ajax=false>New Facebook Event</a></li>
+            <!-- li data-icon="plus" {% if section=="newfb" %}data-theme="e" {%endif %}><a href="/fbnew" data-ajax=false>New Facebook Event</a></li-->
 		    <li data-icon="edit" {% if section=="my" %}data-theme="e" {%endif %}><a href="/my" data-ajax=false>My Events</a></li>
 		    <li><a href="/invited" data-ajax=false {% if section=="invited" %}data-theme="e" {%endif %}>Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
 		    <!-- li data-icon="gear" {% if section=="profile" %}data-theme="e" {%endif %}><a href="/profile" data-ajax=false>Profile</a></li-->
