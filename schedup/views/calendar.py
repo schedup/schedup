@@ -253,7 +253,7 @@ class CalendarPage(BaseHandler):
 class SendEventPage(BaseHandler):
     URL = "/send/(.+)"
     
-    @logged_in
+    @maybe_logged_in
     def post(self, owner_token):
         evt=EventInfo.query(EventInfo.owner_token==owner_token).get()
         if not evt:

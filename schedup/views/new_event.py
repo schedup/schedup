@@ -7,7 +7,7 @@ from dateutil.parser import parse as parse_datetime
 from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
-from schedup.facebook import generate_random_token
+from schedup.facebook import generate_random_token, fb_logged_in
 
 
 class RedirectWithFlash(Exception):
@@ -18,7 +18,7 @@ class RedirectWithFlash(Exception):
 
 TOKEN_SIZE = 25
 
-def create_or_update_event(self, evt):
+def create_or_update_event(self, evt, source):
     logging.info("params: %r", self.request.params)
 
     title = self.request.params["title"]
@@ -58,7 +58,7 @@ def create_or_update_event(self, evt):
     
     if not evt:
         evt = EventInfo(owner_token = generate_random_token(TOKEN_SIZE), owner = self.user.key,
-            first_owner_save = True)
+            first_owner_save = True, source = source)
     
     if clear_votes:
         evt.owner_selected_times = None
@@ -96,12 +96,42 @@ class NewEventPage(BaseHandler):
             "description" : "",
         }
         return self.render_response("new_event.html", post_url=self.URL, 
-            the_event = fake_event, the_event_guests=[], edit_event = False, section="new")
+            the_event = fake_event, the_event_guests=[], edit_event = False, section = "new")
 
     @logged_in
     def post(self):
         try:
-            evt = create_or_update_event(self, None)
+            evt = create_or_update_event(self, None, "google")
+        except RedirectWithFlash as ex:
+            return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
+        self.session["eventkey"] = evt.key.urlsafe()
+        
+        logging.info("Guests: %r", evt.guests)
+        self.redirect("/cal/%s" % (evt.owner_token,)) 
+
+
+class NewFBEventPage(BaseHandler):
+    URL = "/fbnew"
+    
+    @fb_logged_in
+    def get(self):
+        fake_event = {
+            "title" : "", 
+            "start_window" : None,
+            "end_window" : None,
+            "daytime" : ("evening",),
+            "type" : "friends",
+            "duration" : 120,
+            "location" : "",
+            "description" : "",
+        }
+        return self.render_response("new_event.html", post_url=self.URL, 
+            the_event = fake_event, the_event_guests=[], edit_event = False, section = "newfb", which = "facebook")
+
+    @logged_in
+    def post(self):
+        try:
+            evt = create_or_update_event(self, None, "facebook")
         except RedirectWithFlash as ex:
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
         self.session["eventkey"] = evt.key.urlsafe()
@@ -135,7 +165,7 @@ class EditEventPage(BaseHandler):
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
 
         try:
-            create_or_update_event(self, evt)
+            create_or_update_event(self, evt, None)
         except RedirectWithFlash as ex:
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
         

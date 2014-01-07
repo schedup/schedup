@@ -121,7 +121,7 @@
 		var searchTextFieldAutocomplete = new google.maps.places.Autocomplete(document.getElementById("searchTextField"));
 		
 		setTimeout(function(){
-	        $("#guestinput").tokenInput("/api/autocomplete-contacts", {
+	        $("#guestinput").tokenInput("/api/{% if which=='facebook' %}fb-{%endif%}autocomplete-contacts", {
 	            minChars : 3,
 	            theme : "facebook",
 	            hintText : "Email address or contact name",

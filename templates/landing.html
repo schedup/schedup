@@ -4,64 +4,113 @@
 SchedUp
 {% endblock %}
 
+{% block extracss %}
+    <!-- Important Owl stylesheet -->
+    <link rel="stylesheet" href="/static/owl-carousel/owl.carousel.css">
+ 
+    <!-- Default Theme -->
+    <link rel="stylesheet" href="/static/owl-carousel/owl.theme.css">
+ 
+    <!-- Include js plugin -->
+    <script src="/static/owl-carousel/owl.carousel.js"></script>
+    
+    <link href='http://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700' rel='stylesheet' type='text/css'>
+    
+    <style type="text/css">
+    
+    .explanation {
+        font-family: 'Averia Sans Libre', cursive;
+        font-size: 30px;
+        font-weight: 700;
+        text-align: center;
+        color: rgb(63, 138, 167);
+    }
+    
+    #mainlimit {
+        width:600px;
+        margin: 0 auto;
+    }
+    #bannerimg {
+        width: 600px;
+        margin: 0 auto 10px auto;
+        display: block;
+    }
+    #owl-example {
+        width: 400px;
+        margin: 0 auto;
+    }
+    #signupbtn1 {
+        width: 360px;
+        display: block;
+        margin: 0 auto 10px auto;
+    }
+    #signupbtn2 {
+        display: none;
+    }
+    
+    #owl-example {
+        background: rgba(0,0,0,0.05);
+        border-radius: 10px;
+    }
+    
+    @media print, handheld, only screen and (max-width:600px) {
+        #mainlimit {
+            width: 360px;
+        }
+        
+        #bannerimg {
+            width: 360px;
+        }
+        
+	    #owl-example {
+	        width: 360px;
+	    }
+	    #signupbtn1 {
+	       display: none;
+	    }
+	    #signupbtn2 {
+	        width: 100%;
+	        display: block;
+            margin: 20px auto 10px auto;
+	    }
+	            
+    }
+    
+    </style>
+
+{% endblock %}
+
 {% block content %}
-<div style="max-width:600px; margin: 0 auto;">
-
-
-
-
-<!-- <div style="font-size:130%;">
-	<p>
-	SchedUp lets you schedule multi-participant events in just three easy steps:
-	</p>
-	<ol>
-		<li>Enter the title and participants, and choose a time range in which the event should materialize</li>
-		<li>Your guests sync their calendars with SchedUp and choose convenient times</li>
-		<li>You're notified of everyone's picks and send the invite</li>
-	</ol>
-</div> -->
-
-<div id="owl-example" class="owl-carousel">
- 
-  <div class="item"><img src="/static/img/tutorial-schedup.jpg" alt="The Last of us"></div>
-  <div class="item"><img src="/static/img/tutorial-schedup2.jpg" alt="GTA V"></div>
-  <div class="item"><img src="/static/img/tutorial-schedup3.jpg" alt="Mirror Edge" height="700">
-  	 <a href="/my" data-role="button" data-theme="b" style="max-width:300px; float:right; bottom:90px; right:15px;" data-ajax="false">
-    	<div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
-   		<div style="font-size:90%;">with your Google account</div>
-	</a> 
-  </div>
- 
-</div>
-
-<!-- <a href="/my" data-role="button" data-theme="b" style="max-width:300px; float:right" data-ajax="false">
-    <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
-    <div style="font-size:90%;">with your Google account</div>
-</a> -->
-
+<div id="mainlimit">
+    <img src="/static/img/banner.png" id="bannerimg">
+    <div class="explanation" style="font-size:20px; color:black">Schedule Events in a Breeze!</div>
+    <a href="/my" data-role="button" id="signupbtn1" data-theme="b" data-ajax="false">
+       <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
+       <div style="font-size:90%;">with your Google account</div>
+    </a> 
+    
+	<div id="owl-example" class="owl-carousel">
+	  <div class="item">
+	       <div class="explanation">Pick the title, guests and a time window</div>
+	       <img src="/static/img/tutorial-1.png" >
+	  </div>
+	  <div class="item">
+           <div class="explanation">Your guests will pick their preferred times</div>
+           <img src="/static/img/tutorial-2.png" >
+      </div>
+	  <div class="item">
+           <div class="explanation">And choose the final time in one click!</div>
+	       <img src="/static/img/tutorial-3.png" >
+      </div>
+	</div>
+    <a href="/my" data-role="button" id="signupbtn2" data-theme="b" data-ajax="false">
+       <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
+       <div style="font-size:90%;">with your Google account</div>
+    </a> 
 </div>
 
 <script language="javascript">
-/* $(document).ready(function() {
- 
-  $("#owl-demo").owlCarousel({
- 
-      navigation : true, <!-- // Show next and prev buttons-->
-      slideSpeed : 300,
-      paginationSpeed : 400,
-      singleItem:true
- <!-- 
-      // "singleItem:true" is a shortcut for:
-      // items : 1, 
-      // itemsDesktop : false,
-      // itemsDesktopSmall : false,
-      // itemsTablet: false,
-      // itemsMobile : false -->
- 
-  });
- 
-});
- */
+
  $(document).ready(function() {
 	 
 	  $("#owl-example").owlCarousel({
@@ -86,7 +135,7 @@ SchedUp
 	    stopOnHover : false,
 	 
 	    // Navigation
-	    navigation : true,
+	    navigation : false,
 	    navigationText : ["prev","next"],
 	    rewindNav : true,
 	    scrollPerPage : false,

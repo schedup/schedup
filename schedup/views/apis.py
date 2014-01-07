@@ -7,6 +7,8 @@ APIs for the client-side:
 import re
 from schedup.base import BaseHandler, logged_in, json_handler
 from datetime import datetime, timedelta
+from schedup.facebook import fb_logged_in
+import logging
 
 EMAIL_PATTERN = re.compile(r".+?@.+?\..+")
 
@@ -43,6 +45,14 @@ class GetCalendarEvents(BaseHandler):
         return self.gconn.get_events("primary", now, now + timedelta(days=14))
 
 
+class FBAutocompleteContacts(BaseHandler):
+    URL = "/api/fb-autocomplete-contacts"
+
+    @fb_logged_in
+    @json_handler
+    def get(self):
+        logging.info("in fb-autocomplete-contacts")
+        return self.fbconn.get_friends(self.request.params["q"], 10)
 
 
 

@@ -55,6 +55,7 @@ class EventInfo(ndb.Model):
     owner_selected_times= ndb.PickleProperty()
     new_notifications = ndb.IntegerProperty(default = 0)
     first_owner_save = ndb.BooleanProperty()
+    source = ndb.StringProperty(choices=["google", "facebook"], default = "google")
     
     daytime = ndb.StringProperty(repeated = True)
     type = ndb.StringProperty()

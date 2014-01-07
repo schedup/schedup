@@ -16,24 +16,28 @@ if ON_DEV:
 else:
     FB_URI = "http://sched-up.appspot.com/fboauth"
 
-class FBLoginHandler(BaseHandler):
-    URL = "/fblogin"
-    
-    def get(self):
-        pass
 
 def fb_logged_in(method):
     @functools.wraps(method)
     def method2(self, *args):
-        if self.session.get("fb_token"):
-            return method(*args)
+        fb_email = self.session.get("fb_email")
+        logging.info("fb_email=%r", fb_email)
+        if fb_email:
+            self.user = UserProfile.query(UserProfile.email == fb_email).get()
+            logging.info("auth token=%r", self.user.facebook_token)
+            self.gconn = None
+            self.fbconn = FBConnector(self.user.facebook_token)
+            logging.info("now invoking %r", method)
+            return method(self, *args)
         
-        self.session["fb_token"] = None
+        logging.info("redirecting to facebook")
+        self.session["fb_email"] = None
         self.session["fb_redirect"] = self.request.url
         self.session["fb_state"] = generate_random_token(20)
         return self.redirect("https://www.facebook.com/dialog/oauth?"
             "client_id=%s&redirect_uri=%s&state=%s&scope=%s&response_type=code" % (
                 settings.FB_CLIENT_ID, FB_URI, self.session["fb_state"], FB_SCOPES))
+    return method2
 
 
 class FBOauthHandler(BaseHandler):
@@ -53,22 +57,60 @@ class FBOauthHandler(BaseHandler):
             return self.redirect_with_flashmsg("/", "Login failed: %s" % (reply.get("error_description"),), "error")
         
         access_token = reply["access_token"][0]
-        self.session["fb_token"] = access_token
         req = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s" % (access_token,))
         data = req.read()
         logging.info("userinfo = %r", data)
         userinfo = json.loads(data)
         
-        self.user = UserProfile.query(UserProfile.email == userinfo["email"]).get()
-        if not self.user:
-            self.user = UserProfile(email = userinfo["email"], fullname = userinfo["name"], 
-                facebook_token = access_token)
-            self.user.put()
+        user = UserProfile.query(UserProfile.email == userinfo["email"]).get()
+        if not user:
+            user = UserProfile(email = userinfo["email"], fullname = userinfo["name"])
+        user.facebook_token = access_token
+        user.put()
+        self.session["fb_email"] = user.email
         
-        return self.redirect(self.session.pop("fb_redirect"))
+        url = str(self.session.pop("fb_redirect"))
+        logging.info("fb auth successful, redirecting to %r", url)
+        return self.redirect(url)
+
+
+class FBLoginHandler(BaseHandler):
+    URL = "/fblogin"
+    
+    @fb_logged_in
+    def get(self, url):
+        return self.redirect(url)
+
 
 class FBConnector(object):
-    "https://graph.facebook.com/me/friends"
+    def __init__(self, access_token):
+        self.access_token = access_token
+    
+    def get_friends(self, pattern, limit = 10):
+        req = urllib2.urlopen("https://graph.facebook.com/fql?q=select+uid%2C+name+from+user+where+uid+in+"
+            "(SELECT+uid2+FROM+friend+WHERE+uid1+%3D+me())+and+strpos(lower(name)%2C'$NAME')%3E%3D0+limit+$LIMIT&format=json&"
+            "suppress_http_code=1&access_token=$TOKEN".replace("$NAME", pattern.lower()).
+                                                       replace("$LIMIT", str(limit)).
+                                                       replace("$TOKEN", self.access_token))    
+        return [{"name":item["name"], "id":str(item["uid"])} for item in json.loads(req.read())["data"]]
+
+    def send_message(self, userid, text):
+        pass
+    
+    def notify(self, text, url):
+        pass
+    
+    def create_event(self, info):
+        pass
+    
+    def get_events(self, start_date, end_date):
+        pass
+    
+    def update_event(self, eventid, info):
+        pass
+    
+    def cancel_event(self, eventid):
+        pass
 
 
 

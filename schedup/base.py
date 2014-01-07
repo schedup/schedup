@@ -99,6 +99,7 @@ def logged_in(method):
     @functools.wraps(method)
     def method2(self, *args):
         from schedup.connector import GoogleConnector
+        from schedup.facebook import FBConnector
         from schedup.models import UserProfile
         self.gconn = GoogleConnector(oauth)
         self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
@@ -106,18 +107,24 @@ def logged_in(method):
             prof = self.gconn.get_profile()
             self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
             self.user.put()
+        if self.user.facebook_token:
+            self.fbconn = FBConnector(self.user.facebook_token)
+        else:
+            self.fbconn = None
         return method(self, *args)
     return method2
 
 def maybe_logged_in(method):
     @functools.wraps(method)
     def method2(self, *args):
+        from schedup.connector import GoogleConnector
+        from schedup.models import UserProfile
+        from schedup.facebook import FBConnector
+        
         # only start the dance if we have the cookies
         if "ACSID" in self.request.cookies or "dev_appserver_login" in self.request.cookies:
             @oauth.oauth_aware
             def aware(self, *args):
-                from schedup.connector import GoogleConnector
-                from schedup.models import UserProfile
                 if oauth.has_credentials():
                     self.gconn = GoogleConnector(oauth)
                     self.user = UserProfile.query(UserProfile.email == self.gconn.user_email).get()
@@ -125,16 +132,29 @@ def maybe_logged_in(method):
                         prof = self.gconn.get_profile()
                         self.user = UserProfile(email = self.gconn.user_email, fullname = prof["name"])
                         self.user.put()
+                    if self.user.facebook_token:
+                        self.fbconn = FBConnector(self.user.facebook_token)
+                    else:  
+                        self.fbconn = None
                 else:
                     self.gconn = None
                     self.user = None
                 return method(self, *args)
             return aware(self, *args)
+        
+        elif "fb_email" in self.session:
+            self.user = UserProfile.query(UserProfile.email == self.session["fb_email"]).get()
+            self.gconn = None
+            self.fbconn = FBConnector(self.user.facebook_token)
+            return method(self, *args)
+        
         else:
             self.gconn = None
+            self.fbconn = None
             self.user = None
             return method(self, *args)
     return method2
+
 
 def json_handler(method):
     @functools.wraps(method)
