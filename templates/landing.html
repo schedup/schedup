@@ -55,21 +55,23 @@ SchedUp
     
     @media print, handheld, only screen and (max-width:600px) {
         #mainlimit {
-            width: 360px;
+            width: 300px;
         }
         
         #bannerimg {
-            width: 360px;
+            width: 280px;
         }
         
 	    #owl-example {
-	        width: 360px;
+	        margin: 10px auto 0 auto;
+	        width: 280px;
+	        padding: 5px;
 	    }
 	    #signupbtn1 {
 	       display: none;
 	    }
 	    #signupbtn2 {
-	        width: 100%;
+	        width: 280px;
 	        display: block;
             margin: 20px auto 10px auto;
 	    }
@@ -82,7 +84,7 @@ SchedUp
 
 {% block content %}
 <div id="mainlimit">
-    <img src="/static/img/banner.png" id="bannerimg">
+    <a href="/my" style="text-decoration: none;"  data-ajax="false"><img src="/static/img/banner.png" id="bannerimg"></a>
     <div class="explanation" style="font-size:20px; color:black">Schedule Events in a Breeze!</div>
     <a href="/my" data-role="button" id="signupbtn1" data-theme="b" data-ajax="false">
        <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
