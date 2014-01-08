@@ -9,6 +9,7 @@ class UserProfile(ndb.Model):
     fullname = ndb.StringProperty()
     google_id = ndb.StringProperty()
     facebook_token = ndb.StringProperty()
+    gcm_id = ndb.StringProperty()   # google cloud messaging client ID
 
     def get_owner_events(self):
         return EventInfo.query(EventInfo.owner == self.key)

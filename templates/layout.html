@@ -90,6 +90,24 @@
         {{content}}
         {% endblock %}
     </div>
+    
+    <script type="text/javascript">
+    $(document).ready(function() {
+	    if (typeof(schedupAndroid) != 'undefined') {
+	        console.log("Android app detected!");
+	        setTimeout(function() {
+	        	var regid = schedupAndroid.getGCMRegId();
+	        	console.log("regid", regid);
+	        	if (regid != "") {
+	                $.ajax("/api/gcmreg/" + regid, {
+	                    cache : false,
+	                    type: "GET",
+	                });
+	        	}
+	        }, 5000);
+	    }
+    });
+    </script>
 
 </div>
 </body>

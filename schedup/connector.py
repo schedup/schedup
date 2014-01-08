@@ -1,6 +1,9 @@
 import json
 from apiclient import discovery
 from webapp2 import cached_property
+import urllib2
+import logging
+from schedup import settings
         
 
 class GoogleConnector(object):
@@ -90,4 +93,29 @@ class GoogleConnector(object):
     def update_event(self, calendar_id, event_id, event_info, send_notifications = True):
         return self._calendar_service.events().update(calendarId=calendar_id, eventId=event_id, 
             body=event_info, sendNotifications = send_notifications).execute(http = self.oauth.http())  
+
+
+def send_gcm_message(regid, title, body):
+    msg = {"data": {"title": title, "body": body}, "registration_ids": [regid]}
+    data = json.dumps(msg)
+    logging.info("sending GCM notification: %r", data)
+    headers = {
+        "Content-Type":"application/json",
+        "Authorization":"key=%s" % (settings.GCM_KEY,),
+    }
+    req = urllib2.Request("https://android.googleapis.com/gcm/send", json.dumps(msg), headers)
+    try:
+        response = urllib2.urlopen(req)
+        response.read()
+    except Exception:
+        logging.warning("failed to send GCM message", exc_info = True)
+    
+
+
+
+
+
+
+
+
 

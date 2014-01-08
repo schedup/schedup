@@ -5,10 +5,11 @@ APIs for the client-side:
  * Get other people's time slots
 """
 import re
-from schedup.base import BaseHandler, logged_in, json_handler
+from schedup.base import BaseHandler, logged_in, json_handler, maybe_logged_in
 from datetime import datetime, timedelta
 from schedup.facebook import fb_logged_in
 import logging
+import json
 
 EMAIL_PATTERN = re.compile(r".+?@.+?\..+")
 
@@ -53,6 +54,35 @@ class FBAutocompleteContacts(BaseHandler):
     def get(self):
         logging.info("in fb-autocomplete-contacts")
         return self.fbconn.get_friends(self.request.params["q"], 10)
+
+
+class GCMRegisterClientID(BaseHandler):
+    URL = "/api/gcmreg/(.+)"
+    
+    @logged_in
+    def get(self, regid):
+        if not regid or not regid.strip():
+            self.response.status = 403
+            return
+        
+        if self.user.gcm_id != regid:
+            logging.info("%r: setting GCM regid %r", self.user.email, regid);
+            self.user.gcm_id = regid
+            self.user.put()
+        
+        self.response.content_type = "application/json"
+        self.response.write(json.dumps("ok"))
+
+class GCMTest(BaseHandler):
+    URL = "/api/testgcm/(.+)"
+    
+    @logged_in
+    def get(self, msg):
+        if not self.user.gcm_id:
+            return "no GCM regid"
+        
+        from schedup.connector import send_gcm_message
+        return send_gcm_message(self.user.gcm_id, "test", msg)
 
 
 
