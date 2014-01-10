@@ -15,17 +15,17 @@ SchedUp
     <script src="/static/owl-carousel/owl.carousel.js"></script>
     
     <link href='http://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Margarine' rel='stylesheet' type='text/css'>
     
     <style type="text/css">
     
     .explanation {
-        font-family: 'Averia Sans Libre', cursive;
-        font-size: 30px;
+        font-family: 'Margarine', cursive;
+        font-size: 25px;
         font-weight: 700;
         text-align: center;
-        color: rgb(63, 138, 167);
+        color: black;
     }
-    
     #mainlimit {
         width:600px;
         margin: 0 auto;
@@ -60,6 +60,7 @@ SchedUp
         
         #bannerimg {
             width: 280px;
+            margin: auto;
         }
         
 	    #owl-example {
@@ -84,9 +85,13 @@ SchedUp
 
 {% block content %}
 <div id="mainlimit">
+<!-- 
     <a href="/my" style="text-decoration: none;"  data-ajax="false"><img src="/static/img/banner.png" id="bannerimg"></a>
     <div class="explanation" style="font-size:20px; color:black">Schedule Events in a Breeze!</div>
     <div>
+-->
+    <a href="/my" style="text-decoration: none;"  data-ajax="false"><img src="/static/img/banner2.png" id="bannerimg"></a>
+
     <a href="/my" data-role="button" id="signupbtn1" data-theme="b" data-ajax="false">
        <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
        <div style="font-size:90%;">with your Google account</div>
@@ -99,15 +104,15 @@ SchedUp
 	<div id="owl-example" class="owl-carousel">
 	  <div class="item">
 	       <div class="explanation">Pick the title, guests and a time window</div>
-	       <img src="/static/img/tutorial-1.png" >
+	       <img src="/static/img/tutorial-schedup2.png" >
 	  </div>
 	  <div class="item">
            <div class="explanation">Your guests will pick their preferred times</div>
-           <img src="/static/img/tutorial-2.png" >
+           <img src="/static/img/tutorial-schedup2-2.png" >
       </div>
 	  <div class="item">
            <div class="explanation">And choose the final time in one click!</div>
-	       <img src="/static/img/tutorial-3.png" >
+	       <img src="/static/img/tutorial-schedup3-2.png" >
       </div>
 	</div>
     <a href="/my" data-role="button" id="signupbtn2" data-theme="b" data-ajax="false">
@@ -128,7 +133,7 @@ SchedUp
 	    itemsDesktopSmall : false,
 	    itemsTablet: false,
 	    itemsTabletSmall: false,
-	    itemsMobile : false,
+	    itemsMobile : true,
 	    singleItem : true,
 	    itemsScaleUp : false,
 	 

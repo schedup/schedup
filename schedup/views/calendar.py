@@ -9,7 +9,12 @@ from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
+
 from schedup.facebook import FBConnector
+
+from schedup.connector import send_gcm_message
+
+
 
 UTC = tzutc()
 
@@ -224,6 +229,10 @@ class CalendarPage(BaseHandler):
                         html_body = self.render_template("emails/new.html", 
                                 fullname = self.user.fullname, title = the_event.title, token = guest.token),
                     )
+                    if guest.user:
+                        gcm_id = guest.user.get().gcm_id
+                        if gcm_id:
+                            send_gcm_message(gcm_id, the_event.title, "by %s" % (self.user.fullname,))
         else:
             user.selected_times = ranges
             user.status = "accept"
