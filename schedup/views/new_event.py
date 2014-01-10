@@ -8,6 +8,7 @@ from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from schedup.facebook import generate_random_token, fb_logged_in
+from schedup.connector import send_gcm_message
 
 
 class RedirectWithFlash(Exception):
@@ -54,7 +55,7 @@ def create_or_update_event(self, evt, source):
         logging.info("Guest token %r: %r", email, token)
         guests.append(gst)
     if not guests:
-        raise RedirectWithFlash(self.URL, "No emails given", "error")
+        raise RedirectWithFlash(self.URL, "No guests chosen", "error")
     
     if not evt:
         evt = EventInfo(owner_token = generate_random_token(TOKEN_SIZE), owner = self.user.key,
@@ -170,11 +171,23 @@ class EditEventPage(BaseHandler):
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
         
         for guest in evt.guests:
-            send_email("%s updated %s" % (self.user.fullname, evt.title),
-                recipient = guest.email,
-                html_body = self.render_template("emails/update.html", 
-                        fullname = self.user.fullname, title = evt.title, token = guest.token),
-            )
+            if evt.source == "google":
+                send_email("%s updated %s" % (self.user.fullname, evt.title),
+                    recipient = guest.email,
+                    html_body = self.render_template("emails/update.html", 
+                            fullname = self.user.fullname, title = evt.title, token = guest.token),
+                )
+            elif self.fbconn:
+                self.fbconn.send_message(guest.email,
+                    "%s invited you to %s" % (self.user.fullname, evt.title), 
+                    self.render_template("emails/new.html", fullname = self.user.fullname, 
+                        title = evt.title, token = guest.token)
+                )
+            
+            if guest.user:
+                gcm_id = guest.user.get().gcm_id
+                if gcm_id:
+                    send_gcm_message(gcm_id, evt.title, "%s updated the event" % (self.user.fullname,))
         
         logging.info("Guests: %r", evt.guests)
         self.redirect_with_flashmsg("/cal/%s" % (evt.owner_token,), 

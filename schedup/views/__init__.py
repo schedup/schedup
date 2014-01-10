@@ -16,6 +16,12 @@ class MainPage(BaseHandler):
             self.render_response('landing.html', hide_header = True)
 
 
+class HelpPage(BaseHandler):
+    URL = "/help"
+    def get(self):
+        self.render_response('landing.html')
+
+
 class SignUpRedirect(BaseHandler):
     URL = "/signup"
     
