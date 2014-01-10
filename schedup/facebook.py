@@ -109,6 +109,7 @@ class FBConnector(object):
             ans = json.loads(req.read())
             email = "%s@facebook.com" % (ans["username"],)
             send_email(title, email, on_behalf_of = self.myemail, html_body = body)
+            logging.info("sent email to %r on behalf of %r", email, self.myemail)
         except Exception:
             logging.error("send message failed", exc_info = True)
     
