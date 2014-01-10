@@ -54,6 +54,7 @@
 		    <li data-icon="edit" {% if section=="my" %}data-theme="e" {%endif %}><a href="/my" data-ajax=false>My Events</a></li>
 		    <li><a href="/invited" data-ajax=false {% if section=="invited" %}data-theme="e" {%endif %}>Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
 		    <!-- li data-icon="gear" {% if section=="profile" %}data-theme="e" {%endif %}><a href="/profile" data-ajax=false>Profile</a></li-->
+            <li data-icon="info" {% if section=="help" %}data-theme="e" {%endif %}><a href="/help" data-ajax=false>Help</a></li>
 		    <li data-icon="info" {% if section=="about" %}data-theme="e" {%endif %}><a href="/about" data-ajax=false>About</a></li>
 		</ul>
 	</div>
@@ -92,18 +93,25 @@
     </div>
     
     <script type="text/javascript">
+    /*var schedupAndroid = {
+    		getGCMRegId : function() {
+    			return "calvados";
+    		}
+    };*/
+    
     $(document).ready(function() {
 	    if (typeof(schedupAndroid) != 'undefined') {
-	        console.log("Android app detected!");
+            //$("#android").show();
+	    	console.log("schedupAndroid = ", schedupAndroid);
 	        setTimeout(function() {
-	        	var regid = schedupAndroid.getGCMRegId();
-	        	console.log("regid", regid);
-	        	if (regid != "") {
-	                $.ajax("/api/gcmreg/" + regid, {
-	                    cache : false,
-	                    type: "GET",
-	                });
-	        	}
+	            var regid = schedupAndroid.getGCMRegId();
+	            console.log("regid = ", regid);
+	            //$("#android").text("regid = '" + regid + "'");
+	            if (regid != "") {
+                    $.ajax("/api/gcmreg/" + regid, {
+                        type: "GET",
+                    });
+	            }
 	        }, 5000);
 	    }
     });

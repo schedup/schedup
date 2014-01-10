@@ -8,6 +8,7 @@ from schedup.base import BaseHandler, logged_in
 from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from schedup.facebook import generate_random_token, fb_logged_in
+from schedup.connector import send_gcm_message
 
 
 class RedirectWithFlash(Exception):
@@ -175,6 +176,10 @@ class EditEventPage(BaseHandler):
                 html_body = self.render_template("emails/update.html", 
                         fullname = self.user.fullname, title = evt.title, token = guest.token),
             )
+            if guest.user:
+                gcm_id = guest.user.get().gcm_id
+                if gcm_id:
+                    send_gcm_message(gcm_id, evt.title, "%s updated the event" % (self.user.fullname,))
         
         logging.info("Guests: %r", evt.guests)
         self.redirect_with_flashmsg("/cal/%s" % (evt.owner_token,), 
