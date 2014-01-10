@@ -38,19 +38,14 @@ SchedUp
     #owl-example {
         width: 400px;
         margin: 0 auto;
+        background: rgba(0,0,0,0.05);
+        border-radius: 10px;
     }
-    #signupbtn1 {
+    
+    .signupbtn {
         width: 360px;
         display: block;
         margin: 0 auto 10px auto;
-    }
-    #signupbtn2 {
-        display: none;
-    }
-    
-    #owl-example {
-        background: rgba(0,0,0,0.05);
-        border-radius: 10px;
     }
     
     @media print, handheld, only screen and (max-width:600px) {
@@ -68,15 +63,13 @@ SchedUp
 	        width: 280px;
 	        padding: 5px;
 	    }
-	    #signupbtn1 {
-	       display: none;
-	    }
-	    #signupbtn2 {
+	    
+	    .signupbtn {
 	        width: 280px;
 	        display: block;
             margin: 20px auto 10px auto;
 	    }
-	            
+       
     }
     
     </style>
@@ -92,15 +85,15 @@ SchedUp
 -->
     <a href="/my" style="text-decoration: none;"  data-ajax="false"><img src="/static/img/banner2.png" id="bannerimg"></a>
 
-    <a href="/my" data-role="button" id="signupbtn1" data-theme="b" data-ajax="false">
-       <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
-       <div style="font-size:90%;">with your Google account</div>
+    <a href="/my" data-role="button" class="signupbtn" data-theme="b" data-ajax="false">
+       <div style="font-size:120%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Login with Google</div>
+       <!-- div style="font-size:90%;">with your Google account</div-->
     </a> 
-    <a href="/my" data-role="button" id="signupbtn2" data-theme="b" data-ajax="false">
-       <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
-       <div style="font-size:90%;">with your Facebook account</div>
-    </a> 
-    </div>
+    <a href="/fbmy" data-role="button" class="signupbtn" style="margin: 0 auto 10px auto;" data-theme="b" data-ajax="false">
+       <div style="font-size:120%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Login with Facebook</div>
+       <!-- div style="font-size:90%;">with your Facebook account</div-->
+    </a>
+    
 	<div id="owl-example" class="owl-carousel">
 	  <div class="item">
 	       <div class="explanation">Pick the title, guests and a time window</div>
@@ -115,10 +108,10 @@ SchedUp
 	       <img src="/static/img/tutorial-schedup3-2.png" >
       </div>
 	</div>
-    <a href="/my" data-role="button" id="signupbtn2" data-theme="b" data-ajax="false">
+    <!-- a href="/my" data-role="button" id="signupbtn2" data-theme="b" data-ajax="false">
        <div style="font-size:140%; padding: 0 0 6px 0; color: rgb(245, 245, 191);">Sign Up Now</div>
        <div style="font-size:90%;">with your Google account</div>
-    </a> 
+    </a--> 
 </div>
 
 <script language="javascript">

@@ -171,11 +171,19 @@ class EditEventPage(BaseHandler):
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
         
         for guest in evt.guests:
-            send_email("%s updated %s" % (self.user.fullname, evt.title),
-                recipient = guest.email,
-                html_body = self.render_template("emails/update.html", 
-                        fullname = self.user.fullname, title = evt.title, token = guest.token),
-            )
+            if evt.source == "google":
+                send_email("%s updated %s" % (self.user.fullname, evt.title),
+                    recipient = guest.email,
+                    html_body = self.render_template("emails/update.html", 
+                            fullname = self.user.fullname, title = evt.title, token = guest.token),
+                )
+            elif self.fbconn:
+                self.fbconn.send_message(guest.email,
+                    "%s invited you to %s" % (self.user.fullname, evt.title), 
+                    self.render_template("emails/new.html", fullname = self.user.fullname, 
+                        title = evt.title, token = guest.token)
+                )
+            
             if guest.user:
                 gcm_id = guest.user.get().gcm_id
                 if gcm_id:
