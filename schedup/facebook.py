@@ -7,12 +7,13 @@ import urlparse
 import json
 from schedup.models import UserProfile
 from schedup.utils import generate_random_token
+import urllib
 
 
 FB_SCOPES = "email,create_event,rsvp_event,user_events,manage_notifications"
 
 if ON_DEV:
-    FB_URI = "http://localhost:8080/fboauth"
+    FB_URI = "http://localhost:9080/fboauth"
 else:
     FB_URI = "http://sched-up.appspot.com/fboauth"
 
@@ -100,17 +101,55 @@ class FBConnector(object):
     def notify(self, text, url):
         pass
     
-    def create_event(self, info):
-        pass
-    
+    def create_event(self, evt_info):
+                
+        req = urllib2.urlopen("https://graph.facebook.com/me/events?method=POST&name=$NAME&start_time=$START&end_time=$END&"
+                              "description=$DESCRIPTION&location=$LOCATION&privacy_type=SECRET&format=json&suppress_http_code=1&"
+                              "access_token=$TOKEN".replace("$NAME", urllib.quote_plus(str(evt_info["summary"]))).
+                                                    replace("$START", urllib.quote_plus(str(evt_info["start"]))).
+                                                    replace("$END", urllib.quote_plus(str(evt_info["end"]))).
+                                                    replace("$DESCRIPTION", urllib.quote_plus(str(evt_info["description"]))).
+                                                    replace("$LOCATION", urllib.quote_plus(str(evt_info["location"]))).
+                                                    replace("$TOKEN", self.access_token))
+        
+        guests_list = [str(user["email"]) for user in evt_info["attendees"]]
+        guests = "%2C".join(guests_list)
+        
+        req2 = urllib2.urlopen("https://graph.facebook.com/$EVTID/invited?method=POST&users=$USERS&format=json&suppress_http_code=1&"
+                               "access_token=$TOKEN".replace("$EVTID", str(req)).
+                                                     replace("$USERS", urllib.quote_plus(guests)).
+                                                     replace("$TOKEN", self.access_token))
+        
+        if not req2:
+            return self.redirect_with_flashmsg("/", "Unable to send invites!", "error")
+        
+        return req["id"]
+        
+        
     def get_events(self, start_date, end_date):
-        pass
+        pass    
     
-    def update_event(self, eventid, info):
-        pass
+    def update_event(self, eventid, evt_info):
+        req = urllib2.urlopen("https://graph.facebook.com/$ID?method=POST&name=$NAME&description=$DESCRIPTION&"
+                              "start_time=$START&end_time=$END&location=$LOCATION&format=json&suppress_http_code=1&"
+                              "access_token=$TOKEN".replace("$NAME", urllib.quote_plus(evt_info.owner)).
+                                                    replace("$ID", str(eventid)).
+                                                    replace("$START", urllib.quote_plus(str(evt_info.start_time))).
+                                                    replace("$END", urllib.quote_plus(str(evt_info.end_time))).
+                                                    replace("$DESCRIPTION", urllib.quote_plus(str(evt_info.description))).
+                                                    replace("$LOCATION", urllib.quote_plus(str(evt_info.location))).
+                                                    replace("$TOKEN", self.access_token))
+        if (not req):
+            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
+
     
     def cancel_event(self, eventid):
-        pass
+        req = urllib2.urlopen("https://graph.facebook.com/$ID?method=DELETE&format=json&"
+                              "suppress_http_code=1&access_token=$TOKEN".replace("$TOKEN", self.access_token).
+                                                                         replace("$ID", str(eventid)))
+        if not req:
+            return self.redirect_with_flashmsg("/", "Unable to create event!", "error")
+        
 
 
 

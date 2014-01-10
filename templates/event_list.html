@@ -34,7 +34,7 @@
 {% if not events %}
     {% if owner %}
     <h1>You don't have any events <div style="display:inline-block;">;-(</div></h1>
-    <h2><a data-role="button" data-theme="b" href="/new">Create an Event</a></h2>
+    <div></div><a data-role="button" data-inline="true" data-theme="b" href="/new"><i class="fa fa-calendar fa-2x"></i>   Create a calendar Event</a> or <a data-role="button" data-inline="true" data-theme="b" href="/fbnew"><i class="fa fa-facebook-square fa-2x"></i>   Create a facebook Event</a></div>
     {% else %}
     <h1>You weren't invited to any events<div style="display:inline-block;">;-(</div></h1>
     {% endif %}

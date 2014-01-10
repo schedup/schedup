@@ -54,7 +54,7 @@ def create_or_update_event(self, evt, source):
         logging.info("Guest token %r: %r", email, token)
         guests.append(gst)
     if not guests:
-        raise RedirectWithFlash(self.URL, "No emails given", "error")
+        raise RedirectWithFlash(self.URL, "No guests chosen", "error")
     
     if not evt:
         evt = EventInfo(owner_token = generate_random_token(TOKEN_SIZE), owner = self.user.key,

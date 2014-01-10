@@ -9,7 +9,7 @@ from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
-
+from schedup.facebook import FBConnector
 
 UTC = tzutc()
 
@@ -275,12 +275,19 @@ class SendEventPage(BaseHandler):
         logging.info("log: event status = %r", evt.status)
         if evt.status == "pending":    
             evt.status="sent"
-            resp = self.gconn.create_event("primary", event_details, send_notifications = True)
-            evt.evtid = resp["id"]
+            if (evt.source == "google"):
+                resp = self.gconn.create_event("primary", event_details, send_notifications = True)
+                evt.evtid = resp["id"]
+            else:
+                resp = self.fbconn.create_event(event_details)
+                evt.evtid = resp
             evt.put()
             return self.redirect_with_flashmsg("/my", "The event was added to your calendar", "ok")
         elif evt.status == "sent":
-            resp = self.gconn.update_event("primary", evt.evtid, event_details, send_notifications = True)
+            if (evt.source == "google"):
+                resp = self.gconn.update_event("primary", evt.evtid, event_details, send_notifications = True)
+            else:
+                resp = self.fbconn.update_event(evt.evtid)
             return self.redirect_with_flashmsg("/my", "The event was updated in your calendar", "ok")
 
 
@@ -297,7 +304,10 @@ class DeclinePage(BaseHandler):
             the_event.status = "canceled"
             msg = "Event '%s' canceled" % (the_event.title,)
             if the_event.evtid:
-                self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+                if (the_event.source == "google"):
+                    self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+                else:
+                    self.fbconn.cancel_event(the_event.evtid)
                 the_event.evtid = None
         else:
             user.status = "decline"
