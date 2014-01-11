@@ -95,7 +95,7 @@
 	            </fieldset>
 	            <div data-role="fieldcontain" class="ui-field-contain ui-body ui-br" style="width: 80%;display: table;">
 	            	<label for="duration" style="display: table-cell;">Duration(hours):</label>
-	            	<input type="number" name="number" id="duration" data-mini="true" data-clear-btn="false" value="2" step="0.5" min="0.5" class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset">
+	            	<input type="number" name="duration" id="duration" data-mini="true" data-clear-btn="false" value="{{the_event.duration}}" step="0.5" min="0.5" class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset">
 	            </div>
 	            <div class="input-error" id="final_time-error">You must pick a final time</div>
 	            <input type="submit" data-theme="b" value="Send Event">

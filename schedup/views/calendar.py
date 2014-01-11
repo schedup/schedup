@@ -310,6 +310,7 @@ class SendEventPage(BaseHandler):
         
         final_time = self.request.get("final_time");
         evt.start_time = parse_datetime(final_time);
+        evt.duration = int(float(self.request.get("duration"))*60);
         evt.end_time = evt.start_time + timedelta(minutes=evt.duration)
         event_details = {
             'summary': evt.title,
