@@ -116,18 +116,25 @@ class FBConnector(object):
         guests = "%2C".join(guests_list)
         
         req2 = urllib2.urlopen("https://graph.facebook.com/$EVTID/invited?method=POST&users=$USERS&format=json&suppress_http_code=1&"
-                               "access_token=$TOKEN".replace("$EVTID", str(req)).
+                               "access_token=$TOKEN".replace("$EVTID", str(json.loads(req.read())["id"])).
                                                      replace("$USERS", urllib.quote_plus(guests)).
                                                      replace("$TOKEN", self.access_token))
         
         if not req2:
             return self.redirect_with_flashmsg("/", "Unable to send invites!", "error")
         
-        return req["id"]
+        return json.loads(req.read())["id"]
         
         
     def get_events(self, start_date, end_date):
-        pass    
+        req = urllib2.urlopen("https://graph.facebook.com/fql?q=SELECT%20eid%2C%20start_time%2C%20end_time%2C%20name%20FROM%20"
+                              "event%20%0AWHERE%20eid%20IN%20(SELECT%20eid%20FROM%20event_member%20WHERE%20uid%20%3D%20me()%20"
+                              "AND%20rsvp_status%20%3D%3D%20'attending')%0AAND%20start_time%20%3E%3D%20$START%20AND%20"
+                              "end_time%20%3C%3D%20%22$END%22&format=json&suppress_http_code=1&access_token=$TOKEN".replace("$TOKEN", self.access_token).
+                                                                                                                    replace("$START", urllib.quote_plus(str(start_date))).
+                                                                                                                   replace("$END", urllib.quote_plus(str(end_date))))
+           
+        return [{"summary":item["name"], "start":item["start_time"], "end":item["end_time"]} for item in json.loads(req.read())["data"]]
     
     def update_event(self, eventid, evt_info):
         req = urllib2.urlopen("https://graph.facebook.com/$ID?method=POST&name=$NAME&description=$DESCRIPTION&"

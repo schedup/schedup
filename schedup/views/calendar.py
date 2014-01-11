@@ -13,6 +13,7 @@ from schedup.utils import send_email
 from schedup.facebook import FBConnector
 
 from schedup.connector import send_gcm_message
+import urllib
 
 
 
@@ -60,19 +61,30 @@ class CalendarPage(BaseHandler):
             dt_end = dt_start + timedelta(days = (the_event.end_window - the_event.start_window).days + 1)
 
             user_calendar_events = []
-            try:
-                goog_events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
-            except Exception:
-                goog_events = ()
-            for evt in goog_events:
+            if (the_event.source == "google"):
                 try:
-                    if "dateTime" in evt["start"]:
+                    events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
+                except Exception:
+                    events = ()
+            else:
+                try:
+                    events = self.fbconn.get_events(the_event.start_window, the_event.end_window)
+                except Exception:
+                    events = ()
+            for evt in events:
+                try:
+                    if (the_event.source == "facebook"):
+                        start = datetime.strptime(str(evt["start"]),'%Y-%m-%dT%H:%M:%S+0200') 
+                    elif "dateTime" in evt["start"]:
                         start = parse_datetime(evt["start"]["dateTime"])
                     elif "date" in evt["start"]:
                         start = parse_datetime(evt["start"]["date"]).replace(tzinfo = UTC)
                     else:
                         raise ValueError("start: no date or dateTime")
-                    if "dateTime" in evt["end"]:
+                    
+                    if (the_event.source == "facebook"):
+                        end = datetime.strptime(str(evt["end"]),'%Y-%m-%dT%H:%M:%S+0200')
+                    elif "dateTime" in evt["end"]:
                         end = parse_datetime(evt["end"]["dateTime"])
                     elif "date" in evt["end"]:
                         end = parse_datetime(evt["end"]["date"]).replace(hour=23,minute=59,second=59,tzinfo=UTC)
