@@ -72,19 +72,19 @@
                 </label>
             {% endif %}
         {% endfor %}
-    </fieldset>
+        </fieldset>
 </div>
 
 <div data-role="popup" id="finalize" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window"
     style="min-width:250px; max-width:350px;">
     <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-    <h2>Select Final TIme</h2>
+    <h2 style="color:DodgerBlue; width:200px; font-size:24px;">Top 3 Times</h2>
     <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
 	    <form id="sendInvites" action="/send/{{user_token}}" method="post" data-ajax="false">
 	   		{% set times = the_event.suggest_times() %}
 	   		{% if not times %}
 	   		    <div>No times to suggest!</div>
-	   		{% else %} 	
+	   		{% else %}	
 	            <fieldset data-role="controlgroup" data-type="vertical" data-mini="false">
 	       	    {% for best_time, _ in times %}
 		           <input type="radio" name="final_time" value="{{best_time}}" id="final_time-{{loop.index}}">
@@ -93,6 +93,10 @@
 		           </label>
 	       	    {% endfor %}
 	            </fieldset>
+	            <div data-role="fieldcontain" class="ui-field-contain ui-body ui-br" style="width: 80%;display: table;">
+	            	<label for="duration" style="display: table-cell;">Duration(hours):</label>
+	            	<input type="number" name="duration" id="duration" data-mini="true" data-clear-btn="false" value="{{the_event.duration}}" step="0.5" min="0.5" class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset">
+	            </div>
 	            <div class="input-error" id="final_time-error">You must pick a final time</div>
 	            <input type="submit" data-theme="b" value="Send Event">
 	       	{% endif %}
@@ -129,7 +133,7 @@
 	<td style="text-align:center;">
 	<a href="/edit/{{the_event.owner_token}}" id="edit-btn" data-role="button" data-icon="edit"
     	class="ui-icon-nodisc" data-iconshadow="false" data-shadow="false" data-inline="true" 
-    	data-theme="b" data-iconpos="notext"></a>
+    	data-theme="b" data-iconpos="notext">Edit event</a>
 	</td>
 {% endif %}
 <td style="text-align:center;">
@@ -198,7 +202,7 @@
 	    data-position-to="window" data-iconpos="right"
 	    data-transition="pop" data-theme="b" title="Pick final time and create calendar event">
 	    {% if the_event.status == "pending" %}
-	    Add to Calendar
+	    Select Final Time
 	    {% else %}
 	    Update in Calendar
 	    {% endif %}
@@ -582,7 +586,7 @@ function initpage() {
         	slots.fadeOut();
         }
     });
-
+    
     $("#sendInvites").on("submit", function(event){
     	if (!$("input[name='final_time']:checked").val()) {
     		$("#final_time-error").show();

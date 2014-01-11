@@ -30,7 +30,7 @@ class UserProfile(ndb.Model):
     
 
 class EventGuest(ndb.Model):
-    # always expected to be set
+    # always expected to be set (if FB then FB id)
     email = ndb.StringProperty()
     # may be set if the guest is a user
     user = ndb.KeyProperty(UserProfile)

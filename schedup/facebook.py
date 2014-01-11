@@ -3,17 +3,19 @@ from schedup.base import BaseHandler, ON_DEV
 from schedup import settings
 import logging
 import urllib2
+import urllib
 import urlparse
 import json
 from schedup.models import UserProfile
-from schedup.utils import generate_random_token
-import urllib
+from schedup.utils import generate_random_token, send_email
+from dateutil.parser import parse as parse_datetime
+from datetime import timedelta
 
 
 FB_SCOPES = "email,create_event,rsvp_event,user_events,manage_notifications"
 
 if ON_DEV:
-    FB_URI = "http://localhost:9080/fboauth"
+    FB_URI = "http://localhost:8080/fboauth"
 else:
     FB_URI = "http://sched-up.appspot.com/fboauth"
 
@@ -86,81 +88,121 @@ class FBLoginHandler(BaseHandler):
 class FBConnector(object):
     def __init__(self, access_token):
         self.access_token = access_token
+        self.myemail = None
+        try:
+            req = urllib2.urlopen("https://graph.facebook.com/me?access_token=%s" % (self.access_token,))
+            ans = json.loads(req.read())
+            self.myemail = ans["email"]
+        except Exception:
+            logging.error("FBConnector couldn't get my email")
     
     def get_friends(self, pattern, limit = 10):
-        req = urllib2.urlopen("https://graph.facebook.com/fql?q=select+uid%2C+name+from+user+where+uid+in+"
+        url = ("https://graph.facebook.com/fql?q=select+uid%2C+name+from+user+where+uid+in+"
             "(SELECT+uid2+FROM+friend+WHERE+uid1+%3D+me())+and+strpos(lower(name)%2C'$NAME')%3E%3D0+limit+$LIMIT&format=json&"
-            "suppress_http_code=1&access_token=$TOKEN".replace("$NAME", pattern.lower()).
-                                                       replace("$LIMIT", str(limit)).
-                                                       replace("$TOKEN", self.access_token))    
+            "&access_token=$TOKEN")
+        req = urllib2.urlopen(url.replace("$NAME", pattern.lower()).replace("$LIMIT", str(limit)).replace("$TOKEN", self.access_token))    
         return [{"name":item["name"], "id":str(item["uid"])} for item in json.loads(req.read())["data"]]
 
-    def send_message(self, userid, text):
-        pass
+    def send_message(self, userid, title, body):
+        try:
+            req = urllib2.urlopen("https://graph.facebook.com/%s?access_token=%s" % (userid, self.access_token,))
+            ans = json.loads(req.read())
+            email = "%s@facebook.com" % (ans["username"],)
+            send_email(title, email, on_behalf_of = self.myemail, html_body = body)
+            logging.info("sent email to %r on behalf of %r", email, self.myemail)
+        except Exception:
+            logging.error("send message failed", exc_info = True)
     
-    def notify(self, text, url):
-        pass
-    
-    def create_event(self, evt_info):
-                
-        req = urllib2.urlopen("https://graph.facebook.com/me/events?method=POST&name=$NAME&start_time=$START&end_time=$END&"
-                              "description=$DESCRIPTION&location=$LOCATION&privacy_type=SECRET&format=json&suppress_http_code=1&"
-                              "access_token=$TOKEN".replace("$NAME", urllib.quote_plus(str(evt_info["summary"]))).
-                                                    replace("$START", urllib.quote_plus(str(evt_info["start"]))).
-                                                    replace("$END", urllib.quote_plus(str(evt_info["end"]))).
-                                                    replace("$DESCRIPTION", urllib.quote_plus(str(evt_info["description"]))).
-                                                    replace("$LOCATION", urllib.quote_plus(str(evt_info["location"]))).
-                                                    replace("$TOKEN", self.access_token))
-        
-        guests_list = [str(user["email"]) for user in evt_info["attendees"]]
-        guests = "%2C".join(guests_list)
-        
-        req2 = urllib2.urlopen("https://graph.facebook.com/$EVTID/invited?method=POST&users=$USERS&format=json&suppress_http_code=1&"
-                               "access_token=$TOKEN".replace("$EVTID", str(json.loads(req.read())["id"])).
-                                                     replace("$USERS", urllib.quote_plus(guests)).
-                                                     replace("$TOKEN", self.access_token))
-        
-        if not req2:
-            return self.redirect_with_flashmsg("/", "Unable to send invites!", "error")
-        
-        return json.loads(req.read())["id"]
-        
+    def create_event(self, event_info):
+        data = urllib.urlencode(dict(
+            name = event_info["summary"],
+            start_time = event_info["start"]["dateTime"],
+            end_time = event_info["end"]["dateTime"],
+            description = event_info["description"],
+            location = event_info["location"],
+            privacy_type = "SECRET",
+        ))
+        req = urllib2.urlopen("https://graph.facebook.com/me/events?access_token=%s" % (self.access_token,), data)
+        raw = req.read()
+        ans = json.loads(raw)
+        if "id" not in ans:
+            logging.error("Error response from FB: %r", raw)
+            raise ValueError("Failed to create FB event")
+        event_id = ans["id"]
+
+        req = urllib2.urlopen("https://graph.facebook.com/%s/invited?access_token=%s&users=%s" % (
+            event_id, self.access_token, ",".join(att["email"] for att in event_info["attendees"])), " ")
+        req.read()
+
+        return event_id
         
     def get_events(self, start_date, end_date):
-        req = urllib2.urlopen("https://graph.facebook.com/fql?q=SELECT%20eid%2C%20start_time%2C%20end_time%2C%20name%20FROM%20"
-                              "event%20%0AWHERE%20eid%20IN%20(SELECT%20eid%20FROM%20event_member%20WHERE%20uid%20%3D%20me()%20"
-                              "AND%20rsvp_status%20%3D%3D%20'attending')%0AAND%20start_time%20%3E%3D%20$START%20AND%20"
-                              "end_time%20%3C%3D%20%22$END%22&format=json&suppress_http_code=1&access_token=$TOKEN".replace("$TOKEN", self.access_token).
-                                                                                                                    replace("$START", urllib.quote_plus(str(start_date))).
-                                                                                                                   replace("$END", urllib.quote_plus(str(end_date))))
-           
-        return [{"summary":item["name"], "start":item["start_time"], "end":item["end_time"]} for item in json.loads(req.read())["data"]]
-    
-    def update_event(self, eventid, evt_info):
-        req = urllib2.urlopen("https://graph.facebook.com/$ID?method=POST&name=$NAME&description=$DESCRIPTION&"
-                              "start_time=$START&end_time=$END&location=$LOCATION&format=json&suppress_http_code=1&"
-                              "access_token=$TOKEN".replace("$NAME", urllib.quote_plus(evt_info.owner)).
-                                                    replace("$ID", str(eventid)).
-                                                    replace("$START", urllib.quote_plus(str(evt_info.start_time))).
-                                                    replace("$END", urllib.quote_plus(str(evt_info.end_time))).
-                                                    replace("$DESCRIPTION", urllib.quote_plus(str(evt_info.description))).
-                                                    replace("$LOCATION", urllib.quote_plus(str(evt_info.location))).
-                                                    replace("$TOKEN", self.access_token))
-        if (not req):
-            return self.redirect_with_flashmsg("/", "Invalid token!", "error")
-
-    
-    def cancel_event(self, eventid):
-        req = urllib2.urlopen("https://graph.facebook.com/$ID?method=DELETE&format=json&"
-                              "suppress_http_code=1&access_token=$TOKEN".replace("$TOKEN", self.access_token).
-                                                                         replace("$ID", str(eventid)))
-        if not req:
-            return self.redirect_with_flashmsg("/", "Unable to create event!", "error")
+        q = ("SELECT eid, start_time, end_time, name FROM event " 
+            "WHERE eid IN (SELECT eid FROM event_member WHERE uid = me() AND rsvp_status != 'declined') "
+            "AND start_time >= '%s-%s-%s' AND end_time <= '%s-%s-%s'" % (start_date.year, start_date.month, start_date.day,
+                end_date.year, end_date.month, end_date.day))
+        url = "https://graph.facebook.com/fql?%s" % (urllib.urlencode({"q":q, "access_token":self.access_token}))
+        req = urllib2.urlopen(url)
+        ans = json.loads(req.read())
+        events = []
+        for evt in ans["data"]:
+            e = {"summary" : evt["name"], "start" : {}, "end" : {}}
+            if "T" in evt["start_time"]:
+                e["start"]["dateTime"] = evt["start_time"]
+            else:
+                e["start"]["date"] = evt["start_time"]
+            if evt["end_time"]:
+                if "T" in evt["end_time"]:
+                    e["end"]["dateTime"] = evt["end_time"]
+                else:
+                    e["end"]["date"] = evt["end_time"]
+            else:
+                if "T" in evt["start_time"]:
+                    e["end"]["dateTime"] = (parse_datetime(evt["start_time"]) + timedelta(hours = 2)).isoformat()
+                else:
+                    e["end"]["date"] = evt["start_time"]
+            
+            events.append(e)
+        return events
         
 
+    
+    def update_event(self, event_id, event_info):
+        data = urllib.urlencode(dict(
+            name = event_info["summary"],
+            start_time = event_info["start"]["dateTime"],
+            end_time = event_info["end"]["dateTime"],
+            description = event_info["description"],
+            location = event_info["location"],
+        ))
+        req = urllib2.urlopen("https://graph.facebook.com/%s?access_token=%s" % (event_id, self.access_token), data)
+        req.read()
+
+        req = urllib2.urlopen("https://graph.facebook.com/%s/invited?access_token=%s&users=%s" % (event_id, self.access_token))
+        ans = json.loads(req.read())
+        old_invited = set(user["id"] for user in ans["data"])
+        new_invited = set(att["email"] for att in event_info["attendees"])
+        to_remove = old_invited - new_invited
+        to_add = new_invited - old_invited
+        for uid in to_remove:
+            del_url("https://graph.facebook.com/%s/invited/%s?access_token=%s" % (event_id, uid, self.access_token))
+        
+        if to_add:
+            req = urllib2.urlopen("https://graph.facebook.com/%s/invited?access_token=%s&users=%s" % (
+                event_id, self.access_token, ",".join(to_add)), " ")
+            req.read()
+    
+    def cancel_event(self, event_id):
+        resp = del_url('https://graph.facebook.com/%s?access_token=%s' % (event_id, self.access_token))
+        logging.info("DELETE: %r", resp.read())
 
 
-
+def del_url(url):
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    request = urllib2.Request(url)
+    request.get_method = lambda: 'DELETE'
+    resp = opener.open(request)
+    return resp.read()
 
 
 

@@ -4,6 +4,7 @@ Events I organize or that I am invited to
 from schedup.base import BaseHandler, logged_in
 from schedup.models import EventInfo
 from datetime import datetime, timedelta
+from schedup.facebook import fb_logged_in
 
 
 class MyEventsPage(BaseHandler):
@@ -22,6 +23,14 @@ class MyEventsPage(BaseHandler):
             token = token,
             section="my",
         )
+
+class MyFBEventsPage(BaseHandler):
+    URL = "/fbmy"
+    
+    @fb_logged_in
+    def get(self):
+        return self.redirect("/my")
+
 
 class InvitedToPage(BaseHandler):
     URL = "/invited"
