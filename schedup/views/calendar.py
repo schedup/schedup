@@ -277,10 +277,15 @@ class CalendarPage(BaseHandler):
                                     fullname = self.user.fullname, title = the_event.title, token = guest.token),
                         )
                     elif self.fbconn:
+                        invite = ("$NAME has invite you to the event $TITLE.\nWith our app you can choose your optimal time slots for the event,"
+                                  " during the given time window.\nThen $NAME  will decide on a final time and send you the invitation!\n"
+                                  "For your convenience you can also register to the app with your facebook/google acount!\n"
+                                  "Click here to respond: http://sched-up.appspot.com/cal/$TOKEN".replace("$NAME", self.user.fullname).
+                                                                                                  replace("$TITLE", the_event.title).
+                                                                                                  replace("$TOKEN", guest.token))
                         self.fbconn.send_message(guest.email,
                             "%s invited you to %s" % (self.user.fullname, the_event.title), 
-                            self.render_template("emails/new.html", fullname = self.user.fullname, 
-                                title = the_event.title, token = guest.token)
+                            invite, the_event.start_window, the_event.end_window
                         )
                     
                     if guest.user:

@@ -42,6 +42,14 @@
   </script>
 </head>
 <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=591227170970104";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 <!-- Home -->
 <div data-role="page" id="page{{pageid}}">
 
@@ -50,14 +58,18 @@
 	    <ul data-role="listview">
             <li data-icon="delete" data-theme="a"><a href="#" data-rel="close"></a></li>
 		    <li data-icon="plus" {% if section=="new" %}data-theme="e" {%endif %}><a href="/new" data-ajax=false>New Calendar Event</a></li>
-            <!-- li data-icon="plus" {% if section=="newfb" %}data-theme="e" {%endif %}><a href="/fbnew" data-ajax=false>New Facebook Event</a></li-->
+            <li data-icon="plus" {% if section=="newfb" %}data-theme="e" {%endif %}><a href="/fbnew" data-ajax=false>New Facebook Event</a></li>
 		    <li data-icon="edit" {% if section=="my" %}data-theme="e" {%endif %}><a href="/my" data-ajax=false>My Events</a></li>
 		    <li><a href="/invited" data-ajax=false {% if section=="invited" %}data-theme="e" {%endif %}>Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
 		    <!-- li data-icon="gear" {% if section=="profile" %}data-theme="e" {%endif %}><a href="/profile" data-ajax=false>Profile</a></li-->
             <li data-icon="info" {% if section=="help" %}data-theme="e" {%endif %}><a href="/help" data-ajax=false>Help</a></li>
 		    <li data-icon="info" {% if section=="about" %}data-theme="e" {%endif %}><a href="/about" data-ajax=false>About</a></li>
 		</ul>
+		<br>
+		<br>
+		<div class="fb-like" data-href="https://www.facebook.com/schedupapp" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
 	</div>
+	
 	
 	{% endif %}
 	
@@ -90,6 +102,7 @@
         {% block content %}
         {{content}}
         {% endblock %}
+        
     </div>
     
     <script type="text/javascript">

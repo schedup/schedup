@@ -12,7 +12,7 @@ from dateutil.parser import parse as parse_datetime
 from datetime import timedelta
 
 
-FB_SCOPES = "email,create_event,rsvp_event,user_events,manage_notifications"
+FB_SCOPES = "email,create_event,rsvp_event,user_events,manage_notifications,publish_stream"
 
 if ON_DEV:
     FB_URI = "http://localhost:8080/fboauth"
@@ -103,15 +103,13 @@ class FBConnector(object):
         req = urllib2.urlopen(url.replace("$NAME", pattern.lower()).replace("$LIMIT", str(limit)).replace("$TOKEN", self.access_token))    
         return [{"name":item["name"], "id":str(item["uid"])} for item in json.loads(req.read())["data"]]
 
-    def send_message(self, userid, title, body):
-        try:
-            req = urllib2.urlopen("https://graph.facebook.com/%s?access_token=%s" % (userid, self.access_token,))
-            ans = json.loads(req.read())
-            email = "%s@facebook.com" % (ans["username"],)
-            send_email(title, email, on_behalf_of = self.myemail, html_body = body)
-            logging.info("sent email to %r on behalf of %r", email, self.myemail)
-        except Exception:
-            logging.error("send message failed", exc_info = True)
+    def send_message(self, userid, title, body, start_win, end_win):
+        start = {'dateTime': start_win.isoformat() + "+02:00",}
+        end = {'dateTime': end_win.isoformat() + "+02:00",}
+        guest = [{'email': str(userid)}]
+        event_info = {"summary":title, "start":start, "end":end, "description":body, "location":"", "attendees":guest}
+        req = self.create_event(event_info)
+        return req
     
     def create_event(self, event_info):
         data = urllib.urlencode(dict(
@@ -130,6 +128,7 @@ class FBConnector(object):
             raise ValueError("Failed to create FB event")
         event_id = ans["id"]
 
+        #logging.info("guest: %r, guest id: %r", event_info["attendees"], event_info["attendees"]["email"])
         req = urllib2.urlopen("https://graph.facebook.com/%s/invited?access_token=%s&users=%s" % (
             event_id, self.access_token, ",".join(att["email"] for att in event_info["attendees"])), " ")
         req.read()

@@ -33,6 +33,7 @@ class EventGuest(ndb.Model):
     # always expected to be set (if FB then FB id)
     email = ndb.StringProperty()
     # may be set if the guest is a user
+    name = ndb.StringProperty()
     user = ndb.KeyProperty(UserProfile)
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
