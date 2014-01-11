@@ -10,7 +10,6 @@ from schedup.base import BaseHandler, maybe_logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
 from schedup.connector import send_gcm_message
-import urllib
 
 
 UTC = tzutc()
@@ -58,18 +57,11 @@ class CalendarPage(BaseHandler):
             dt_start = datetime(the_event.start_window.year, the_event.start_window.month, the_event.start_window.day, tzinfo = UTC)
             dt_end = dt_start + timedelta(days = (the_event.end_window - the_event.start_window).days + 1)
 
-
-            user_calendar_events = []
-            if (the_event.source == "google"):
-                try:
-                    events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
-                except Exception:
-                    events = ()
-            else:
-                try:
-                    events = self.fbconn.get_events(the_event.start_window, the_event.end_window)
-                except Exception:
-                    events = ()
+            try:
+                events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
+            except Exception:
+                events = ()
+            
             for evt in events:
                 try:
                     if (the_event.source == "facebook"):
@@ -163,7 +155,7 @@ class CalendarPage(BaseHandler):
                     "end" : end_time, 
                     "user" : self.canonize_email(gst.email)
                 })
-               
+        
         user_selected_slots = []
         if is_owner:
             ranges = the_event.owner_selected_times
@@ -331,9 +323,9 @@ class SendEventPage(BaseHandler):
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
-        final_time = self.request.get("final_time");
-        evt.start_time = parse_datetime(final_time);
-        evt.duration = int(float(self.request.get("duration"))*60);
+        final_time = self.request.get("final_time")
+        evt.start_time = parse_datetime(final_time)
+        evt.duration = int(float(self.request.get("duration"))*60)
         evt.end_time = evt.start_time + timedelta(minutes=evt.duration)
         event_details = {
             'summary': evt.title,

@@ -1,7 +1,7 @@
 {% extends "layout.html" %} 
 
 {% block header %} 
-{% if edit_event %}Edit{% else %}New{% endif %} Event
+{% if edit_event %}Edit{% else %}New {% if which=='facebook' %}Facebook{%endif%}{% endif %} Event
 {% endblock %}
 
 {% block content %}
@@ -144,7 +144,11 @@
 	        $("#guestinput").tokenInput("/api/{% if which=='facebook' %}fb-{%endif%}autocomplete-contacts", {
 	            minChars : 3,
 	            theme : "facebook",
-	            hintText : "Email address or contact name",
+	            {% if which=='facebook' %}
+	            hintText : "Facebook friend name",
+	            {% else %}
+                hintText : "Email address or contact name",
+	            {% endif %}
 	            tokenDelimiter : ";",
 	            preventDuplicates : true,
 	            prePopulate : {{the_event_guests|safe}},

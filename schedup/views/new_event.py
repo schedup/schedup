@@ -34,6 +34,10 @@ def create_or_update_event(self, evt, source):
     daytime = self.request.params.getall("when")
     guests = []    
     for email in self.request.params["guests"].split(";"):
+        if source == "facebook":
+            email, name = email.split("/", 1)
+        else:
+            name = None
         if evt:
             found = False
             for gst in evt.guests:
@@ -47,11 +51,14 @@ def create_or_update_event(self, evt, source):
                 continue
         
         user = UserProfile.query(UserProfile.email == email).get()
+        if not user:
+            user = UserProfile.query(UserProfile.facebook_id == email).get()
+            
         token = generate_random_token(TOKEN_SIZE)
         if user:
-            gst = EventGuest(user = user.key, email = email, token = token)
+            gst = EventGuest(user = user.key, email = email, token = token, name = name)
         else:
-            gst = EventGuest(email=email, token = token)
+            gst = EventGuest(email=email, token = token, name = name)
         logging.info("Guest token %r: %r", email, token)
         guests.append(gst)
     if not guests:

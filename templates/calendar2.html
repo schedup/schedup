@@ -80,7 +80,7 @@
 	       	    {% endfor %}
 	            </fieldset>
 	            <fieldset data-role="controlgroup">
-	            	<label for="duration" style="display: table-cell;">Duration (hours)</label>
+	            	<label for="duration">Duration (hours)</label>
 	            	<input type="range" name="duration" id="duration" data-mini="true" 
 	            	  value="{{(the_event.duration // 30) / 2.0}}" min="1" step="0.5" max="5" data-highlight="true">
                 </fieldset>
@@ -616,20 +616,27 @@ function initpage() {
                 setTimeout(function () {
                     $("#tut3").fadeOut(400);
                     $("#tutorial-overlay").fadeOut(400);
+                    setTimeout(function() {
+                    	show_infobox();
+                    }, 500);
                 }, 7000);
             }, 6000);
         }, 5000);
     }
     
+    function show_infobox() {
+        if (user_selected_slots.length == 0) {
+	        setTimeout(function(){
+	            $("#infobox").popup("open");
+	        }, 300);
+        }
+    }
+    
     {% if show_tutorial %}
     show_tutorial();
+    {% elif not is_owner %}
+    show_infobox();
     {% endif %}
-    
-    if ("{{is_owner}}" == "False" && user_selected_slots.length == 0) {
-        setTimeout(function(){
-            $("#infobox").popup("open");
-        }, 300);
-    }
 }
 
 $(document).ready(function() {

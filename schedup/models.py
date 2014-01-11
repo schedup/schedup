@@ -8,6 +8,7 @@ class UserProfile(ndb.Model):
     email = ndb.StringProperty(required=True)
     fullname = ndb.StringProperty()
     google_id = ndb.StringProperty()
+    facebook_id = ndb.StringProperty()
     facebook_token = ndb.StringProperty()
     gcm_id = ndb.StringProperty()   # google cloud messaging client ID
 
@@ -41,7 +42,7 @@ class EventGuest(ndb.Model):
     
     @property
     def fullname(self):
-        return self.user.get().fullname if self.user else self.email
+        return self.user.get().fullname if self.user else (self.name if self.name else self.email)
     
     def sanitized_email(self):
         return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
@@ -127,7 +128,7 @@ class EventInfo(ndb.Model):
                 while t < end_time:
                     if t not in time_table:
                         time_table[t] = 0
-                    time_table[t] += 1
+                    time_table[t] += 2
                     t += halfhour
         
         # add guest votes (but only if owner votes intersect with them)
