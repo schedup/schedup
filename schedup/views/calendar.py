@@ -6,15 +6,11 @@ from dateutil.rrule import rrulestr
 from dateutil.parser import parse as parse_datetime
 from dateutil.tz import tzutc
 from schedup.models import EventInfo
-from schedup.base import BaseHandler, maybe_logged_in, logged_in
+from schedup.base import BaseHandler, maybe_logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
-
-from schedup.facebook import FBConnector
-
 from schedup.connector import send_gcm_message
 import urllib
-
 
 
 UTC = tzutc()
@@ -195,6 +191,12 @@ class CalendarPage(BaseHandler):
             the_event.new_notifications = 0
             the_event.put()
 
+        if not self.session.get("cal_tut_shown", False):
+            self.session["cal_tut_shown"] = True
+            show_tutorial = True
+        else:
+            show_tutorial = False
+
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
@@ -208,6 +210,7 @@ class CalendarPage(BaseHandler):
             is_owner = is_owner,
             is_logged_in = self.user is not None,
             dont_overlay_header = True,
+            show_tutorial = show_tutorial,
         )
         
     @staticmethod
@@ -274,7 +277,8 @@ class CalendarPage(BaseHandler):
                         send_email("%s invited you to %s" % (self.user.fullname, the_event.title),
                             recipient = guest.email,
                             html_body = self.render_template("emails/new.html", 
-                                    fullname = self.user.fullname, title = the_event.title, token = guest.token),
+                                    fullname = self.user.fullname, title = the_event.title, token = guest.token,
+                                    location = the_event.location, description = the_event.description),
                         )
                     elif self.fbconn:
                         invite = ("$NAME has invite you to the event $TITLE.\nWith our app you can choose your optimal time slots for the event,"

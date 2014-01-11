@@ -19,11 +19,19 @@
 		<div class="input-error" id="titleinput-error">This field is required</div>
 	</div>
 	<div data-role="fieldcontain">
-		<label for="guestinput" data-help-message="Enter the guests' emails. You can either write the full email or the person's name (auto-completed from your Google contacts)"> Guests </label> 
-		<input name="guests"
-			id="guestinput" data-mini="true" placeholder="Guests' emails"
-			type="search" data-clear-btn="false">
-        <div class="input-error" id="guestinput-error">At least one email address is required</div>
+	    {% if which=='facebook' %}
+            <label for="guestinput" data-help-message="Enter the event guests (Facebook friends)"> Guests </label> 
+            <input name="guests"
+                id="guestinput" data-mini="true" placeholder="Friends' names"
+                type="search" data-clear-btn="false">
+            <div class="input-error" id="guestinput-error">At least one Facebook friend is required</div>
+        {% else %}
+            <label for="guestinput" data-help-message="Enter the guests' emails. You can either write the full email or the person's name (auto-completed from your Google contacts)"> Guests </label> 
+            <input name="guests"
+                id="guestinput" data-mini="true" placeholder="Guests' emails"
+                type="search" data-clear-btn="false">
+            <div class="input-error" id="guestinput-error">At least one email address is required</div>
+        {% endif %}
 	</div>
 	<div data-role="fieldcontain">
 		<fieldset data-role="controlgroup" data-type="horizontal" id="fieldtype"
@@ -35,6 +43,10 @@
 			<label for="checkbox2">	Noon </label> 
 			<input id="checkbox3" name="when" type="checkbox" value="evening" {% if "evening" in the_event.daytime%}checked{%endif%}> 
 			<label for="checkbox3">	Evening </label>
+			
+			<div class="tutorial" id="tut1">
+			<span>Select the time of day for the event. You can choose more than one</span>
+			</div>
 		</fieldset>
         <div class="input-error" id="when-error">At least one time of day is required</div>
 	</div>
@@ -87,6 +99,10 @@
 			</td></tr>
 			{% endif %}
 			</table>
+            <div class="tutorial" id="tut2">
+            <span>The <i>time window</i> for your event. Your guests will choose time slots in this window</span>
+            </div>
+			
 		</fieldset>
 	</div>
 	
@@ -107,11 +123,15 @@
 	   Next
 	   {% endif %}
 	</a>
+
+    {% if edit_event %}
+        <a href="#" data-rel="back" data-role="button" data-theme="c" data-icon="back" data-iconpos="right" data-ajax="false">Back (don't edit)</a>
+    {% endif %}
 	
 	{% if edit_event %}
 		<a href="#" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right"
 		  style="color: rgb(184, 12, 12); text-shadow: 0px 0px 10px rgba(184,12,12,0.3);">
-		Cancel Event
+		Delete Event
 		</a>
 	{% endif %}
 </form>
@@ -172,14 +192,31 @@
 			$(this).append("<div class='helpbtn'>");
 		});
 		
-		$("*[data-help-message]").on("click", function(e){
-			var msg = $(this).data("help-message");
+		$("*[data-help-message] .helpbtn").on("click", function(e){
+			var msg = $(this).parent().data("help-message");
 			$("#helpMsgPopupText").html(msg);
 			$("#helpMsgPopup").popup("open");
 			e.preventDefault();
 			return false;
 		});
 		
+		function show_tutorial() {
+	        $("#tutorial-overlay").fadeIn(400);
+	        $("#tut1").fadeIn(600);
+	        setTimeout(function () {
+	            $("#tut1").fadeOut(400);
+	            $("#tut2").fadeIn(600);
+	            setTimeout(function () {
+	                $("#tut2").fadeOut(400);
+	                $("#tutorial-overlay").fadeOut(400);
+	            }, 5000);
+	        }, 5000);
+	    }
+		
+		{% if show_tutorial %}
+		show_tutorial();
+        {% endif %}
+        
 		$("#newevtform").on("submit", function(event){
 			var succ = true;
 			var first = null;

@@ -1,11 +1,12 @@
 <div style="font-family:arial, sans-serif;">
-<p><b>{{fullname}}</b> has invited you to <b>{{title}}. Choose your optimal time slots through our app for the event,
-after that the event creator will send you the final time!</b></p>
+<p><b>{{fullname}}</b> is using <a href="http://sched-up.appspot.com">SchedUp</a> to schedule events with ease.</p>
+<p>You've been invited you to <b>{{title}}</b> {% if location %}at <b>{{location}}</b>{% endif %}</p>
+{% if description %}<p style="border-left: 5px solid #ddd; padding: 10px 20px; margin: 0 0 0 20px;">{{description}}</p>{% endif %}
 <p>
 <a href="http://sched-up.appspot.com/cal/{{token}}" style="display:inline-block; width:200px; padding: 10px; text-decoration:none; border-radius:5px; background-color: #88f; color: white; text-align: center; border: 2px solid #5454A7;">
-    <span style="font-size:200%;">Click here</span><br>
-    to respond
+    <span style="font-size:200%;">Click here</span><br>to respond
 </a>
 </p>
-<p></p>
+<p>In the next screen you'll be asked to select the times convenient to you and accept or decline the event. Later on, the organizer will pick the final time for the event.</p>
+<p>Sincerely,<br>&nbsp;&nbsp;&nbsp;&nbsp;The SchedUp team</p>
 </div>

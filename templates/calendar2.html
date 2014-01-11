@@ -9,20 +9,6 @@
 <link rel="stylesheet" href="/static/css/calendar2.css" />
 {% endblock %}
 
-{# block topbar #}
-
-<!-- TOP BAR -->
-<!-- div class="ui-bar ui-bar-b">
-    <a href="#sidepanel" data-role="button" class="ui-icon-nodisc" data-icon="bars" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
-    <a href="#infobox" data-transition="pop" data-icon="info" data-role="button" data-inline="true" data-rel="popup" class="ui-icon-nodisc"data-iconpos="notext"></a>
-    <a href="#friendsFilter" id="friendsButton" data-transition="pop" data-role="button" data-inline="true" data-rel="popup" data-mini="true" class="ui-icon-nodisc"><i class="icon-users" title="Guest List"></i></a>
-    <h1 class="ui-title" role="heading" aria-level="1">SchedUp</h1>
-    <a href="/" data-role="button" class="ui-icon-nodisc" data-icon="home" data-iconpos="notext" data-theme="b" data-iconshadow="false" data-ajax=false data-inline="true"></a>
-</div-->
-
-{# endblock #} 
-
-
 {% block content %}
 
 <div data-role="popup" id="infobox" data-overlay-theme="a" class="ui-content" data-theme="d" data-position-to="window" 
@@ -93,10 +79,11 @@
 		           </label>
 	       	    {% endfor %}
 	            </fieldset>
-	            <div data-role="fieldcontain" class="ui-field-contain ui-body ui-br" style="width: 80%;display: table;">
-	            	<label for="duration" style="display: table-cell;">Duration(hours):</label>
-	            	<input type="number" name="duration" id="duration" data-mini="true" data-clear-btn="false" value="{{the_event.duration}}" step="0.5" min="0.5" class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset">
-	            </div>
+	            <fieldset data-role="controlgroup">
+	            	<label for="duration" style="display: table-cell;">Duration (hours)</label>
+	            	<input type="range" name="duration" id="duration" data-mini="true" 
+	            	  value="{{(the_event.duration // 30) / 2.0}}" min="1" step="0.5" max="5" data-highlight="true">
+                </fieldset>
 	            <div class="input-error" id="final_time-error">You must pick a final time</div>
 	            <input type="submit" data-theme="b" value="Send Event">
 	       	{% endif %}
@@ -145,11 +132,19 @@
     data-iconshadow="false" data-shadow="false" data-icon="arrow-r" data-iconpos="notext">Scroll right</a>
 </td>
 </tr></table>
+
+<div class="tutorial" id="tut1">
+<span>See details and filter by participants</span>
 </div>
 
+</div>
 
+<div class="calendar-container disable-select" style="position: relative;">
 
-<div class="calendar-container disable-select">
+<div class="tutorial" id="tut2" style="position: absolute; top: 100px;">
+<span>Click and drag to select times. Long-click on days or hours to select rows and columns</span>
+</div>
+
 <table cellpadding="0" cellspacing="0" style="width:100%;"><tr>
     <td class="cal-hours-column">
     <div style="z-index:5; background:white;">
@@ -190,6 +185,16 @@
         <div class="input-error" style="display:block;">Event Canceled</div>
     {% else %}
     <!-- fieldset data-role="controlgroup" data-type="horizontal" style="display: inline-block;"-->
+		<div class="tutorial" id="tut3">
+		<span>
+		{% if is_owner %}
+        Once you've selected your preferred times, click Send Invites. Your guests will be notified.
+		{% else %}
+        Once you've selected your preferred times, click Save
+		{% endif %}
+		</span>
+		</div>
+        
 		<button data-role="button" id="savebtn" data-theme="{% if is_owner and not the_event.first_owner_save %}c{%else%}b{%endif%}" data-icon="check" data-iconpos="right">
 		  {% if is_owner and the_event.first_owner_save %}
           Save and Send Invites
@@ -598,6 +603,28 @@ function initpage() {
     	}
     });
 
+    function show_tutorial() {
+        $("#tutorial-overlay").fadeIn(400);
+        $("#tut1").fadeIn(600);
+        setTimeout(function () {
+            $("#tut1").fadeOut(400);
+            $("#tut2").fadeIn(600);
+            setTimeout(function () {
+                $("#tut2").fadeOut(400);
+                $("#tut3").fadeIn(600);
+                $('body').animate({scrollTop: $("#tut3").offset().top});
+                setTimeout(function () {
+                    $("#tut3").fadeOut(400);
+                    $("#tutorial-overlay").fadeOut(400);
+                }, 7000);
+            }, 6000);
+        }, 5000);
+    }
+    
+    {% if show_tutorial %}
+    show_tutorial();
+    {% endif %}
+    
     if ("{{is_owner}}" == "False" && user_selected_slots.length == 0) {
         setTimeout(function(){
             $("#infobox").popup("open");
