@@ -41,15 +41,15 @@
 	  ga('send', 'pageview');
   </script>
 </head>
-<body>
-<!-- Home -->
+<body style="position: relative;">
+
 <div data-role="page" id="page{{pageid}}">
 
 	{% if not hide_header %}
 	<div data-role="panel" id="sidepanel" data-position="left" data-theme="b" data-display="overlay">
 	    <ul data-role="listview">
             <li data-icon="delete" data-theme="a"><a href="#" data-rel="close"></a></li>
-		    <li data-icon="plus" {% if section=="new" %}data-theme="e" {%endif %}><a href="/new" data-ajax=false>New Calendar Event</a></li>
+		    <li data-icon="plus" {% if section=="new" %}data-theme="e" {%endif %}><a href="/new" data-ajax=false>New Event</a></li>
             <!-- li data-icon="plus" {% if section=="newfb" %}data-theme="e" {%endif %}><a href="/fbnew" data-ajax=false>New Facebook Event</a></li-->
 		    <li data-icon="edit" {% if section=="my" %}data-theme="e" {%endif %}><a href="/my" data-ajax=false>My Events</a></li>
 		    <li><a href="/invited" data-ajax=false {% if section=="invited" %}data-theme="e" {%endif %}>Invited To <span class="ui-li-count">{{user.count_invited_to() if user else 0}}</span></a></li>
@@ -72,6 +72,8 @@
 	{%endblock %}
 
     <div data-role="content" class="content-width-limit">
+        <div id="tutorial-overlay"></div>
+    
         {% block flashmsg %}
 	    {% if flashmsg %}
 	        <div id="flashmsg" class="{{flashclass}}"> {{flashmsg|safe}} </div>
@@ -93,20 +95,12 @@
     </div>
     
     <script type="text/javascript">
-    /*var schedupAndroid = {
-    		getGCMRegId : function() {
-    			return "calvados";
-    		}
-    };*/
-    
     $(document).ready(function() {
 	    if (typeof(schedupAndroid) != 'undefined') {
-            //$("#android").show();
 	    	console.log("schedupAndroid = ", schedupAndroid);
 	        setTimeout(function() {
 	            var regid = schedupAndroid.getGCMRegId();
 	            console.log("regid = ", regid);
-	            //$("#android").text("regid = '" + regid + "'");
 	            if (regid != "") {
                     $.ajax("/api/gcmreg/" + regid, {
                         type: "GET",

@@ -96,8 +96,15 @@ class NewEventPage(BaseHandler):
             "location" : "",
             "description" : "",
         }
+        if not self.session.get("new_evt_tut_shown", False):
+            self.session["new_evt_tut_shown"] = True
+            show_tutorial = True
+        else:
+            show_tutorial = False
+            
         return self.render_response("new_event.html", post_url=self.URL, 
-            the_event = fake_event, the_event_guests=[], edit_event = False, section = "new")
+            the_event = fake_event, the_event_guests=[], edit_event = False, section = "new", which="google",
+            show_tutorial = show_tutorial)
 
     @logged_in
     def post(self):
@@ -175,7 +182,8 @@ class EditEventPage(BaseHandler):
                 send_email("%s updated %s" % (self.user.fullname, evt.title),
                     recipient = guest.email,
                     html_body = self.render_template("emails/update.html", 
-                            fullname = self.user.fullname, title = evt.title, token = guest.token),
+                            fullname = self.user.fullname, title = evt.title, token = guest.token,
+                            location = evt.location, description = evt.description)
                 )
             elif self.fbconn:
                 self.fbconn.send_message(guest.email,

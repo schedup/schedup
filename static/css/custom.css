@@ -92,4 +92,32 @@ div[data-role="popup"] {
     max-width:350px;
 }
 
+.tutorial {
+	margin: 15px;
+	text-align: center;
+	display: none;
+	position: relative;
+    z-index: 50;
+}
+.tutorial span {
+	box-shadow: 0 0px 25px 25px yellow, 0 0 3px 2px yellow inset;
+	display: inline-block;
+	padding: 10px;
+	border-radius: 10px;
+	background: white;
+	font-weight: bold;
+	font-size: smaller;
+}
+
+#tutorial-overlay {
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color: black;
+    opacity: 0.5;
+    z-index:20;
+    display: none;
+}
 
