@@ -9,7 +9,11 @@ from schedup.models import EventInfo
 from schedup.base import BaseHandler, maybe_logged_in, logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
+
+from schedup.facebook import FBConnector
+
 from schedup.connector import send_gcm_message
+
 
 
 UTC = tzutc()
@@ -51,11 +55,12 @@ class CalendarPage(BaseHandler):
             hours.update(range(17,23))
         hours = range(min(hours), max(hours)+1)
 
+        user_calendar_events = []
+
         if self.gconn:
             dt_start = datetime(the_event.start_window.year, the_event.start_window.month, the_event.start_window.day, tzinfo = UTC)
             dt_end = dt_start + timedelta(days = (the_event.end_window - the_event.start_window).days + 1)
 
-            user_calendar_events = []
             try:
                 goog_events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
             except Exception:
@@ -100,8 +105,39 @@ class CalendarPage(BaseHandler):
                         "start" : start,
                         "end" : end,
                     })
-        else:
-            user_calendar_events = ()
+        
+        if self.fbconn:
+            try:
+                fb_events = self.fbconn.get_events(the_event.start_window, the_event.end_window)
+            except Exception:
+                logging.error("failed to fetch FB events", exc_info = True)
+                fb_events = ()
+
+            logging.info("fb event=%r", fb_events)
+            
+            for evt in fb_events:
+                try:
+                    if "dateTime" in evt["start"]:
+                        start = parse_datetime(evt["start"]["dateTime"])
+                    elif "date" in evt["start"]:
+                        start = parse_datetime(evt["start"]["date"]).replace(tzinfo = UTC)
+                    else:
+                        raise ValueError("start: no date or dateTime")
+                    if "dateTime" in evt["end"]:
+                        end = parse_datetime(evt["end"]["dateTime"])
+                    elif "date" in evt["end"]:
+                        end = parse_datetime(evt["end"]["date"]).replace(hour=23,minute=59,second=59,tzinfo=UTC)
+                    else:
+                        raise ValueError("end: no date or dateTime")
+                except Exception:
+                    logging.error("bad event: %r", evt, exc_info = True)
+                    continue
+                
+                user_calendar_events.append({
+                    "title" : evt["summary"] + " [FB]", 
+                    "start" : start,
+                    "end" : end,
+                })
         
         user_calendar_votes = []
         for gst in the_event.guests:
@@ -220,11 +256,19 @@ class CalendarPage(BaseHandler):
                 the_event.first_owner_save = False
                 emails_sent = True
                 for guest in the_event.guests:
-                    send_email("%s invited you to %s" % (self.user.fullname, the_event.title),
-                        recipient = guest.email,
-                        html_body = self.render_template("emails/new.html", 
-                                fullname = self.user.fullname, title = the_event.title, token = guest.token),
-                    )
+                    if the_event.source == "google":
+                        send_email("%s invited you to %s" % (self.user.fullname, the_event.title),
+                            recipient = guest.email,
+                            html_body = self.render_template("emails/new.html", 
+                                    fullname = self.user.fullname, title = the_event.title, token = guest.token),
+                        )
+                    elif self.fbconn:
+                        self.fbconn.send_message(guest.email,
+                            "%s invited you to %s" % (self.user.fullname, the_event.title), 
+                            self.render_template("emails/new.html", fullname = self.user.fullname, 
+                                title = the_event.title, token = guest.token)
+                        )
+                    
                     if guest.user:
                         gcm_id = guest.user.get().gcm_id
                         if gcm_id:
@@ -280,12 +324,19 @@ class SendEventPage(BaseHandler):
         logging.info("log: event status = %r", evt.status)
         if evt.status == "pending":    
             evt.status="sent"
-            resp = self.gconn.create_event("primary", event_details, send_notifications = True)
-            evt.evtid = resp["id"]
+            if evt.source == "google":
+                resp = self.gconn.create_event("primary", event_details, send_notifications = True)
+                evt.evtid = resp["id"]
+            else:
+                resp = self.fbconn.create_event(event_details)
+                evt.evtid = resp
             evt.put()
             return self.redirect_with_flashmsg("/my", "The event was added to your calendar", "ok")
         elif evt.status == "sent":
-            resp = self.gconn.update_event("primary", evt.evtid, event_details, send_notifications = True)
+            if evt.source == "google":
+                resp = self.gconn.update_event("primary", evt.evtid, event_details, send_notifications = True)
+            else:
+                resp = self.fbconn.update_event(evt.evtid, event_details)
             return self.redirect_with_flashmsg("/my", "The event was updated in your calendar", "ok")
 
 
@@ -302,7 +353,10 @@ class DeclinePage(BaseHandler):
             the_event.status = "canceled"
             msg = "Event '%s' canceled" % (the_event.title,)
             if the_event.evtid:
-                self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+                if the_event.source == "google":
+                    self.gconn.remove_event("primary", the_event.evtid, send_notifications = True)
+                else:
+                    self.fbconn.cancel_event(the_event.evtid)
                 the_event.evtid = None
         else:
             user.status = "decline"
