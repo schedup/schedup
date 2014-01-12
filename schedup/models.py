@@ -20,7 +20,8 @@ class UserProfile(ndb.Model):
     
     def count_invited_to(self):
         count = 0
-        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending"):
+        mintime = datetime.datetime.today() - timedelta(days = 3)
+        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
             for guest in evt.guests:
                 if guest.user == self.key and guest.status == "pending":
                     count += 1
