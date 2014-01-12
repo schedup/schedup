@@ -383,14 +383,19 @@ class DeclinePage(BaseHandler):
                 else:
                     self.fbconn.cancel_event(the_event.evtid)
                 the_event.evtid = None
+            url = "/my"
         else:
             user.status = "decline"
             user.selected_times = []
             the_event.new_notifications += 1
             msg = "You've declined '%s'" % (the_event.title,)
+            if user.user:
+                url = "/invited"
+            else:
+                url = "/"
         the_event.put()
+        return self.redirect_with_flashmsg(url, msg, "note")
 
-        return self.redirect_with_flashmsg("/", msg, "note")
 
 
 

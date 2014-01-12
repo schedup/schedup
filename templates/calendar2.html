@@ -579,9 +579,9 @@ function initpage() {
     
     $('#decline-btn').on("click", function(event) {
         event.preventDefault();
-        if (confirm("Are you sure you want to {% if is_owner %}cancel{% else %}decline{% endif %} the event?")) {  
-           window.location = '/invited';
-           return true;
+        if (confirm("Are you sure you want to decline the event?")) {
+            window.location = '/decline/{{user_token}}';
+            return true;
         }
         return false;
     });
