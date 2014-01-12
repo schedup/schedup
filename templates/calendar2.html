@@ -580,7 +580,7 @@ function initpage() {
     $('#decline-btn').on("click", function(event) {
         event.preventDefault();
         if (confirm("Are you sure you want to {% if is_owner %}cancel{% else %}decline{% endif %} the event?")) {  
-           window.location = $(this).attr('/invited');
+           window.location = '/invited';
            return true;
         }
         return false;
