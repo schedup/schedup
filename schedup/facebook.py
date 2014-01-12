@@ -140,7 +140,7 @@ class FBConnector(object):
         
     def get_events(self, start_date, end_date):
         q = ("SELECT eid, start_time, end_time, name FROM event " 
-            "WHERE eid IN (SELECT eid FROM event_member WHERE uid = me() AND rsvp_status != 'declined') "
+            "WHERE eid IN (SELECT eid FROM event_member WHERE uid = me() AND rsvp_status = 'attending') "
             "AND start_time >= '%s-%s-%s' AND end_time <= '%s-%s-%s'" % (start_date.year, start_date.month, start_date.day,
                 end_date.year, end_date.month, end_date.day))
         url = "https://graph.facebook.com/fql?%s" % (urllib.urlencode({"q":q, "access_token":self.access_token}))
