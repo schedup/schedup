@@ -11,6 +11,8 @@ class UserProfile(ndb.Model):
     facebook_id = ndb.StringProperty()
     facebook_token = ndb.StringProperty()
     gcm_id = ndb.StringProperty()   # google cloud messaging client ID
+    seen_tutorial1 = ndb.BooleanProperty()
+    seen_tutorial2 = ndb.BooleanProperty()
 
     def get_owner_events(self):
         return EventInfo.query(EventInfo.owner == self.key)
@@ -40,6 +42,8 @@ class EventGuest(ndb.Model):
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
+    seen_tutorial1 = ndb.BooleanProperty()
+    seen_tutorial2 = ndb.BooleanProperty()
     
     @property
     def fullname(self):
@@ -47,6 +51,20 @@ class EventGuest(ndb.Model):
     
     def sanitized_email(self):
         return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
+    
+    def has_seen_tutorial1(self):
+        if self.seen_tutorial1:
+            return True
+        if self.user:
+            return self.user.seen_tutorial1
+        return False
+
+    def has_seen_tutorial2(self):
+        if self.seen_tutorial2:
+            return True
+        if self.user:
+            return self.user.seen_tutorial2
+        return False
 
 
 class EventInfo(ndb.Model):

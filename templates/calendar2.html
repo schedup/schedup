@@ -616,22 +616,22 @@ function initpage() {
                 setTimeout(function () {
                     $("#tut3").fadeOut(400);
                     $("#tutorial-overlay").fadeOut(400);
+                    {% if not is_owner %}
                     setTimeout(function() {
                     	show_infobox();
                     }, 500);
+                    {% endif %}
                 }, 7000);
             }, 6000);
         }, 5000);
     }
     
     function show_infobox() {
-        {% if not is_owner %}        
         if (user_selected_slots.length == 0) {
 	        setTimeout(function(){
 	            $("#infobox").popup("open");
 	        }, 300);
         }
-        {% endif %}
     }
     
     {% if show_tutorial %}

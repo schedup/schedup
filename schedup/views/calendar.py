@@ -183,11 +183,20 @@ class CalendarPage(BaseHandler):
             the_event.new_notifications = 0
             the_event.put()
 
-        if not self.session.get("cal_tut_shown", False):
-            self.session["cal_tut_shown"] = True
-            show_tutorial = True
+        if self.user:
+            if not self.user.seen_tutorial2:
+                self.user.seen_tutorial2 = True
+                self.user.put()
+                show_tutorial = True
+            else:
+                show_tutorial = False
         else:
-            show_tutorial = False
+            if not user.seen_tutorial2:
+                user.seen_tutorial2 = True
+                the_event.put()
+                show_tutorial = True
+            else:
+                show_tutorial = False
 
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 

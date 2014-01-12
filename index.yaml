@@ -53,11 +53,3 @@ indexes:
   - name: owner
   - name: start_window
     direction: desc
-
-- kind: EventInfo
-  properties:
-  - name: guests.status
-  - name: guests.user
-  - name: end_window
-
-  
