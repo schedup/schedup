@@ -202,6 +202,14 @@
           Save Selection
 		  {% endif %}
 		</button>
+		
+	    {% if not is_owner %}
+	    <a href="#" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right"
+	          style="color: rgb(184, 12, 12); text-shadow: 0px 0px 10px rgba(184,12,12,0.3);">
+	        Decline Event
+	    </a>
+	    {% endif %}
+		
 	    {% if is_owner and the_event.owner_selected_times %}
 	    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
 	    data-position-to="window" data-iconpos="right"
@@ -571,9 +579,9 @@ function initpage() {
     
     $('#decline-btn').on("click", function(event) {
         event.preventDefault();
-        if (confirm("Are you sure you want to {% if is_owner %}cancel{% else %}decline{% endif %} the event?")) {  
-           window.location = $(this).attr('href');
-           return true;
+        if (confirm("Are you sure you want to decline the event?")) {
+            window.location = '/decline/{{user_token}}';
+            return true;
         }
         return false;
     });
@@ -616,9 +624,11 @@ function initpage() {
                 setTimeout(function () {
                     $("#tut3").fadeOut(400);
                     $("#tutorial-overlay").fadeOut(400);
+                    {% if not is_owner %}
                     setTimeout(function() {
                     	show_infobox();
                     }, 500);
+                    {% endif %}
                 }, 7000);
             }, 6000);
         }, 5000);
