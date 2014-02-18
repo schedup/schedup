@@ -15,7 +15,7 @@ from datetime import timedelta
 FB_SCOPES = "email,create_event,rsvp_event,user_events,manage_notifications,publish_stream"
 
 if ON_DEV:
-    FB_URI = "http://localhost:8080/fboauth"
+    FB_URI = "http://localhost:9080/fboauth"
 else:
     FB_URI = "http://sched-up.appspot.com/fboauth"
 
