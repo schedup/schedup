@@ -73,12 +73,19 @@
 	   		{% else %}	
 	            <fieldset data-role="controlgroup" data-type="vertical" data-mini="false">
 	       	    {% for best_time, _ in times %}
-		           <input type="radio" name="final_time" value="{{best_time}}" id="final_time-{{loop.index}}">
+		           <input type="radio" name="final_time" class="radioBtn" value="{{best_time}}" id="final_time-{{loop.index}}">
 		           <label for="final_time-{{loop.index}}">
 		           {{best_time.strftime("%H:%M")}}<br><small>{{best_time.strftime("%a, %d %b %Y")}}</small>
 		           </label>
 	       	    {% endfor %}
+	       	  		<input type="radio" name="final_time" class="radioBtn" id="final_time_custom" value="Other">
+		          	<label for="final_time_custom">Pick other time</label>
 	            </fieldset>
+	            {% set default_time = the_event.start_time %}
+	            {% if not the_event.start_time %}
+	            	{% set default_time = times[0][0] %}
+	            {% endif %}
+	            <input type="datetime-local" data-clear-btn="true" disabled="disabled" name="datetime" id="datetime" data-clear-btn="false" value="{{default_time.strftime('%Y-%m-%dT%H:%M')}}">
 	            <fieldset data-role="controlgroup">
 	            	<label for="duration">Duration (hours)</label>
 	            	<input type="range" name="duration" id="duration" data-mini="true" 
@@ -600,6 +607,16 @@ function initpage() {
         }
     });
     
+    $(".radioBtn").click(function() {
+        $("#datetime").attr('disabled', 'disabled');
+        $("#datetime").closest("div").addClass("ui-disabled");
+        if ($("input[name=final_time]:checked").attr('id') == "final_time_custom") {
+            $("#datetime").removeAttr('disabled');
+            $("#datetime").closest("div").removeClass("ui-disabled");
+        }
+    });
+    
+    
     $("#sendInvites").on("submit", function(event){
     	if (!$("input[name='final_time']:checked").val()) {
     		$("#final_time-error").show();
@@ -608,6 +625,12 @@ function initpage() {
     		});
             event.preventDefault();
             return false;
+    	}
+    	var elem = $("input[name=final_time]:checked");
+    	if (elem.attr('id') == "final_time_custom") {
+    		var newTime = $("#datetime").val();
+    		elem.attr("value",newTime);
+    		console.log(elem.val());
     	}
     });
 

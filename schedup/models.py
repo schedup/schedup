@@ -24,8 +24,7 @@ class UserProfile(ndb.Model):
         count = 0
         mintime = datetime.datetime.today() - timedelta(days = 3)
         for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
-            for guest in evt.guests:
-                if guest.user == self.key and guest.status == "pending":
+            if evt.status != "canceled":
                     count += 1
         return count
 
