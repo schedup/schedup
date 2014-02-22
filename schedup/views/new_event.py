@@ -9,6 +9,7 @@ from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from schedup.facebook import generate_random_token, fb_logged_in
 from schedup.connector import send_gcm_message
+from schedup.views.apis import EMAIL_PATTERN
 
 
 class RedirectWithFlash(Exception):
@@ -38,6 +39,8 @@ def create_or_update_event(self, evt, source):
             email, name = email.split("/", 1)
         else:
             name = None
+        if not EMAIL_PATTERN.match(email):
+            raise ValueError("Invalid email %r" % (email,))
         if evt:
             found = False
             for gst in evt.guests:
