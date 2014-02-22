@@ -684,11 +684,11 @@ function initpage() {
         }
     }
     
-    //{# if show_tutorial #}
+    {% if show_tutorial %}
     show_tutorial();
-    //{# elif not is_owner #}
-    //show_infobox();
-    //{# endif #}
+    {% elif not is_owner %}
+    show_infobox();
+    {% endif %}
 }
 
 $(document).ready(function() {

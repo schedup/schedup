@@ -234,9 +234,9 @@
 	        $("#tut2").hide();
 	    }
 	    		
-		//{# if show_tutorial #}
+		{% if show_tutorial %}
 		show_tutorial();
-        //{# endif #}
+        {% endif %}
         
 		$("#newevtform").on("submit", function(event){
 			var succ = true;
