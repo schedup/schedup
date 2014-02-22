@@ -30,9 +30,6 @@ def create_or_update_event(self, evt, source):
     if fromtime > totime:
         raise RedirectWithFlash(self.URL, "Start time is later than end time", "error")
 
-    #clear_votes = evt and (fromtime > evt.start_window or totime < evt.end_window)
-    clear_votes = evt and (fromtime > evt.end_window or totime < evt.start_window)
-    logging.info("clear_votes = %r", clear_votes)
     daytime = self.request.params.getall("when")
     guests = []    
     for email in self.request.params["guests"].split(";"):
@@ -48,26 +45,10 @@ def create_or_update_event(self, evt, source):
                 if gst.email == email:
                     guests.append(gst)
                     found = True
-                    if clear_votes:
-                        gst.selected_times = None
-                    else:
-                        new_selected = []
-                        if not gst.selected_times:
-                            continue
-                        if gst.status != "accept":
-                            continue
-                        for start_time, end_time in gst.selected_times:
-                            if not (end_time.date() < fromtime or start_time.date() > totime):
-                                    #gst.selected_times.remove(start_time,end_time)
-                                    new_selected.append((start_time,end_time))
-                        gst.selected_times = new_selected
-                                    
-                                #user_calendar_votes.append({
-                                 #                           "start" : start_time, 
-                                  #                          "end" : end_time, 
-                                   #                         "user" : self.canonize_email(gst.email)
-                                    #                        })
-        
+                    if not gst.selected_times:
+                        continue
+                    gst.selected_times = [(s, e) for s, e in gst.selected_times
+                        if s.date() >= fromtime and e.date() <= totime]
                     break
             if found:
                 continue
@@ -89,20 +70,10 @@ def create_or_update_event(self, evt, source):
     if not evt:
         evt = EventInfo(owner_token = generate_random_token(TOKEN_SIZE), owner = self.user.key,
             first_owner_save = True, source = source)
+    elif evt.owner_selected_times:
+        evt.owner_selected_times = [(s, e) for s, e in evt.owner_selected_times
+            if s.date() >= fromtime and e.date() <= totime]
     
-    #if clear_votes:
-    #    evt.owner_selected_times = None
-    if clear_votes:
-        evt.owner_selected_times = None
-    else:
-        new_selected = []
-        if evt.owner_selected_times:
-            for start_time, end_time in evt.owner_selected_times:
-                if not (end_time.date() < fromtime or start_time.date() > totime):
-    #gst.selected_times.remove(start_time,end_time)
-                    new_selected.append((start_time,end_time))
-            evt.owner_selected_times = new_selected
-        
     evt.title = title
     evt.location = location
     evt.daytime = daytime

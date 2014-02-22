@@ -282,12 +282,16 @@ class CalendarPage(BaseHandler):
                                     location = the_event.location, description = the_event.description),
                         )
                     elif self.fbconn:
-                        invite = ("$NAME has invite you to the event $TITLE.\nWith our app you can choose your optimal time slots for the event,"
-                                  " during the given time window.\nThen $NAME  will decide on a final time and send you the invitation!\n"
-                                  "For your convenience you can also register to the app with your facebook/google acount!\n"
-                                  "Click here to respond: http://sched-up.appspot.com/cal/$TOKEN".replace("$NAME", self.user.fullname).
-                                                                                                  replace("$TITLE", the_event.title).
-                                                                                                  replace("$TOKEN", guest.token))
+                        invite = ("%(name)s has invite you to the event %(title)s.\n"
+                            "With our app you can choose your optimal time slots for the event, "
+                            "during the given time window.\n"
+                            "Then %(name)s will decide on a final time and send you the invitation!\n"
+                            "For your convenience you can also register to the app with your facebook/google acount!\n"
+                            "Click here to respond: http://sched-up.appspot.com/cal/%(token)s" % {
+                                "name" : self.user.fullname,
+                                "title" : the_event.title,
+                                "token" : guest.token,
+                            })
                         self.fbconn.send_message(guest.email,
                             "%s invited you to %s" % (self.user.fullname, the_event.title), 
                             invite, the_event.start_window, the_event.end_window
