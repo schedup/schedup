@@ -204,22 +204,39 @@
 			return false;
 		});
 		
+		var tut1_timeout = null, tut2_timeout = null;
+		
 		function show_tutorial() {
-	        $("#tutorial-overlay").fadeIn(400);
+	        $("#tutorial-overlay").on("click", kill_tutorial);
+	        $("body").on("keydown.tutorial", function() {
+	            kill_tutorial();
+	            $("body").off("keydown.tutorial");
+	        });
+
+			$("#tutorial-overlay").fadeIn(400);
 	        $("#tut1").fadeIn(600);
-	        setTimeout(function () {
+	        tut1_timeout = setTimeout(function () {
 	            $("#tut1").fadeOut(400);
 	            $("#tut2").fadeIn(600);
-	            setTimeout(function () {
+	            tut2_timeout = setTimeout(function () {
 	                $("#tut2").fadeOut(400);
 	                $("#tutorial-overlay").fadeOut(400);
 	            }, 5000);
 	        }, 5000);
 	    }
 		
-		{% if show_tutorial %}
+	    function kill_tutorial() {
+	        console.log("killing tutorial");
+	        clearTimeout(tut1_timeout);
+	        clearTimeout(tut2_timeout);
+	        $("#tutorial-overlay").fadeOut(400);
+	        $("#tut1").hide();
+	        $("#tut2").hide();
+	    }
+	    		
+		//{# if show_tutorial #}
 		show_tutorial();
-        {% endif %}
+        //{# endif #}
         
 		$("#newevtform").on("submit", function(event){
 			var succ = true;
