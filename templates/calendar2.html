@@ -326,11 +326,10 @@ function initpage() {
     function calendarGridSelect(event, phase) {
         var elem = null;
         if (event.type.indexOf("mouse") == 0) {
-            elem = $(event.toElement);
+            elem = $(event.target);
         }
         else if (event.type.indexOf("touch") == 0) {
             elem = $(document.elementFromPoint(event.changedTouches[0].screenX, event.changedTouches[0].screenY));
-            /*elem = $(event.relatedTarget);*/
         }
         else {
             return;
@@ -678,7 +677,7 @@ function initpage() {
     
     function show_infobox() {
         if (user_selected_slots.length == 0) {
-	        setTimeout(function(){
+	        setTimeout(function() {
 	            $("#infobox").popup("open");
 	        }, 300);
         }
