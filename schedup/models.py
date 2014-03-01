@@ -29,8 +29,9 @@ class UserProfile(ndb.Model):
         return count
 
     def sanitized_email(self):
-        return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
-    
+        good = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890-_'
+        return "".join((ch if ch in good else "_") for ch in self.email)
+
 
 class EventGuest(ndb.Model):
     # always expected to be set (if FB then FB id)

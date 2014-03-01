@@ -596,7 +596,11 @@ function initpage() {
     $(".guestFilterCheckbox.decline").checkboxradio('disable');
 
     $(".guestFilterCheckbox").on("change", function() {
-    	var slots = $(".cal-user-vote.email-" + $(this).data("email"));
+    	try {
+	    	var slots = $(".cal-user-vote.email-" + $(this).data("email"));
+    	} catch (err) {
+    		console.error("oh no", err);
+    	}
         
         if ($(this).is(":checked")) {
         	slots.fadeIn();
