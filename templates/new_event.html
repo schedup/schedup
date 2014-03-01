@@ -90,6 +90,7 @@
 				</div>
 				<div class="input-error" style="max-width:140px" id="todate-error">Required</div>
 				<div class="input-error" style="max-width:140px" id="todate-error2">End date must be later than start date</div>
+				<div class="input-error" style="max-width:140px" id="todate-error3">Start date must be later than today's date</div>
 			</td>
 			</tr>
             {% if edit_event %}
@@ -271,9 +272,26 @@
 				}
                 return {truth:truth,obj:$("#todate")};
 			}
+			function check_startime_gt_now()
+			{
+				console.log($("#fromdate").val());
+				var now= new Date();
+				console.log(now);
+				var truth=$("#fromdate").val() <= now 
+				if (!truth) {
+                    var msg = $("#todate-error3");
+                    msg.show();
+                    function onchg(){
+                        msg.fadeOut();
+                    }
+                    $("#fromdate").change(onchg);
+                    $("#todate").change(onchg);
+				}
+                return {truth:truth,obj:$("#todate")};
+			}
 			
 			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 
-			                   check_when, check_endtime_gt_startime];
+			                   check_when, check_endtime_gt_startime, check_startime_gt_now];
 			
 			for (var i in to_validate) {
 				var selector = to_validate[i];
