@@ -676,7 +676,7 @@ function initpage() {
     }
     
     function show_infobox() {
-        if (user_selected_slots.length == 0) {
+        if ("{{show_info}}" == "True") {
 	        setTimeout(function() {
 	            $("#infobox").popup("open");
 	        }, 300);
@@ -689,8 +689,9 @@ function initpage() {
     show_infobox();
     {% endif %}
 
-    
-    if ("{{is_owner}}" == "False" && "{{show_info}}" == "about to see") {
+    console.log("{{show_info}}");
+    console.log("{{show_info}}" == "True");
+    if ("{{show_info}}" == "True") {
         setTimeout(function(){
             $("#infobox").popup("open");
         }, 300);

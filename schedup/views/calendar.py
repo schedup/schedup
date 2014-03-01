@@ -33,19 +33,20 @@ class CalendarPage(BaseHandler):
         
         
         if is_owner:
-            show_info = "seen"
+            show_info = False
         else:
+            show_info = False
             logging.info("show_info before = %r", user.seenInfo)
             if user.seenInfo == "not seen":
                 user.seenInfo = "about to see"
-                show_info = "about to see"
+                show_info = True
             elif user.seenInfo == "about to see":
                 user.seenInfo = "seen"
-                show_info = "seen"
+                show_info = False
             user.put()
             for gst in the_event.guests:
                 if gst.email == user.email:
-                    gst.seenInfo = show_info
+                    gst.seenInfo = user.seenInfo
                     the_event.put()
                 
         logging.info("show_info after= %r", show_info)
