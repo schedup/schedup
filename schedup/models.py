@@ -8,8 +8,11 @@ class UserProfile(ndb.Model):
     email = ndb.StringProperty(required=True)
     fullname = ndb.StringProperty()
     google_id = ndb.StringProperty()
+    facebook_id = ndb.StringProperty()
     facebook_token = ndb.StringProperty()
     gcm_id = ndb.StringProperty()   # google cloud messaging client ID
+    seen_tutorial1 = ndb.BooleanProperty()
+    seen_tutorial2 = ndb.BooleanProperty()
 
     def get_owner_events(self):
         return EventInfo.query(EventInfo.owner == self.key)
@@ -19,9 +22,9 @@ class UserProfile(ndb.Model):
     
     def count_invited_to(self):
         count = 0
-        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending"):
-            for guest in evt.guests:
-                if guest.user == self.key and guest.status == "pending":
+        mintime = datetime.datetime.today() - timedelta(days = 3)
+        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
+            if evt.status != "canceled":
                     count += 1
         return count
 
@@ -39,13 +42,30 @@ class EventGuest(ndb.Model):
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
     seenInfo = ndb.StringProperty(choices=["not seen", "about to see", "seen"], default="not seen")
+    seen_tutorial1 = ndb.BooleanProperty()
+    seen_tutorial2 = ndb.BooleanProperty()
+
     
     @property
     def fullname(self):
-        return self.user.get().fullname if self.user else self.email
+        return self.user.get().fullname if self.user else (self.name if self.name else self.email)
     
     def sanitized_email(self):
         return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
+    
+    def has_seen_tutorial1(self):
+        if self.seen_tutorial1:
+            return True
+        if self.user:
+            return self.user.seen_tutorial1
+        return False
+
+    def has_seen_tutorial2(self):
+        if self.seen_tutorial2:
+            return True
+        if self.user:
+            return self.user.seen_tutorial2
+        return False
 
 
 class EventInfo(ndb.Model):
@@ -128,7 +148,7 @@ class EventInfo(ndb.Model):
                 while t < end_time:
                     if t not in time_table:
                         time_table[t] = 0
-                    time_table[t] += 1
+                    time_table[t] += 2
                     t += halfhour
         
         # add guest votes (but only if owner votes intersect with them)

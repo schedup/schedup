@@ -10,7 +10,6 @@ from schedup.base import BaseHandler, maybe_logged_in
 from google.appengine.ext import ndb
 from schedup.utils import send_email
 from schedup.connector import send_gcm_message
-import urllib
 
 
 UTC = tzutc()
@@ -77,18 +76,11 @@ class CalendarPage(BaseHandler):
             dt_start = datetime(the_event.start_window.year, the_event.start_window.month, the_event.start_window.day, tzinfo = UTC)
             dt_end = dt_start + timedelta(days = (the_event.end_window - the_event.start_window).days + 1)
 
-
-            user_calendar_events = []
-            if (the_event.source == "google"):
-                try:
-                    events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
-                except Exception:
-                    events = ()
-            else:
-                try:
-                    events = self.fbconn.get_events(the_event.start_window, the_event.end_window)
-                except Exception:
-                    events = ()
+            try:
+                events = self.gconn.get_events("primary", the_event.start_window, the_event.end_window)
+            except Exception:
+                events = ()
+            
             for evt in events:
                 try:
                     if (the_event.source == "facebook"):
@@ -182,7 +174,7 @@ class CalendarPage(BaseHandler):
                     "end" : end_time, 
                     "user" : self.canonize_email(gst.email)
                 })
-               
+        
         user_selected_slots = []
         if is_owner:
             ranges = the_event.owner_selected_times
@@ -211,11 +203,20 @@ class CalendarPage(BaseHandler):
             the_event.new_notifications = 0
             the_event.put()
 
-        if not self.session.get("cal_tut_shown", False):
-            self.session["cal_tut_shown"] = True
-            show_tutorial = True
+        if self.user:
+            if not self.user.seen_tutorial2:
+                self.user.seen_tutorial2 = True
+                self.user.put()
+                show_tutorial = True
+            else:
+                show_tutorial = False
         else:
-            show_tutorial = False
+            if not user.seen_tutorial2:
+                user.seen_tutorial2 = True
+                the_event.put()
+                show_tutorial = True
+            else:
+                show_tutorial = False
 
 #         if is_owner:
 #             continue
@@ -310,12 +311,16 @@ class CalendarPage(BaseHandler):
                                     location = the_event.location, description = the_event.description),
                         )
                     elif self.fbconn:
-                        invite = ("$NAME has invite you to the event $TITLE.\nWith our app you can choose your optimal time slots for the event,"
-                                  " during the given time window.\nThen $NAME  will decide on a final time and send you the invitation!\n"
-                                  "For your convenience you can also register to the app with your facebook/google acount!\n"
-                                  "Click here to respond: http://sched-up.appspot.com/cal/$TOKEN".replace("$NAME", self.user.fullname).
-                                                                                                  replace("$TITLE", the_event.title).
-                                                                                                  replace("$TOKEN", guest.token))
+                        invite = ("%(name)s has invite you to the event %(title)s.\n"
+                            "With our app you can choose your optimal time slots for the event, "
+                            "during the given time window.\n"
+                            "Then %(name)s will decide on a final time and send you the invitation!\n"
+                            "For your convenience you can also register to the app with your facebook/google acount!\n"
+                            "Click here to respond: http://sched-up.appspot.com/cal/%(token)s" % {
+                                "name" : self.user.fullname,
+                                "title" : the_event.title,
+                                "token" : guest.token,
+                            })
                         self.fbconn.send_message(guest.email,
                             "%s invited you to %s" % (self.user.fullname, the_event.title), 
                             invite, the_event.start_window, the_event.end_window
@@ -360,9 +365,9 @@ class SendEventPage(BaseHandler):
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
-        final_time = self.request.get("final_time");
-        evt.start_time = parse_datetime(final_time);
-        evt.duration = int(float(self.request.get("duration"))*60);
+        final_time = self.request.get("final_time")
+        evt.start_time = parse_datetime(final_time)
+        evt.duration = int(float(self.request.get("duration"))*60)
         evt.end_time = evt.start_time + timedelta(minutes=evt.duration)
         event_details = {
             'summary': evt.title,
@@ -411,14 +416,19 @@ class DeclinePage(BaseHandler):
                 else:
                     self.fbconn.cancel_event(the_event.evtid)
                 the_event.evtid = None
+            url = "/my"
         else:
             user.status = "decline"
             user.selected_times = []
             the_event.new_notifications += 1
             msg = "You've declined '%s'" % (the_event.title,)
+            if user.user:
+                url = "/invited"
+            else:
+                url = "/"
         the_event.put()
+        return self.redirect_with_flashmsg(url, msg, "note")
 
-        return self.redirect_with_flashmsg("/", msg, "note")
 
 
 

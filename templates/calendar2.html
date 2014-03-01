@@ -73,14 +73,21 @@
 	   		{% else %}	
 	            <fieldset data-role="controlgroup" data-type="vertical" data-mini="false">
 	       	    {% for best_time, _ in times %}
-		           <input type="radio" name="final_time" value="{{best_time}}" id="final_time-{{loop.index}}">
+		           <input type="radio" name="final_time" class="radioBtn" value="{{best_time}}" id="final_time-{{loop.index}}">
 		           <label for="final_time-{{loop.index}}">
 		           {{best_time.strftime("%H:%M")}}<br><small>{{best_time.strftime("%a, %d %b %Y")}}</small>
 		           </label>
 	       	    {% endfor %}
+	       	  		<input type="radio" name="final_time" class="radioBtn" id="final_time_custom" value="Other">
+		          	<label for="final_time_custom">Pick other time</label>
 	            </fieldset>
+	            {% set default_time = the_event.start_time %}
+	            {% if not the_event.start_time %}
+	            	{% set default_time = times[0][0] %}
+	            {% endif %}
+	            <input type="datetime-local" data-clear-btn="true" disabled="disabled" name="datetime" id="datetime" data-clear-btn="false" value="{{default_time.strftime('%Y-%m-%dT%H:%M')}}">
 	            <fieldset data-role="controlgroup">
-	            	<label for="duration" style="display: table-cell;">Duration (hours)</label>
+	            	<label for="duration">Duration (hours)</label>
 	            	<input type="range" name="duration" id="duration" data-mini="true" 
 	            	  value="{{(the_event.duration // 30) / 2.0}}" min="1" step="0.5" max="5" data-highlight="true">
                 </fieldset>
@@ -202,6 +209,14 @@
           Save Selection
 		  {% endif %}
 		</button>
+		
+	    {% if not is_owner %}
+	    <a href="#" id="decline-btn" data-role="button" data-theme="c" data-icon="delete" data-iconpos="right"
+	          style="color: rgb(184, 12, 12); text-shadow: 0px 0px 10px rgba(184,12,12,0.3);">
+	        Decline Event
+	    </a>
+	    {% endif %}
+		
 	    {% if is_owner and the_event.owner_selected_times %}
 	    <a href="#finalize" id="finalize-btn" data-rel="popup" data-role="button" data-icon="star" data-iconpos="right" data-iconshadow="false"
 	    data-position-to="window" data-iconpos="right"
@@ -311,11 +326,10 @@ function initpage() {
     function calendarGridSelect(event, phase) {
         var elem = null;
         if (event.type.indexOf("mouse") == 0) {
-            elem = $(event.toElement);
+            elem = $(event.target);
         }
         else if (event.type.indexOf("touch") == 0) {
             elem = $(document.elementFromPoint(event.changedTouches[0].screenX, event.changedTouches[0].screenY));
-            /*elem = $(event.relatedTarget);*/
         }
         else {
             return;
@@ -571,9 +585,9 @@ function initpage() {
     
     $('#decline-btn').on("click", function(event) {
         event.preventDefault();
-        if (confirm("Are you sure you want to {% if is_owner %}cancel{% else %}decline{% endif %} the event?")) {  
-           window.location = $(this).attr('href');
-           return true;
+        if (confirm("Are you sure you want to decline the event?")) {
+            window.location = '/decline/{{user_token}}';
+            return true;
         }
         return false;
     });
@@ -592,6 +606,16 @@ function initpage() {
         }
     });
     
+    $(".radioBtn").click(function() {
+        $("#datetime").attr('disabled', 'disabled');
+        $("#datetime").closest("div").addClass("ui-disabled");
+        if ($("input[name=final_time]:checked").attr('id') == "final_time_custom") {
+            $("#datetime").removeAttr('disabled');
+            $("#datetime").closest("div").removeClass("ui-disabled");
+        }
+    });
+    
+    
     $("#sendInvites").on("submit", function(event){
     	if (!$("input[name='final_time']:checked").val()) {
     		$("#final_time-error").show();
@@ -601,39 +625,82 @@ function initpage() {
             event.preventDefault();
             return false;
     	}
+    	var elem = $("input[name=final_time]:checked");
+    	if (elem.attr('id') == "final_time_custom") {
+    		var newTime = $("#datetime").val();
+    		elem.attr("value",newTime);
+    		console.log(elem.val());
+    	}
     });
+    
+    var tut1_timeout = null, tut2_timeout = null, tut3_timeout = null;
 
     function show_tutorial() {
-        $("#tutorial-overlay").fadeIn(400);
+        $("#tutorial-overlay").on("click", kill_tutorial);
+        $("body").on("keydown.tutorial", function() {
+            kill_tutorial();
+            $("body").off("keydown.tutorial");
+        });
+        
+    	$("#tutorial-overlay").fadeIn(400);
         $("#tut1").fadeIn(600);
-        setTimeout(function () {
+        tut1_timeout = setTimeout(function () {
             $("#tut1").fadeOut(400);
             $("#tut2").fadeIn(600);
-            setTimeout(function () {
+            tut2_timeout = setTimeout(function () {
                 $("#tut2").fadeOut(400);
                 $("#tut3").fadeIn(600);
                 $('body').animate({scrollTop: $("#tut3").offset().top});
-                setTimeout(function () {
+                tut3_timeout = setTimeout(function () {
                     $("#tut3").fadeOut(400);
                     $("#tutorial-overlay").fadeOut(400);
+                    {% if not is_owner %}
+                    setTimeout(function() {
+                    	show_infobox();
+                    }, 500);
+                    {% endif %}
                 }, 7000);
             }, 6000);
         }, 5000);
     }
     
+    function kill_tutorial() {
+    	console.log("killing tutorial");
+        clearTimeout(tut1_timeout);
+        clearTimeout(tut2_timeout);
+        clearTimeout(tut3_timeout);
+        $("#tutorial-overlay").fadeOut(400);
+        $("#tut1").hide();
+        $("#tut2").hide();
+        $("#tut3").hide();
+    }
+    
+    function show_infobox() {
+        if (user_selected_slots.length == 0) {
+	        setTimeout(function() {
+	            $("#infobox").popup("open");
+	        }, 300);
+        }
+    }
+    
     {% if show_tutorial %}
     show_tutorial();
+    {% elif not is_owner %}
+    show_infobox();
     {% endif %}
+
     
     if ("{{is_owner}}" == "False" && "{{show_info}}" == "about to see") {
         setTimeout(function(){
             $("#infobox").popup("open");
         }, 300);
     }
+
 }
 
 $(document).ready(function() {
 	setTimeout(initpage, 100);
+	console.log("hello from ready");
 });
 </script>
 

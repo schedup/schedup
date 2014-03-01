@@ -7,7 +7,7 @@ import urllib
 import urlparse
 import json
 from schedup.models import UserProfile
-from schedup.utils import generate_random_token, send_email
+from schedup.utils import generate_random_token
 from dateutil.parser import parse as parse_datetime
 from datetime import timedelta
 
@@ -67,7 +67,10 @@ class FBOauthHandler(BaseHandler):
         
         user = UserProfile.query(UserProfile.email == userinfo["email"]).get()
         if not user:
+            user = UserProfile.query(UserProfile.facebook_id == userinfo["id"]).get()
+        if not user:
             user = UserProfile(email = userinfo["email"], fullname = userinfo["name"])
+        user.facebook_id = userinfo["id"]
         user.facebook_token = access_token
         user.put()
         self.session["fb_email"] = user.email
@@ -101,7 +104,7 @@ class FBConnector(object):
             "(SELECT+uid2+FROM+friend+WHERE+uid1+%3D+me())+and+strpos(lower(name)%2C'$NAME')%3E%3D0+limit+$LIMIT&format=json&"
             "&access_token=$TOKEN")
         req = urllib2.urlopen(url.replace("$NAME", pattern.lower()).replace("$LIMIT", str(limit)).replace("$TOKEN", self.access_token))    
-        return [{"name":item["name"], "id":str(item["uid"])} for item in json.loads(req.read())["data"]]
+        return [{"name":item["name"], "id":"%s/%s" % (item["uid"], item["name"])} for item in json.loads(req.read())["data"]]
 
     def send_message(self, userid, title, body, start_win, end_win):
         start = {'dateTime': start_win.isoformat() + "+02:00",}
@@ -137,7 +140,7 @@ class FBConnector(object):
         
     def get_events(self, start_date, end_date):
         q = ("SELECT eid, start_time, end_time, name FROM event " 
-            "WHERE eid IN (SELECT eid FROM event_member WHERE uid = me() AND rsvp_status != 'declined') "
+            "WHERE eid IN (SELECT eid FROM event_member WHERE uid = me() AND rsvp_status = 'attending') "
             "AND start_time >= '%s-%s-%s' AND end_time <= '%s-%s-%s'" % (start_date.year, start_date.month, start_date.day,
                 end_date.year, end_date.month, end_date.day))
         url = "https://graph.facebook.com/fql?%s" % (urllib.urlencode({"q":q, "access_token":self.access_token}))

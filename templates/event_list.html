@@ -14,11 +14,7 @@
 	  		</li>
     	{% else %}
     	    {% set resp = evt.get_response(user) %}
-  			<li {% if resp == "pending" %} 
-  			    data-theme="e"
-  			    {% elif resp == "decline" %}
-  			    data-theme = "a"
-  			{% endif %}>
+  			<li {% if resp == "pending" %}data-theme="e"{% elif resp == "decline" %}data-theme="a"{% endif %} >
 	   			<a href="/cal/{{evt.get_token_for(user)}}" data-ajax="false">
 	       		<h2>{{ evt.title }}</h2>
 	       		<p class="ui-li-aside"><strong>{{evt.start_window}} - {{evt.end_window}}</strong></p>

@@ -10,6 +10,8 @@ from schedup.utils import send_email
 from schedup.facebook import generate_random_token, fb_logged_in
 from schedup.connector import send_gcm_message
 from datetime import datetime
+from schedup.views.apis import EMAIL_PATTERN
+
 
 class RedirectWithFlash(Exception):
     def __init__(self, url, msg, style):
@@ -34,27 +36,39 @@ def create_or_update_event(self, evt, source):
 
     clear_votes = evt and (fromtime > evt.start_window or totime < evt.end_window)
     logging.info("clear_votes = %r", clear_votes)
+
     daytime = self.request.params.getall("when")
     guests = []    
     for email in self.request.params["guests"].split(";"):
+        if source == "facebook":
+            email, name = email.split("/", 1)
+        else:
+            name = None
+        if not EMAIL_PATTERN.match(email):
+            raise ValueError("Invalid email %r" % (email,))
         if evt:
             found = False
             for gst in evt.guests:
                 if gst.email == email:
                     guests.append(gst)
                     found = True
-                    if clear_votes:
-                        gst.selected_times = None
+                    if not gst.selected_times:
+                        continue
+                    gst.selected_times = [(s, e) for s, e in gst.selected_times
+                        if s.date() >= fromtime and e.date() <= totime]
                     break
             if found:
                 continue
         
         user = UserProfile.query(UserProfile.email == email).get()
+        if not user:
+            user = UserProfile.query(UserProfile.facebook_id == email).get()
+            
         token = generate_random_token(TOKEN_SIZE)
         if user:
-            gst = EventGuest(user = user.key, email = email, token = token)
+            gst = EventGuest(user = user.key, email = email, token = token, name = name)
         else:
-            gst = EventGuest(email=email, token = token)
+            gst = EventGuest(email=email, token = token, name = name)
         logging.info("Guest token %r: %r", email, token)
         guests.append(gst)
     if not guests:
@@ -63,9 +77,10 @@ def create_or_update_event(self, evt, source):
     if not evt:
         evt = EventInfo(owner_token = generate_random_token(TOKEN_SIZE), owner = self.user.key,
             first_owner_save = True, source = source)
+    elif evt.owner_selected_times:
+        evt.owner_selected_times = [(s, e) for s, e in evt.owner_selected_times
+            if s.date() >= fromtime and e.date() <= totime]
     
-    if clear_votes:
-        evt.owner_selected_times = None
     evt.title = title
     evt.location = location
     evt.daytime = daytime
@@ -99,12 +114,13 @@ class NewEventPage(BaseHandler):
             "location" : "",
             "description" : "",
         }
-        if not self.session.get("new_evt_tut_shown", False):
-            self.session["new_evt_tut_shown"] = True
+        if not self.user.seen_tutorial1:
+            self.user.seen_tutorial1 = True
+            self.user.put()
             show_tutorial = True
         else:
             show_tutorial = False
-            
+        
         return self.render_response("new_event.html", post_url=self.URL, 
             the_event = fake_event, the_event_guests=[], edit_event = False, section = "new", which="google",
             show_tutorial = show_tutorial, today = datetime.now())

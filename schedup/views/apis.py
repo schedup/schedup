@@ -5,13 +5,13 @@ APIs for the client-side:
  * Get other people's time slots
 """
 import re
-from schedup.base import BaseHandler, logged_in, json_handler, maybe_logged_in
-from datetime import datetime, timedelta
-from schedup.facebook import fb_logged_in
 import logging
 import json
+from schedup.base import BaseHandler, logged_in, json_handler
+from datetime import datetime, timedelta
+from schedup.facebook import fb_logged_in
 
-EMAIL_PATTERN = re.compile(r".+?@.+?\..+")
+EMAIL_PATTERN = re.compile(r"\S+?@\S+?\.\S+")
 
 
 class AutocompleteContacts(BaseHandler):

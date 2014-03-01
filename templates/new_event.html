@@ -1,7 +1,7 @@
 {% extends "layout.html" %} 
 
 {% block header %} 
-{% if edit_event %}Edit{% else %}New{% endif %} Event
+{% if edit_event %}Edit{% else %}New {% if which=='facebook' %}Facebook{%endif%}{% endif %} Event
 {% endblock %}
 
 {% block content %}
@@ -90,12 +90,13 @@
 				</div>
 				<div class="input-error" style="max-width:140px" id="todate-error">Required</div>
 				<div class="input-error" style="max-width:140px" id="todate-error2">End date must be later than start date</div>
+				<div class="input-error" style="max-width:140px" id="todate-error3">Start date must be later than today's date</div>
 			</td>
 			</tr>
             {% if edit_event %}
 			<tr><td colspan="2">
-			<div style="background: rgba(255,255,0,0.2); border-radius: 8px; padding:10px; margin:5px 0;">Changing the time window will clear 
-			your guests' preferences and will require them to vote again</div>
+			<div style="background: rgba(255,255,0,0.2); border-radius: 8px; padding:10px; margin:5px 0; max-width:500px">
+			Changing the time window will clear time slots that fall out of the new range, requiring your guests to vote again</div>
 			</td></tr>
 			{% endif %}
 			</table>
@@ -144,7 +145,11 @@
 	        $("#guestinput").tokenInput("/api/{% if which=='facebook' %}fb-{%endif%}autocomplete-contacts", {
 	            minChars : 3,
 	            theme : "facebook",
-	            hintText : "Email address or contact name",
+	            {% if which=='facebook' %}
+	            hintText : "Facebook friend name",
+	            {% else %}
+                hintText : "Email address or contact name",
+	            {% endif %}
 	            tokenDelimiter : ";",
 	            preventDuplicates : true,
 	            prePopulate : {{the_event_guests|safe}},
@@ -200,19 +205,36 @@
 			return false;
 		});
 		
+		var tut1_timeout = null, tut2_timeout = null;
+		
 		function show_tutorial() {
-	        $("#tutorial-overlay").fadeIn(400);
+	        $("#tutorial-overlay").on("click", kill_tutorial);
+	        $("body").on("keydown.tutorial", function() {
+	            kill_tutorial();
+	            $("body").off("keydown.tutorial");
+	        });
+
+			$("#tutorial-overlay").fadeIn(400);
 	        $("#tut1").fadeIn(600);
-	        setTimeout(function () {
+	        tut1_timeout = setTimeout(function () {
 	            $("#tut1").fadeOut(400);
 	            $("#tut2").fadeIn(600);
-	            setTimeout(function () {
+	            tut2_timeout = setTimeout(function () {
 	                $("#tut2").fadeOut(400);
 	                $("#tutorial-overlay").fadeOut(400);
 	            }, 5000);
 	        }, 5000);
 	    }
 		
+	    function kill_tutorial() {
+	        console.log("killing tutorial");
+	        clearTimeout(tut1_timeout);
+	        clearTimeout(tut2_timeout);
+	        $("#tutorial-overlay").fadeOut(400);
+	        $("#tut1").hide();
+	        $("#tut2").hide();
+	    }
+	    		
 		{% if show_tutorial %}
 		show_tutorial();
         {% endif %}
@@ -250,9 +272,26 @@
 				}
                 return {truth:truth,obj:$("#todate")};
 			}
+			function check_startime_gt_now()
+			{
+				console.log($("#fromdate").val());
+				var now= new Date();
+				console.log(now);
+				var truth=$("#fromdate").val() <= now 
+				if (!truth) {
+                    var msg = $("#todate-error3");
+                    msg.show();
+                    function onchg(){
+                        msg.fadeOut();
+                    }
+                    $("#fromdate").change(onchg);
+                    $("#todate").change(onchg);
+				}
+                return {truth:truth,obj:$("#todate")};
+			}
 			
 			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 
-			                   check_when, check_endtime_gt_startime];
+			                   check_when, check_endtime_gt_startime, check_startime_gt_now];
 			
 			for (var i in to_validate) {
 				var selector = to_validate[i];

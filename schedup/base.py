@@ -138,6 +138,7 @@ def maybe_logged_in(method):
                         self.fbconn = None
                 else:
                     self.gconn = None
+                    self.fbconn = None
                     self.user = None
                 return method(self, *args)
             return aware(self, *args)
