@@ -43,12 +43,12 @@ class CalendarPage(BaseHandler):
             elif user.seenInfo == "about to see":
                 user.seenInfo = "seen"
                 show_info = False
-            user.put()
             for gst in the_event.guests:
                 if gst.email == user.email:
                     gst.seenInfo = user.seenInfo
                     the_event.put()
-                
+            user.put()
+
         logging.info("show_info after= %r", show_info)
         
         days = []
