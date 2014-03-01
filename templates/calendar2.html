@@ -625,7 +625,7 @@ function initpage() {
     show_tutorial();
     {% endif %}
     
-    if ("{{is_owner}}" == "False" && user_selected_slots.length == 0) {
+    if ("{{is_owner}}" == "False" && "{{show_info}}" == "about to see") {
         setTimeout(function(){
             $("#infobox").popup("open");
         }, 300);
