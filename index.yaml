@@ -19,6 +19,12 @@ indexes:
 
 - kind: EventInfo
   properties:
+  - name: guests.status
+  - name: guests.user
+  - name: end_window
+
+- kind: EventInfo
+  properties:
   - name: guests.user
   - name: end_window
 
