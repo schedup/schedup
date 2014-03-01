@@ -688,6 +688,14 @@ function initpage() {
     {% elif not is_owner %}
     show_infobox();
     {% endif %}
+
+    
+    if ("{{is_owner}}" == "False" && "{{show_info}}" == "about to see") {
+        setTimeout(function(){
+            $("#infobox").popup("open");
+        }, 300);
+    }
+
 }
 
 $(document).ready(function() {

@@ -31,6 +31,25 @@ class CalendarPage(BaseHandler):
         
         logging.info("the_event = %r", the_event)
         
+        
+        if is_owner:
+            show_info = "seen"
+        else:
+            logging.info("show_info before = %r", user.seenInfo)
+            if user.seenInfo == "not seen":
+                user.seenInfo = "about to see"
+                show_info = "about to see"
+            elif user.seenInfo == "about to see":
+                user.seenInfo = "seen"
+                show_info = "seen"
+            user.put()
+            for gst in the_event.guests:
+                if gst.email == user.email:
+                    gst.seenInfo = show_info
+                    the_event.put()
+                
+        logging.info("show_info after= %r", show_info)
+        
         days = []
         s = the_event.start_window
         
@@ -160,6 +179,7 @@ class CalendarPage(BaseHandler):
         if is_owner:
             ranges = the_event.owner_selected_times
         else:
+            
             ranges = user.selected_times
             owner_email = the_event.owner.get().email
             if the_event.owner_selected_times:
@@ -198,6 +218,14 @@ class CalendarPage(BaseHandler):
             else:
                 show_tutorial = False
 
+#         if is_owner:
+#             continue
+#         else:
+#             if user.seenInfo == "not seen":
+#                 user.seenInfo = "about to see"
+#             elif user.seenInfo == "about to see":
+#                 user.seenInfo = "seen"
+
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
@@ -212,6 +240,7 @@ class CalendarPage(BaseHandler):
             is_logged_in = self.user is not None,
             dont_overlay_header = True,
             show_tutorial = show_tutorial,
+            show_info = show_info,
         )
         
     @staticmethod

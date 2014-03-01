@@ -9,6 +9,7 @@ from schedup.models import UserProfile, EventInfo, EventGuest
 from schedup.utils import send_email
 from schedup.facebook import generate_random_token, fb_logged_in
 from schedup.connector import send_gcm_message
+from datetime import datetime
 from schedup.views.apis import EMAIL_PATTERN
 
 
@@ -29,6 +30,12 @@ def create_or_update_event(self, evt, source):
     totime = parse_datetime(self.request.params["todate"]).date()
     if fromtime > totime:
         raise RedirectWithFlash(self.URL, "Start time is later than end time", "error")
+
+    if fromtime < datetime.now().date():
+        raise RedirectWithFlash(self.URL, "Start time is in the past", "error")
+
+    clear_votes = evt and (fromtime > evt.start_window or totime < evt.end_window)
+    logging.info("clear_votes = %r", clear_votes)
 
     daytime = self.request.params.getall("when")
     guests = []    
@@ -116,7 +123,7 @@ class NewEventPage(BaseHandler):
         
         return self.render_response("new_event.html", post_url=self.URL, 
             the_event = fake_event, the_event_guests=[], edit_event = False, section = "new", which="google",
-            show_tutorial = show_tutorial)
+            show_tutorial = show_tutorial, today = datetime.now())
 
     @logged_in
     def post(self):
@@ -146,11 +153,12 @@ class NewFBEventPage(BaseHandler):
             "description" : "",
         }
         return self.render_response("new_event.html", post_url=self.URL, 
-            the_event = fake_event, the_event_guests=[], edit_event = False, section = "newfb", which = "facebook")
+            the_event = fake_event, the_event_guests=[], edit_event = False, section = "newfb", which = "facebook", today = datetime.now())
 
     @logged_in
     def post(self):
         try:
+            logging.info("guests: %r", self.request.params["guests"])
             evt = create_or_update_event(self, None, "facebook")
         except RedirectWithFlash as ex:
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)

@@ -18,7 +18,7 @@ class UserProfile(ndb.Model):
         return EventInfo.query(EventInfo.owner == self.key)
     
     def get_participating_events(self):
-        return EventInfo.query(EventInfo.guests.user == self.key)
+        return EventInfo.query(EventInfo.guests.email == self.email)
     
     def count_invited_to(self):
         count = 0
@@ -41,8 +41,10 @@ class EventGuest(ndb.Model):
     token = ndb.StringProperty()
     selected_times= ndb.PickleProperty()
     status = ndb.StringProperty(choices=["accept","decline","pending"], default="pending")
+    seenInfo = ndb.StringProperty(choices=["not seen", "about to see", "seen"], default="not seen")
     seen_tutorial1 = ndb.BooleanProperty()
     seen_tutorial2 = ndb.BooleanProperty()
+
     
     @property
     def fullname(self):
