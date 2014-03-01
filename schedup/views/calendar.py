@@ -215,14 +215,6 @@ class CalendarPage(BaseHandler):
             else:
                 show_tutorial = False
 
-#         if is_owner:
-#             continue
-#         else:
-#             if user.seenInfo == "not seen":
-#                 user.seenInfo = "about to see"
-#             elif user.seenInfo == "about to see":
-#                 user.seenInfo = "seen"
-
         logging.info("going to calendar2.html. days = %r, hours = %r, user_token = %r, post_url = %r, is_owner = %r" % (days, hours, user_token, "/cal/%s" % (user_token,), is_owner))
         self.render_response("calendar2.html", 
             days = days,
