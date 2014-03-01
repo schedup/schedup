@@ -52,7 +52,8 @@ class EventGuest(ndb.Model):
         return self.user.get().fullname if self.user else (self.name if self.name else self.email)
     
     def sanitized_email(self):
-        return self.email.replace(".", "_").replace("+", "_").replace("-", "_").replace("@", "_")
+        good = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890-_'
+        return "".join((ch if ch in good else "_") for ch in self.email)
     
     def has_seen_tutorial1(self):
         if self.seen_tutorial1:

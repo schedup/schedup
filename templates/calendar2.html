@@ -600,6 +600,7 @@ function initpage() {
 	    	var slots = $(".cal-user-vote.email-" + $(this).data("email"));
     	} catch (err) {
     		console.error("oh no", err);
+    		return;
     	}
         
         if ($(this).is(":checked")) {
