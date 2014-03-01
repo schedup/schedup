@@ -35,6 +35,7 @@ class CalendarPage(BaseHandler):
         if is_owner:
             show_info = "seen"
         else:
+            show_info = "seen"
             logging.info("show_info before = %r", user.seenInfo)
             if user.seenInfo == "not seen":
                 user.seenInfo = "about to see"

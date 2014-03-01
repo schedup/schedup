@@ -690,7 +690,7 @@ function initpage() {
     {% endif %}
 
     
-    if ("{{is_owner}}" == "False" && "{{show_info}}" == "about to see") {
+    if ("{{is_owner}}" == "False" && {{show_info}} == "about to see") {
         setTimeout(function(){
             $("#infobox").popup("open");
         }, 300);
