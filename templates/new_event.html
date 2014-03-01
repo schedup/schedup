@@ -274,10 +274,8 @@
 			}
 			function check_startime_gt_now()
 			{
-				console.log($("#fromdate").val());
-				var now= new Date();
-				console.log(now);
-				var truth=$("#fromdate").val() <= now 
+				var today = new Date();
+				var truth=$("#fromdate").datebox("getTheDate") >= today 
 				if (!truth) {
                     var msg = $("#todate-error3");
                     msg.show();
