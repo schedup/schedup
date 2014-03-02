@@ -115,14 +115,26 @@ class FBConnector(object):
         return req
     
     def create_event(self, event_info):
-        data = urllib.urlencode(dict(
-            name = event_info["summary"],
-            start_time = event_info["start"]["dateTime"],
-            end_time = event_info["end"]["dateTime"],
-            description = event_info["description"],
-            location = event_info["location"],
-            privacy_type = "SECRET",
-        ))
+        logging.info(event_info["end"])
+        logging.info(event_info["end"]["dateTime"])
+        
+        if event_info["end"]["dateTime"] == event_info["start"]["dateTime"]:
+            data = urllib.urlencode(dict(
+                                         name = event_info["summary"],
+                                         start_time = event_info["start"]["dateTime"],
+                                         description = event_info["description"],
+                                         location = event_info["location"],
+                                         privacy_type = "SECRET",
+                                         ))
+        else:
+            data = urllib.urlencode(dict(
+                                         name = event_info["summary"],
+                                         start_time = event_info["start"]["dateTime"],
+                                         end_time = event_info["end"]["dateTime"],
+                                         description = event_info["description"],
+                                         location = event_info["location"],
+                                         privacy_type = "SECRET",
+                                         ))
         req = urllib2.urlopen("https://graph.facebook.com/me/events?access_token=%s" % (self.access_token,), data)
         raw = req.read()
         ans = json.loads(raw)
