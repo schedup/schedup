@@ -44,8 +44,8 @@ def create_or_update_event(self, evt, source):
             email, name = email.split("/", 1)
         else:
             name = None
-        if not EMAIL_PATTERN.match(email):
-            raise ValueError("Invalid email %r" % (email,))
+            if not EMAIL_PATTERN.match(email):
+                raise ValueError("Invalid email %r" % (email,))
         if evt:
             found = False
             for gst in evt.guests:
