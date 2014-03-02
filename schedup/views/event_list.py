@@ -38,11 +38,20 @@ class InvitedToPage(BaseHandler):
     @logged_in
     def get(self):
         mintime = datetime.now() - timedelta(days = 3)
+        
+        events_cal = [evt for evt in 
+                self.user.get_participating_events().filter(EventInfo.end_window >= mintime).order(EventInfo.end_window) 
+                if evt.status != "canceled" and (not evt.end_time or evt.end_time >= mintime)]
+        
+        events_fb = [evt for evt in 
+                self.user.get_participating_events_fb().filter(EventInfo.end_window >= mintime).order(EventInfo.end_window) 
+                if evt.status != "canceled" and (not evt.end_time or evt.end_time >= mintime)]
+        
+        
+        
         self.render_response("event_list.html", 
             title = "Invited To", 
-            events = [evt for evt in 
-                self.user.get_participating_events().filter(EventInfo.end_window >= mintime).order(EventInfo.end_window) 
-                if evt.status != "canceled" and (not evt.end_time or evt.end_time >= mintime)],
+            events = events_cal + events_fb,
             owner = False,
             section="invited",
         )
