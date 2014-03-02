@@ -90,8 +90,8 @@
 				</div>
 				<div class="input-error" style="max-width:140px" id="todate-error">Required</div>
 				<div class="input-error" style="max-width:140px" id="todate-error2">End date must be later than start date</div>
-				<div class="input-error" style="max-width:140px" id="todate-error3">Start date must be later than today's date</div>
 			</td>
+			<div class="input-error" style="max-width:140px" id="todate-error3">Time window must not be in the past</div>				
 			</tr>
             {% if edit_event %}
 			<tr><td colspan="2">
@@ -285,7 +285,7 @@
                     $("#fromdate").change(onchg);
                     $("#todate").change(onchg);
 				}
-                return {truth:truth,obj:$("#todate")};
+                return {truth:truth};
 			}
 			
 			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 

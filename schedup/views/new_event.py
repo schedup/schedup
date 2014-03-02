@@ -31,8 +31,8 @@ def create_or_update_event(self, evt, source):
     if fromtime > totime:
         raise RedirectWithFlash(self.URL, "Start time is later than end time", "error")
 
-    if fromtime < datetime.now().date():
-        raise RedirectWithFlash(self.URL, "Start time is in the past", "error")
+    if totime < datetime.now().date():
+        raise RedirectWithFlash(self.URL, "Time window is in the past", "error")
 
     clear_votes = evt and (fromtime > evt.start_window or totime < evt.end_window)
     logging.info("clear_votes = %r", clear_votes)
