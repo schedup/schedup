@@ -103,7 +103,8 @@ class FBConnector(object):
         url = ("https://graph.facebook.com/fql?q=select+uid%2C+name+from+user+where+uid+in+"
             "(SELECT+uid2+FROM+friend+WHERE+uid1+%3D+me())+and+strpos(lower(name)%2C'$NAME')%3E%3D0+limit+$LIMIT&format=json&"
             "&access_token=$TOKEN")
-        req = urllib2.urlopen(url.replace("$NAME", pattern.lower()).replace("$LIMIT", str(limit)).replace("$TOKEN", self.access_token))    
+        req = urllib2.urlopen(url.replace("$NAME", pattern.lower()).replace("$LIMIT", str(limit)).replace("$TOKEN", self.access_token)) 
+         
         return [{"name":item["name"], "id":"%s/%s" % (item["uid"], item["name"])} for item in json.loads(req.read())["data"]]
 
     def send_message(self, userid, title, body, start_win, end_win):

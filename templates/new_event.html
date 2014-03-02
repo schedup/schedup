@@ -275,16 +275,16 @@
 			function check_startime_gt_now()
 			{
 				var today = new Date();
-				today.setHours(23);
-				today.setMinutes(59);
-				today.setSeconds(59);
-				today.setDate(today.getDate()-1);
-				
+				var todateval = new Date($("#todate").val());
+ 				today.setHours(0);
+ 				today.setMinutes(0);
+ 				today.setSeconds(0);
+			
 				console.log($("#fromdate").datebox("getTheDate"));
 				console.log($("#todate").datebox("getTheDate"));		
 				console.log(today);
 				
-				var truth=$("#todate").datebox("getTheDate") >= today 
+				var truth=todateval >= today; 
 				
 				console.log(truth);
 				

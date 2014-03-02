@@ -41,6 +41,7 @@ def create_or_update_event(self, evt, source):
     guests = []    
     for email in self.request.params["guests"].split(";"):
         if source == "facebook":
+            logging.info("the user is: %r ", email)
             email, name = email.split("/", 1)
         else:
             name = None
@@ -177,12 +178,17 @@ class EditEventPage(BaseHandler):
         if not evt:
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
         
+        if (evt.source == "facebook"):
+            event_guests = json.dumps([{"id":("%s/%s" % (gst.email, gst.fullname)), "name":gst.fullname} for gst in evt.guests])
+        else:
+            event_guests = json.dumps([{"id":gst.email, "name":gst.fullname} for gst in evt.guests])
+        
         self.render_response("new_event.html", 
             post_url = "/edit/%s" % (owner_token,),
             user_token = owner_token,
             the_event = evt,
             edit_event = True,
-            the_event_guests = json.dumps([{"id":gst.email, "name":gst.fullname} for gst in evt.guests]),
+            the_event_guests = event_guests,
             section=None,
         )
     
@@ -193,7 +199,7 @@ class EditEventPage(BaseHandler):
             return self.redirect_with_flashmsg("/", "Invalid token!", "error")
 
         try:
-            create_or_update_event(self, evt, None)
+            create_or_update_event(self, evt, evt.source)
         except RedirectWithFlash as ex:
             return self.redirect_with_flashmsg(ex.url, ex.msg, ex.style)
         
@@ -206,10 +212,19 @@ class EditEventPage(BaseHandler):
                             location = evt.location, description = evt.description)
                 )
             elif self.fbconn:
+                invite = ("%(name)s has updated the event %(title)s.\n"
+                            "With our app you can choose your optimal time slots for the event, "
+                            "during the given time window.\n"
+                            "Then %(name)s will decide on a final time and send you the invitation!\n"
+                            "For your convenience you can also register to the app with your facebook/google acount!\n"
+                            "Click here to respond: http://sched-up.appspot.com/cal/%(token)s" % {
+                                "name" : self.user.fullname,
+                                "title" : evt.title,
+                                "token" : guest.token,
+                            })
                 self.fbconn.send_message(guest.email,
                     "%s invited you to %s" % (self.user.fullname, evt.title), 
-                    self.render_template("emails/new.html", fullname = self.user.fullname, 
-                        title = evt.title, token = guest.token)
+                    invite, evt.start_window, evt.end_window
                 )
             
             if guest.user:
