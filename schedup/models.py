@@ -30,9 +30,11 @@ class UserProfile(ndb.Model):
         mintime = datetime.datetime.today() - timedelta(days = 3)
         for evt in EventInfo.query(EventInfo.guests.email == self.email, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
             if evt.status != "canceled":
+                    logging.info("TITLE: %r", evt.title)
                     count += 1
         for evt in EventInfo.query(EventInfo.guests.email == self.facebook_id, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
             if evt.status != "canceled":
+                    logging.info("TITLE: %r", evt.title)
                     count += 1
         return count
 
