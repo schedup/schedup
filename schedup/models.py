@@ -2,7 +2,7 @@ import time
 from google.appengine.ext import ndb
 from datetime import timedelta
 import datetime
-
+import logging
 
 class UserProfile(ndb.Model):
     email = ndb.StringProperty(required=True)
@@ -18,7 +18,8 @@ class UserProfile(ndb.Model):
         return EventInfo.query(EventInfo.owner == self.key)
     
     def get_participating_events(self):
-        return EventInfo.query(EventInfo.guests.email == self.email)
+        logging.info("CHECK: %r",self.facebook_id)
+        return EventInfo.query(EventInfo.guests.email == self.email or EventInfo.guests.email == self.facebook_id)
     
     def count_invited_to(self):
         count = 0
