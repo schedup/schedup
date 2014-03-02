@@ -275,6 +275,8 @@
 			function check_startime_gt_now()
 			{
 				var today = new Date();
+				console.log($("#fromdate").datebox("getTheDate"));
+				console.log($("#todate").datebox("getTheDate"));				
 				var truth=$("#fromdate").datebox("getTheDate") >= today 
 				if (!truth) {
                     var msg = $("#todate-error3");
@@ -285,7 +287,7 @@
                     $("#fromdate").change(onchg);
                     $("#todate").change(onchg);
 				}
-                return {truth:truth,obj:$("#todate")};
+                return {truth:truth,obj:$("#fromdate")};
 			}
 			
 			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 
