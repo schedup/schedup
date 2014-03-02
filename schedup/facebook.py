@@ -213,7 +213,7 @@ class FBConnector(object):
     
     def cancel_event(self, event_id):
         resp = del_url('https://graph.facebook.com/%s?access_token=%s' % (event_id, self.access_token))
-        logging.info("DELETE: %r", resp.read())
+        #logging.info("DELETE: %r", resp.read())
 
 
 def del_url(url):
