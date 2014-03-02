@@ -28,7 +28,10 @@ class UserProfile(ndb.Model):
     def count_invited_to(self):
         count = 0
         mintime = datetime.datetime.today() - timedelta(days = 3)
-        for evt in EventInfo.query(EventInfo.guests.user == self.key, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
+        for evt in EventInfo.query(EventInfo.guests.email == self.email, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
+            if evt.status != "canceled":
+                    count += 1
+        for evt in EventInfo.query(EventInfo.guests.email == self.facebook_id, EventInfo.guests.status == "pending").filter(EventInfo.end_window >= mintime):
             if evt.status != "canceled":
                     count += 1
         return count
