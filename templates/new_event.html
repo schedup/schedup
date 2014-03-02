@@ -275,7 +275,19 @@
 			function check_startime_gt_now()
 			{
 				var today = new Date();
-				var truth=$("#fromdate").datebox("getTheDate") >= today 
+				today.setHours(23);
+				today.setMinutes(59);
+				today.setSeconds(59);
+				today.setDate(today.getDate()-1);
+				
+				console.log($("#fromdate").datebox("getTheDate"));
+				console.log($("#todate").datebox("getTheDate"));		
+				console.log(today);
+				
+				var truth=$("#todate").datebox("getTheDate") >= today 
+				
+				console.log(truth);
+				
 				if (!truth) {
                     var msg = $("#todate-error3");
                     msg.show();
@@ -286,6 +298,7 @@
                     $("#todate").change(onchg);
 				}
                 return {truth:truth};
+
 			}
 			
 			var to_validate = ["#titleinput", "#guestinput", "#fromdate", "#todate", 
