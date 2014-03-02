@@ -190,6 +190,7 @@ class EditEventPage(BaseHandler):
             edit_event = True,
             the_event_guests = event_guests,
             section=None,
+            which = evt.source,
         )
     
     @logged_in

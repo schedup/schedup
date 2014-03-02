@@ -145,6 +145,10 @@ class FBConnector(object):
         event_id = ans["id"]
 
         #logging.info("guest: %r, guest id: %r", event_info["attendees"], event_info["attendees"]["email"])
+        
+        for att in event_info["attendees"]:
+            logging.info("ATT[EMAIL]: %r",att["email"])
+        
         req = urllib2.urlopen("https://graph.facebook.com/%s/invited?access_token=%s&users=%s" % (
             event_id, self.access_token, ",".join(att["email"] for att in event_info["attendees"])), " ")
         req.read()
